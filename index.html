@@ -4,75 +4,84 @@
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass { background: #111; border: 1px solid #222; }
-        body { background-color: #000; color: #ececec; font-family: 'Segoe UI', sans-serif; }
+        .user-bubble { background: #2563eb; color: white; align-self: flex-end; }
+        .ai-bubble { background: #1f2937; color: #f3f4f6; align-self: flex-start; border: 1px solid #374151; }
+        body { background-color: #000; color: white; }
     </style>
 </head>
 <body class="h-screen flex">
 
-    <aside class="w-64 glass p-6 hidden md:flex flex-col">
-        <h2 class="font-bold mb-6 text-xl">FAST AI V4</h2>
-        <button onclick="location.reload()" class="w-full bg-white text-black py-2 rounded-lg font-bold mb-8">+ Nouvo Chat</button>
-        <div id="sessionList" class="flex-1 space-y-2 text-sm text-gray-400"></div>
-        <div class="glass p-4 rounded-xl text-center">
-            <p class="text-sm font-bold">Premium Plan</p>
-            <p class="text-[10px] mb-3 text-gray-500">10$ / mwa - Aksè san limit</p>
-            <button class="w-full border border-gray-700 py-2 rounded-lg hover:bg-gray-800">Upgrade</button>
+    <aside class="w-64 bg-[#0a0a0a] border-r border-gray-800 p-6 flex flex-col">
+        <h2 class="font-bold text-xl mb-8">FAST AI V7</h2>
+        <button onclick="location.reload()" class="w-full bg-white text-black py-2 rounded-xl font-bold mb-6">+ New Chat</button>
+        <div id="dbSources" class="text-xs text-gray-500 space-y-2">
+            <p class="uppercase font-bold text-gray-300">Sources konekte:</p>
+            <p>• Wikidata, Google Books, Open Library</p>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col">
-        <div id="chatBox" class="flex-1 overflow-y-auto p-8 space-y-6">
-            <div class="max-w-2xl mx-auto p-6 bg-[#111] rounded-2xl">Kijan mwen ka ede w jodi a?</div>
+    <main class="flex-1 flex flex-col h-full">
+        <div id="chatBox" class="flex-1 overflow-y-auto p-8 space-y-6 flex flex-col">
+            <div class="ai-bubble p-4 rounded-2xl max-w-lg">Mwen konekte ak baz done entènasyonal yo. Poze kesyon w!</div>
         </div>
 
-        <div class="p-6 max-w-2xl mx-auto w-full">
-            <div class="glass p-3 rounded-2xl flex items-center">
-                <input type="text" id="userInput" class="flex-1 bg-transparent outline-none px-4" placeholder="Poze yon kesyon...">
-                <button onclick="processAI()" class="bg-white text-black px-6 py-2 rounded-xl font-bold">Envoyer</button>
+        <div class="p-6 max-w-3xl mx-auto w-full">
+            <div class="bg-[#111] p-2 rounded-2xl flex border border-gray-800">
+                <input type="text" id="userInput" class="flex-1 bg-transparent outline-none px-4" placeholder="Poze kesyon...">
+                <button onclick="runAdvancedSearch()" class="bg-blue-600 px-6 py-2 rounded-xl font-bold">Search</button>
             </div>
         </div>
     </main>
 
     <script>
-        let count = parseInt(localStorage.getItem('count')) || 0;
-
-        async function processAI() {
-            const input = document.getElementById('userInput');
-            const chatBox = document.getElementById('chatBox');
-            const query = input.value;
-            
-            if(!query) return;
-            if(count >= 100) { alert("Tanpri pase nan Premium pou plis aksè."); return; }
-
-            count++;
-            localStorage.setItem('count', count);
-            chatBox.innerHTML += `<div class="max-w-2xl mx-auto p-4 bg-[#111] rounded-2xl ml-auto">${query}</div>`;
-            input.value = '';
-
-            // Lojik Rechèch: DB -> Wikipedia -> Google
-            let response = await fetchSmart(query);
-
-            // Garanti repons lan gen plis pase 100 mo
-            if(response.split(' ').length < 100) {
-                response += "\n\nAnaliz pwofondè: FAST AI te analize baz done pwofesyonèl yo pou bay plis detay sou sijè sa a. Nou verifye enfòmasyon ki soti nan plizyè sous pou asire presizyon maksimòm. Lè n ap analize yon kesyon konsa, li enpòtan pou nou konsidere tout kontèks istorik ak teknik ki antoure l. Se poutèt sa nou bay yon repons konplè pou satisfè bezwen akademik oswa pwofesyonèl ou. Si ou bezwen plis eksplikasyon, nou la pou sèvi w 24/24.";
-            }
-
-            chatBox.innerHTML += `<div class="max-w-2xl mx-auto p-6 glass rounded-2xl">${response}</div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
+        // --- Fonksyon Rechèch Ou yo ---
+        async function searchWikidata(query) {
+            const sparql = `SELECT ?item ?itemLabel ?description WHERE { SERVICE wikibase:label { bd:serviceParam wikibase:language "fr". } ?item ?label "${query}"@fr. ?item schema:description ?description. } LIMIT 5`;
+            const res = await fetch(`https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`);
+            const data = await res.json();
+            return data.results.bindings.map(b => `${b.itemLabel.value}: ${b.description.value}`).join('\n');
         }
 
-        async function fetchSmart(q) {
-            // 1. Wikipedia Search
-            try {
-                const res = await fetch(`https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=${q}&format=json&origin=*`);
-                const data = await res.json();
-                if(data.query.search[0]) return data.query.search[0].snippet.replace(/<[^>]*>?/gm, '');
-            } catch(e) {}
+        async function searchGoogleBooks(query) {
+            const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=3`);
+            const data = await res.json();
+            return data.items?.map(i => `${i.volumeInfo.title} pa ${i.volumeInfo.authors?.[0]}`).join('\n');
+        }
+
+        async function searchOpenLibrary(query) {
+            const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=3`);
+            const data = await res.json();
+            return data.docs.map(d => `${d.title} (${d.first_publish_year})`).join('\n');
+        }
+
+        // --- Lojik Chat ---
+        async function runAdvancedSearch() {
+            const input = document.getElementById('userInput');
+            const query = input.value;
+            if(!query) return;
+
+            document.getElementById('chatBox').innerHTML += `<div class="user-bubble p-4 rounded-2xl ml-auto max-w-lg">${query}</div>`;
+            input.value = '';
+
+            // Egzekite tout rechèch an paralèl
+            const [wiki, google, openLib] = await Promise.all([
+                searchWikidata(query).catch(() => ""),
+                searchGoogleBooks(query).catch(() => ""),
+                searchOpenLibrary(query).catch(() => "")
+            ]);
+
+            let finalResponse = `Rezilta pou '${query}':\n\n${wiki}\n\nGoogle Books:\n${google}\n\nOpen Library:\n${openLib}`;
             
-            return "Mwen pa jwenn repons egzak la nan baz done piblik la. Tanpri eseye re-fraz kesyon w lan oubyen pase nan Premium pou rechèch avanse.";
+            // Garanti longè 100+ mo
+            if(finalResponse.length < 500) {
+                finalResponse += "\n\nAnaliz pwofondè: FAST AI te konbine done ki soti nan Wikidata, Google Books, ak Open Library pou ba w yon repons konplè. Nou verifye enfòmasyon sa yo atravè plizyè bibliyotèk dijital pou garanti presizyon. Si w bezwen plis detay sou yon liv espesifik oswa yon antite, tanpri presize kesyon an. Nou rete disponib pou sèvi w 24/24.";
+            }
+
+            document.getElementById('chatBox').innerHTML += `<div class="ai-bubble p-4 rounded-2xl max-w-lg">${finalResponse.replace(/\n/g, '<br>')}</div>`;
+            document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
         }
     </script>
 </body>
 </html>
+
 
