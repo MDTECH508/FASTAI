@@ -1,85 +1,62 @@
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr" class="h-full">
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass-liquid {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        body { background-color: #030712; color: #e5e7eb; font-family: 'Inter', sans-serif; }
-        .input-area { border-top: 1px solid rgba(255,255,255,0.1); }
+        .glass-liquid { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body class="h-screen flex flex-col items-center">
 
-    <div class="w-full max-w-4xl p-6 flex justify-between items-center">
-        <h1 class="font-bold text-lg tracking-tight">FAST AI <span class="text-blue-500 font-normal">v1.0</span></h1>
+    <div class="w-full max-w-2xl flex-1 overflow-y-auto px-4 py-8 space-y-6" id="chatBox">
+        <div class="glass-liquid p-6 rounded-3xl">Mwen pare! Poze kesyon w, m ap korije òtograf ou epi m ap ba w repons.</div>
     </div>
 
-    <div class="w-full max-w-2xl flex-1 overflow-y-auto px-4 mb-32 space-y-6" id="chatBox">
-        <div class="glass-liquid p-5 rounded-3xl w-fit">Bonjou! Kisa m ka fè pou ou jodi a?</div>
-    </div>
-
-    <div class="fixed bottom-6 w-full max-w-2xl px-4">
-        
-        <div class="flex gap-2 mb-3 overflow-x-auto pb-2">
-            <select id="modelSelect" class="glass-liquid px-4 py-2 rounded-xl text-sm outline-none border border-white/10">
-                <option value="Student AI v1">🎓 Student AI v1</option>
-                <option value="Work AI v2">💼 Work AI v2</option>
-                <option value="Fast AI v1">⚡ Fast AI v1</option>
-                <option value="Any AI v1">🤖 Any AI v1</option>
-            </select>
-        </div>
-
-        <div class="glass-liquid p-2 rounded-full flex items-center shadow-2xl">
-            <button class="p-4 text-gray-400 hover:text-white">+</button>
-            <input type="text" id="userInput" placeholder="Demandez à FAST AI..." class="flex-1 bg-transparent outline-none px-2 text-lg">
-            <button onclick="handleSearch()" class="bg-blue-600 p-3 rounded-full hover:bg-blue-500 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </button>
+    <div class="w-full max-w-2xl p-4">
+        <div class="glass-liquid p-2 rounded-full flex items-center shadow-2xl border border-gray-800">
+            <input type="text" id="userInput" placeholder="Poze kesyon w lan..." class="flex-1 bg-transparent outline-none px-6 h-12">
+            <button onclick="smartSearch()" class="bg-blue-600 px-8 py-3 rounded-full font-bold hover:bg-blue-500 transition">Search</button>
         </div>
     </div>
 
     <script>
-        const myBooksDB = {
-            "kisa ki ayiti": "Ayiti se premye repiblik nwa nan mond lan, endepandan depi 1804.",
-            "kisa ki fast ai": "Fast AI se yon asistans entelijan ki fèt pou bay repons rapid."
-        };
-
-        async function handleSearch() {
-            const inputField = document.getElementById('userInput');
-            const model = document.getElementById('modelSelect').value;
-            const query = inputField.value.toLowerCase();
+        async function smartSearch() {
+            const input = document.getElementById('userInput');
+            const rawQuery = input.value;
+            const words = rawQuery.trim().split(/\s+/);
             const chatBox = document.getElementById('chatBox');
             
-            if(!query) return;
+            if(!rawQuery) return;
 
-            chatBox.innerHTML += `<div class="glass-liquid p-4 rounded-3xl ml-auto w-fit max-w-[80%]">${query}</div>`;
-            inputField.value = '';
+            chatBox.innerHTML += `<div class="glass-liquid p-4 rounded-3xl ml-auto w-fit text-sm">${rawQuery}</div>`;
+            input.value = '';
 
-            // Lojik rechèch
-            if (myBooksDB[query]) {
-                appendResponse(myBooksDB[query], model);
-            } else {
-                const wikiUrl = `https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`;
-                try {
-                    const res = await fetch(wikiUrl);
-                    const data = await res.json();
-                    const snippet = data.query.search[0]?.snippet.replace(/<[^>]*>?/gm, '');
-                    appendResponse(snippet || "Pa gen repons jwenn.", model);
-                } catch (e) {
-                    appendResponse("Erè koneksyon.", model);
+            // Amelyorasyon: 100 mo limit
+            const isHeavy = words.length > 100;
+
+            try {
+                const res = await fetch(`https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(rawQuery)}&format=json&origin=*`);
+                const data = await res.json();
+                let result = data.query.search[0]?.snippet.replace(/<[^>]*>?/gm, '') || "Pa gen repons.";
+
+                if (isHeavy) {
+                    // Si kesyon an twò lou, bay yon ti pati + envitasyon Premium
+                    const truncated = result.split('.').slice(0, 2).join('.') + "...";
+                    appendResponse(truncated + "\n\n⚠️ *Kesyon sa a twò long (plis pase 100 mo). Pase nan vèsyon **Premium** pou detay konplè ak analiz pwofondè.*", "Smart AI");
+                } else {
+                    appendResponse(result, "Smart AI");
                 }
+            } catch(e) {
+                appendResponse("Erè rezo, tanpri reeseye.", "System");
             }
         }
 
-        function appendResponse(text, model) {
+        function appendResponse(text, source) {
             document.getElementById('chatBox').innerHTML += `
-                <div class="glass-liquid p-5 rounded-3xl w-full border-l-4 border-blue-500">
-                    <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">${model}</p>
-                    ${text}
+                <div class="glass-liquid p-6 rounded-3xl border border-gray-800">
+                    <p class="text-[10px] text-blue-400 font-bold mb-2 uppercase">${source}</p>
+                    <p class="text-base">${text}</p>
                 </div>`;
             document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
         }
