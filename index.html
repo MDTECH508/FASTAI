@@ -3,36 +3,57 @@
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass-liquid { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass-liquid { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { background-color: #020617; color: #e2e8f0; font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body class="h-screen flex flex-col items-center">
 
-    <div class="w-full max-w-2xl flex-1 overflow-y-auto px-4 py-8 space-y-6" id="chatBox">
-        <div class="glass-liquid p-6 rounded-3xl">Mwen pare! Poze kesyon w, m ap korije òtograf ou epi m ap ba w repons.</div>
+    <div class="w-full max-w-3xl p-6 flex justify-between items-center">
+        <h1 class="text-xl font-bold">FAST AI <span class="text-blue-500 font-light">Hub</span></h1>
     </div>
 
-    <div class="w-full max-w-2xl p-4">
-        <div class="glass-liquid p-2 rounded-full flex items-center shadow-2xl border border-gray-800">
-            <input type="text" id="userInput" placeholder="Poze kesyon w lan..." class="flex-1 bg-transparent outline-none px-6 h-12">
-            <button onclick="smartSearch()" class="bg-blue-600 px-8 py-3 rounded-full font-bold hover:bg-blue-500 transition">Search</button>
+    <div class="w-full max-w-2xl flex-1 overflow-y-auto px-4 space-y-6 mb-32" id="chatBox">
+        <div class="glass-liquid p-6 rounded-3xl w-fit">Bonjou! Mwen pare pou m ede w. Ou ka poze kesyon oswa upload yon dosye pou m analize.</div>
+    </div>
+
+    <div class="fixed bottom-0 w-full p-4 flex justify-center bg-gradient-to-t from-[#020617] to-transparent">
+        <div class="w-full max-w-2xl glass-liquid p-2 rounded-full flex items-center shadow-2xl border border-gray-800">
+            <input type="file" id="fileUpload" class="hidden" onchange="handleFile(this)">
+            <button onclick="document.getElementById('fileUpload').click()" class="p-4 text-gray-400 hover:text-blue-400">📎</button>
+            
+            <input type="text" id="userInput" placeholder="Poze kesyon w lan..." class="flex-1 bg-transparent outline-none px-4 h-12">
+            
+            <button onclick="smartSearch()" class="bg-blue-600 px-8 py-3 rounded-full font-bold hover:bg-blue-500">Search</button>
         </div>
     </div>
 
     <script>
+        // Koreksyon Òtograf Senplifye
+        function autoCorrect(text) {
+            // Mwen ajoute yon diksyonè senp pou erè komen
+            const dict = { "ayitii": "Ayiti", "kesyonn": "kesyon", "ia": "AI" };
+            return text.split(' ').map(w => dict[w.toLowerCase()] || w).join(' ');
+        }
+
+        function handleFile(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('chatBox').innerHTML += `<div class="glass-liquid p-4 rounded-3xl ml-auto w-fit italic">📎 File uploaded: ${file.name}</div>`;
+            }
+        }
+
         async function smartSearch() {
             const input = document.getElementById('userInput');
-            const rawQuery = input.value;
+            const rawQuery = autoCorrect(input.value);
             const words = rawQuery.trim().split(/\s+/);
             const chatBox = document.getElementById('chatBox');
             
             if(!rawQuery) return;
 
-            chatBox.innerHTML += `<div class="glass-liquid p-4 rounded-3xl ml-auto w-fit text-sm">${rawQuery}</div>`;
+            chatBox.innerHTML += `<div class="glass-liquid p-4 rounded-3xl ml-auto w-fit max-w-[80%]">${rawQuery}</div>`;
             input.value = '';
 
-            // Amelyorasyon: 100 mo limit
             const isHeavy = words.length > 100;
 
             try {
@@ -41,14 +62,13 @@
                 let result = data.query.search[0]?.snippet.replace(/<[^>]*>?/gm, '') || "Pa gen repons.";
 
                 if (isHeavy) {
-                    // Si kesyon an twò lou, bay yon ti pati + envitasyon Premium
-                    const truncated = result.split('.').slice(0, 2).join('.') + "...";
-                    appendResponse(truncated + "\n\n⚠️ *Kesyon sa a twò long (plis pase 100 mo). Pase nan vèsyon **Premium** pou detay konplè ak analiz pwofondè.*", "Smart AI");
+                    const truncated = result.split('.').slice(0, 1).join('.') + "...";
+                    appendResponse(truncated + "\n\n⚠️ *Kesyon sa a twò long. Pase nan **Premium** pou detay konplè.*", "Smart AI");
                 } else {
                     appendResponse(result, "Smart AI");
                 }
             } catch(e) {
-                appendResponse("Erè rezo, tanpri reeseye.", "System");
+                appendResponse("Erè koneksyon.", "System");
             }
         }
 
@@ -56,7 +76,7 @@
             document.getElementById('chatBox').innerHTML += `
                 <div class="glass-liquid p-6 rounded-3xl border border-gray-800">
                     <p class="text-[10px] text-blue-400 font-bold mb-2 uppercase">${source}</p>
-                    <p class="text-base">${text}</p>
+                    <p class="text-base leading-relaxed">${text}</p>
                 </div>`;
             document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
         }
