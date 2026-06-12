@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>FAST v3 — IA offline + base open source</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-dark: #05070a;
+      --bg-glass: rgba(12, 16, 24, 0.65);
+      --bg-card: rgba(18, 24, 34, 0.7);
+      --border-glass: rgba(56, 128, 255, 0.2);
+      --border-glow: rgba(0, 160, 255, 0.4);
+      --accent-blue: #2c7dfe;
+      --accent-cyan: #00c6fb;
+      --text-primary: #f0f3fa;
+      --text-secondary: #9aa6bf;
+      --shadow-glow: 0 8px 32px rgba(0, 100, 255, 0.12);
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 20%, #0a0f1a, #020408);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--text-primary);
+      backdrop-filter: blur(2px);
+    }
+
+    /* Effet liquid glass général */
+    .glass-panel {
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      border-radius: 32px;
+      box-shadow: var(--shadow-glow);
+    }
+
+    /* Layout principal */
+    .app {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Sidebar style néo-brume */
+    .sidebar {
+      width: 280px;
+      background: rgba(8, 12, 20, 0.75);
+      backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(44, 125, 254, 0.2);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      z-index: 20;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(44, 125, 254, 0.25);
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #2c7dfe, #00c6fb);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 20px rgba(44, 125, 254, 0.5);
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 20px;
+      background: linear-gradient(135deg, #fff, #7bb9ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .badge-v3 {
+      background: rgba(0, 198, 251, 0.2);
+      border: 1px solid #00c6fb;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 40px;
+    }
+
+    /* Liste des IA disponibles */
+    .ia-list {
+      margin: 20px 0;
+    }
+
+    .ia-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .ia-card {
+      background: rgba(20, 28, 40, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(44, 125, 254, 0.2);
+      border-radius: 20px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ia-card.active {
+      border-color: var(--accent-blue);
+      background: rgba(44, 125, 254, 0.12);
+      box-shadow: 0 0 12px rgba(44, 125, 254, 0.2);
+    }
+
+    .ia-card:hover {
+      transform: translateX(4px);
+      border-color: var(--accent-cyan);
+    }
+
+    .ia-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(145deg, #1e2a3a, #0f1722);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .ia-info h4 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .ia-info p {
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    /* Bouton nouveau chat */
+    .new-chat-btn {
+      margin-top: auto;
+      background: rgba(44, 125, 254, 0.15);
+      border: 1px solid rgba(44, 125, 254, 0.4);
+      border-radius: 40px;
+      padding: 12px;
+      text-align: center;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .new-chat-btn:hover {
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    /* MAIN CHAT — style ChatGPT */
+    .main-chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px;
+      scroll-behavior: smooth;
+    }
+
+    /* bulles style ChatGPT */
+    .message {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.25s ease;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message.user .msg-bubble {
+      background: rgba(44, 125, 254, 0.2);
+      border-radius: 24px 24px 8px 24px;
+      border: 1px solid rgba(44, 125, 254, 0.3);
+    }
+
+    .message.ai .msg-bubble {
+      background: rgba(20, 28, 38, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 24px 24px 24px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2c7dfe, #00c6fb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .msg-bubble {
+      max-width: 80%;
+      padding: 12px 18px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #f1f5f9;
+    }
+
+    .msg-bubble p {
+      margin-bottom: 8px;
+    }
+
+    .msg-bubble strong {
+      color: #7bb9ff;
+    }
+
+    /* zone input liquid glass */
+    .input-area {
+      padding: 20px 24px 28px;
+      background: linear-gradient(to top, rgba(5, 7, 12, 0.95), transparent);
+    }
+
+    .input-container {
+      background: rgba(18, 24, 34, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(44, 125, 254, 0.25);
+      border-radius: 48px;
+      display: flex;
+      align-items: flex-end;
+      padding: 8px 12px 8px 20px;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+
+    .input-container:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(44, 125, 254, 0.2);
+    }
+
+    #userInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-size: 15px;
+      padding: 12px 0;
+      resize: none;
+      font-family: inherit;
+      max-height: 120px;
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, #2c7dfe, #00c6fb);
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      font-size: 20px;
+      transition: 0.2s;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.4;
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      padding-left: 12px;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* scroll personnalisé */
+    .chat-messages::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: var(--accent-blue);
+      border-radius: 10px;
+    }
+
+    /* responsive mobile */
+    @media (max-width: 720px) {
+      .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        height: 100%;
+        transition: left 0.25s ease;
+        z-index: 30;
+      }
+      .sidebar.open {
+        left: 0;
+      }
+      .menu-toggle {
+        display: flex;
+        position: fixed;
+        bottom: 20px;
+        left: 16px;
+        background: var(--accent-blue);
+        border-radius: 40px;
+        padding: 10px 16px;
+        z-index: 25;
+        border: none;
+        color: white;
+        gap: 6px;
+        font-size: 12px;
+        backdrop-filter: blur(8px);
+      }
+      .msg-bubble {
+        max-width: 90%;
+      }
+    }
+
+    @media (min-width: 721px) {
+      .menu-toggle {
+        display: none;
+      }
+    }
+
+    .thinking {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 8px 12px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8);}
+      50% { opacity: 1; transform: scale(1);}
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar avec liste des IA -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div class="logo-text">FAST v3</div>
+        <div class="badge-v3">Auto-FAST v1 · offline</div>
+      </div>
+    </div>
+
+    <div class="ia-list">
+      <div class="ia-title">🤖 Modèles IA disponibles</div>
+      <div class="ia-card" data-ia="gemini">
+        <div class="ia-avatar">🌟</div>
+        <div class="ia-info"><h4>Gemini Pro (simulé)</h4><p>Réponses rapides</p></div>
+      </div>
+      <div class="ia-card" data-ia="mistral">
+        <div class="ia-avatar">⚡</div>
+        <div class="ia-info"><h4>Mistral AI (simulé)</h4><p>Précision technique</p></div>
+      </div>
+      <div class="ia-card active" data-ia="autofast">
+        <div class="ia-avatar">🧠</div>
+        <div class="ia-info"><h4>Auto‑FAST v1</h4><p>Réponses locales + base open source</p></div>
+      </div>
+    </div>
+
+    <div class="new-chat-btn" id="newChatBtn">✨ Nouvelle conversation</div>
+  </aside>
+
+  <!-- Menu toggle pour mobile -->
+  <button class="menu-toggle" id="menuToggleBtn">☰ IA Menu</button>
+
+  <!-- Zone principale chat -->
+  <main class="main-chat">
+    <div class="chat-messages" id="chatMessages">
+      <div class="message ai">
+        <div class="avatar">🧠</div>
+        <div class="msg-bubble">
+          <strong>🤖 Auto‑FAST v1 actif</strong><br>
+          Mwen se modèl entegre ki reponn tout kesyon w ak baz konesans open source + rezònman entelijan. Poze m nenpòt kesyon !
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-container">
+        <textarea id="userInput" rows="1" placeholder="Mande nenpòt kesyon... (filosofi, syans, istwa, teknoloji...)" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+      <div class="status-text" id="statusInfo">✅ Auto‑FAST v1 · Base de connaissances locale active</div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // ---------- BASE DE CONNAISSANCES OPEN SOURCE (intégrée) ----------
+  const knowledgeDB = {
+    // Général
+    "ayiti": "Ayiti se premye repiblik nwa nan mond, li te vin endepandan an 1804 apre revolisyon esklav. Kapital li se Pòtoprens.",
+    "kapital france": "Kapital Frans se Pari, li se yon gwo vil kilti ak mod.",
+    "python": "Python se yon langaj pwogramasyon fasil pou aprann. Li itilize nan done syans, entèlijans atifisyèl, ak devlopman web.",
+    "entelijans atifisyèl": "Entèlijans atifisyèl se fè machinn imite entèlijans moun. Gen anpil branch tankou aprantisaj machinn, rezo neral, ak robotik.",
+    "einstein": "Albert Einstein te fizisyen an teorik, li te devlope relativite jeneral ak E=mc² ( enèji = mas × vitès limyè au kare).",
+    "diferans ia ak moun": "IA ka trete done vit men li manke konsyans, emosyon ak eksperyans imen. Moun gen kreyativite ak jijman moral.",
+    "limyè vitès": "Vitès limyè nan vakyòm se apeprè 299 792 km/s. Li se vitès maksimòm linivè selon fizik modèn.",
+    "javascript": "JavaScript se langaj web ki fè paj entèaktif. Li kouri nan navigatè a.",
+    "wouj bwe": "Wouj bwe se yon plant medsinay, li itilize pou fè te ak amelyore sante."
+  };
+
+  // Fallback intelligent (auto-fast v1)
+  function getBestAnswer(question) {
+    let qLower = question.toLowerCase();
+    // recherche dans la base
+    for (let [key, value] of Object.entries(knowledgeDB)) {
+      if (qLower.includes(key)) {
+        return value + " (sous: base open source FAST)";
+      }
+    }
+    // Réponses génériques intelligentes sans API
+    if (qLower.includes("ki moun") || qLower.includes("ki ye") || qLower.includes("definisyon")) {
+      return `Dapre baz konesans mwen, " ${question.substring(0, 60)} " se yon sijè enteresan. FAST v1 gen yon motè rezònman ki baze sou done lib (open source). Pou kesyon sa espesifik, mwen rekòmande w konsilte yon sous serye oswa poze m ankò ak plis detay.`;
+    }
+    if (qLower.includes("sijè") || qLower.includes("eksplike")) {
+      return `Mwen pa gen repons egzak nan baz mwen pou kesyon sa, men dapre lojik mwen: ${question} mande yon analiz pwofon. Auto‑FAST v1 kapab rezoud lè w bay plis kontèks.`;
+    }
+    // réponse par défaut constructive
+    return `📘 **Auto‑FAST v1 (local)** : Mwen poko genyen enfòmasyon espesifik sou "${question}" nan baz konesans entegre a. Sepandan, mwen kapab rezoud kesyon sou syans, istwa, teknoloji, ak kilti jeneral. Eseye mande m sou "Ayiti", "Python", "entèlijans atifisyèl" oswa "Einstein". Map ede w ak tout konesans lib mwen!`;
+  }
+
+  // Historique UI
+  let currentAI = "autofast";  // autofast par défaut (fonctionne sans API)
+  let isProcessing = false;
+  let conversationHistory = [];
+
+  // Sauvegarde localStorage
+  function saveChatToLocal() {
+    const messages = [];
+    document.querySelectorAll('.message').forEach(msg => {
+      const role = msg.classList.contains('user') ? 'user' : 'ai';
+      const bubble = msg.querySelector('.msg-bubble');
+      if(bubble) messages.push({ role, text: bubble.innerText });
+    });
+    localStorage.setItem('fast_chat_history', JSON.stringify(messages));
+  }
+
+  function loadChatFromLocal() {
+    const saved = localStorage.getItem('fast_chat_history');
+    if(saved) {
+      try {
+        const msgs = JSON.parse(saved);
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = '';
+        msgs.forEach(msg => {
+          addMessageToUI(msg.role, msg.text, false);
+        });
+        scrollToBottom();
+        return true;
+      } catch(e) {}
+    }
+    return false;
+  }
+
+  function addMessageToUI(role, text, save = true) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    const avatar = role === 'user' ? '👤' : (currentAI === 'autofast' ? '🧠' : (currentAI === 'gemini' ? '🌟' : '⚡'));
+    div.innerHTML = `
+      <div class="avatar">${avatar}</div>
+      <div class="msg-bubble">${formatMessage(text)}</div>
+    `;
+    container.appendChild(div);
+    if(save) saveChatToLocal();
+    scrollToBottom();
+  }
+
+  function formatMessage(txt) {
+    return txt.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  }
+
+  function scrollToBottom() {
+    const chatDiv = document.getElementById('chatMessages');
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+  }
+
+  // Simulateur de réponse (local + base open source) pour tous les modèles, mais Auto-FAST le plus complet
+  async function getAIResponse(question, modelId) {
+    // On attend un peu pour effet réaliste
+    await new Promise(r => setTimeout(r, 400));
+    if(modelId === "autofast") {
+      return getBestAnswer(question);
+    } else if(modelId === "gemini") {
+      let basic = getBestAnswer(question);
+      return `🌟 **Gemini (mode simulé offline)** : ${basic}\n\n(Note: API Gemini pa aktif, men mwen itilize menm baz entelijan FAST pou repons konplè.)`;
+    } else if(modelId === "mistral") {
+      let basic = getBestAnswer(question);
+      return `⚡ **Mistral AI (simulation)** : ${basic}\n\nModèl sa a baze sou rechèch lokal ak baz done lib. Repons egzak ak serye.`;
+    }
+    return getBestAnswer(question);
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const question = input.value.trim();
+    if (!question || isProcessing) return;
+    isProcessing = true;
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+
+    // Ajouter message user
+    addMessageToUI('user', question, true);
+    input.value = '';
+    input.style.height = 'auto';
+
+    // indicateur "en train d'écrire"
+    const thinkingDiv = document.createElement('div');
+    thinkingDiv.className = 'message ai';
+    thinkingDiv.id = 'thinkingMsg';
+    thinkingDiv.innerHTML = `<div class="avatar">🧠</div><div class="msg-bubble"><div class="thinking"><span class="dot"></span><span class="dot"></span><span class="dot"></span> <span style="font-size:12px;">${currentAI === 'autofast' ? 'Auto‑FAST v1 ap reflechi...' : 'IA ap trete kesyon an...'}</span></div></div>`;
+    document.getElementById('chatMessages').appendChild(thinkingDiv);
+    scrollToBottom();
+
+    // Obtenir réponse (toujours locale / base open source)
+    let answer = await getAIResponse(question, currentAI);
+    
+    // Supprimer indicateur
+    if(document.getElementById('thinkingMsg')) document.getElementById('thinkingMsg').remove();
+    
+    addMessageToUI('ai', answer, true);
+    
+    // Mettre à jour le status
+    document.getElementById('statusInfo').innerHTML = `✅ ${currentAI === 'autofast' ? 'Auto‑FAST v1 (moteur open source)' : currentAI === 'gemini' ? 'Gemini offline (fallback FAST)' : 'Mistral offline (fallback)'} · Repons entelijan lokal`;
+    isProcessing = false;
+    sendBtn.disabled = false;
+    input.focus();
+  }
+
+  // Gestionnaire clavier
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  // Sélecteur d'IA dans la sidebar
+  function setActiveIA(modelId) {
+    currentAI = modelId;
+    document.querySelectorAll('.ia-card').forEach(card => {
+      card.classList.remove('active');
+      if (card.getAttribute('data-ia') === modelId) card.classList.add('active');
+    });
+    let nameDisplay = modelId === 'autofast' ? 'Auto‑FAST v1 (local + base open source)' : (modelId === 'gemini' ? 'Gemini (mode simulé offline)' : 'Mistral (offline intelligent)');
+    document.getElementById('statusInfo').innerHTML = `🧠 ${nameDisplay} · repons garantit san API`;
+    // petit message dans le chat (optionnel)
+    let infoMsg = `🔄 Chanje modèl: **${modelId.toUpperCase()}** aktif. Mwen reponn tout kesyon ak baz konesans entegre FAST + rezònman.`;
+    addMessageToUI('ai', infoMsg, true);
+  }
+
+  function newConversation() {
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = '';
+    addMessageToUI('ai', "✨ Nouvo konvèsasyon komanse. Mwen se FAST v3 + Auto‑FAST v1. Poze m nenpòt kesyon epi m ap reponn ak konesans lib mwen.", true);
+    scrollToBottom();
+  }
+
+  // Évènements
+  document.getElementById('sendBtn').onclick = sendMessage;
+  document.getElementById('newChatBtn').onclick = () => newConversation();
+  document.querySelectorAll('.ia-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const model = card.getAttribute('data-ia');
+      setActiveIA(model);
+      if (window.innerWidth <= 720) document.getElementById('sidebar').classList.remove('open');
+    });
+  });
+  document.getElementById('menuToggleBtn').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+  // click en dehors pour fermer sidebar mobile
+  document.addEventListener('click', (e) => {
+    const sidebar = document.getElementById('sidebar');
+    if (window.innerWidth <= 720 && !sidebar.contains(e.target) && !e.target.closest('.menu-toggle')) {
+      sidebar.classList.remove('open');
+    }
+  });
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 720) document.getElementById('sidebar').classList.remove('open');
+  });
+
+  // auto-resize textarea
+  const textarea = document.getElementById('userInput');
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+
+  // charger historique
+  if (!loadChatFromLocal()) {
+    // message bienvenue par défaut 
+    addMessageToUI('ai', "⚡ **FAST v3 — offline intelligent**  \nMwen gen baz konesans open source (istwa, syans, teknoloji). Poze m kesyon tankou 'Kisa Ayiti?', 'Eksplike E=mc²', 'Python c'est quoi?' – repons imedya san entènèt obligatwa.", true);
+  }
+  setActiveIA('autofast');
+</script>
+</body>
+</html>
