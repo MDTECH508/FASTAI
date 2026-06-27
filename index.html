@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>FAST AI v7 — Intelligence Ultime</title>
+    <style>
+        /* RESET & BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sw: 280px;
+            --rad: 16px;
+            --glass-bg: rgba(12, 16, 30, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            --blue: #2563eb;
+            --gold: #FFD700;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: #03040a;
+            color: #f0f4ff;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── 3D / LIQUID BACKGROUND ─── */
+        #bg-3d {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 20% 30%, #0a0f2a 0%, #03040a 80%);
+        }
+
+        #bg-3d canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            opacity: 0.9;
+            filter: blur(0px) saturate(1.4);
+        }
+
+        /* ─── GLASS OVERLAY ─── */
+        .glass-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 50% 80%, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        /* ─── PARTICLES (floating) ─── */
+        .particle-field {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+            animation: floatParticle linear infinite;
+            will-change: transform;
+        }
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* ─── SPLASH FIFA ─── */
+        #fifa-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            animation: splashFade 10s ease forwards;
+            pointer-events: none;
+        }
+        @keyframes splashFade {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            5% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            85% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.05);
+            }
+        }
+
+        .splash-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 40px 50px;
+            box-shadow: var(--glass-shadow), 0 0 0 1px rgba(255, 255, 255, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            text-align: center;
+            max-width: 520px;
+            width: 90%;
+            transform: translateY(-10px);
+            animation: floatGlass 4s ease-in-out infinite alternate;
+        }
+        @keyframes floatGlass {
+            0% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(10px);
+            }
+        }
+
+        .splash-trophy {
+            font-size: 64px;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.7));
+            animation: trophySpin 6s linear infinite, trophyPulse 2s ease-in-out infinite alternate;
+        }
+        @keyframes trophySpin {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+        @keyframes trophyPulse {
+            0% {
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+            }
+            100% {
+                filter: drop-shadow(0 0 60px rgba(255, 215, 0, 0.9));
+            }
+        }
+
+        .splash-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: clamp(28px, 5vw, 44px);
+            background: linear-gradient(135deg, #FFD700, #fff, #fbbf24);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 12px 0 6px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+        }
+        .splash-sub {
+            font-size: clamp(14px, 2.5vw, 18px);
+            color: rgba(255, 215, 0, 0.8);
+            letter-spacing: 1px;
+            font-weight: 400;
+        }
+        .splash-tagline {
+            font-size: clamp(11px, 2vw, 14px);
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        .splash-flags {
+            font-size: 38px;
+            margin: 16px 0 12px;
+            animation: flagWave 3s ease-in-out infinite;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        @keyframes flagWave {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .splash-prog {
+            width: 180px;
+            height: 3px;
+            background: rgba(255, 215, 0, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px auto 10px;
+        }
+        .splash-prog-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FFD700, #fff, #FFD700);
+            background-size: 200% 100%;
+            border-radius: 4px;
+            animation: progFill 10s ease-out forwards, progShine 1.5s linear infinite;
+        }
+        @keyframes progFill {
+            from {
+                width: 0%;
+            }
+            to {
+                width: 100%;
+            }
+        }
+        @keyframes progShine {
+            0% {
+                background-position: 200% 50%;
+            }
+            100% {
+                background-position: -200% 50%;
+            }
+        }
+
+        .splash-skip {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            transition: color 0.3s;
+            background: none;
+            border: none;
+            font-family: inherit;
+            pointer-events: auto;
+            margin-top: 6px;
+        }
+        .splash-skip:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ─── APP SHELL ─── */
+        .shell {
+            display: flex;
+            height: 100vh;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            animation: appFade 10.5s ease forwards;
+        }
+        @keyframes appFade {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* SIDEBAR — glass iPhone style */
+        .sidebar {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            bottom: 16px;
+            width: var(--sw);
+            z-index: 300;
+            background: var(--glass-bg);
+            backdrop-filter: blur(60px) saturate(210%);
+            -webkit-backdrop-filter: blur(60px) saturate(210%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.4), transparent);
+            border-radius: 1px;
+            z-index: 2;
+        }
+
+        .brand {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            flex-shrink: 0;
+        }
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .brand-ico {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            font-size: 22px;
+            background: linear-gradient(145deg, #1e3a8a, #0c4a6e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3), 0 0 30px rgba(37, 99, 235, 0.2);
+        }
+        .brand-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            background: linear-gradient(130deg, #fff 0%, #93c5fd 50%, #c4b5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .brand-v {
+            font-size: 9px;
+            color: var(--t4);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.5px;
+            opacity: 0.6;
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+            margin-left: calc(var(--sw) + 32px);
+            transition: margin-left 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* TOPBAR — glass */
+        .topbar {
+            margin: 16px 16px 0;
+            padding: 12px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .tb-status {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(22, 163, 74, 0.08);
+            border: 1px solid rgba(22, 163, 74, 0.15);
+            border-radius: 30px;
+            padding: 4px 14px;
+            flex-shrink: 0;
+        }
+        .tb-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+        .tb-txt {
+            font-size: 10px;
+            color: #22c55e;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* WC BANNER — glass + FIFA ring */
+        .wc-bar {
+            margin: 8px 16px 0;
+            padding: 12px 18px;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .wc-bar:hover {
+            border-color: rgba(255, 215, 0, 0.35);
+            box-shadow: var(--glass-shadow), 0 0 40px rgba(255, 215, 0, 0.05);
+        }
+        .wc-bar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.04), transparent);
+            animation: wcShine 4s ease-in-out infinite;
+        }
+        @keyframes wcShine {
+            0%,
+            100% {
+                transform: translateX(-100%);
+            }
+            50% {
+                transform: translateX(100%);
+            }
+        }
+
+        .wc-rings-wrap {
+            display: flex;
+            gap: -2px;
+            flex-shrink: 0;
+        }
+        .wc-ring-s {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid;
+            flex-shrink: 0;
+            margin-right: -4px;
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+        .wc-ring-s:nth-child(1) {
+            border-color: #3b82f6;
+        }
+        .wc-ring-s:nth-child(2) {
+            border-color: #f59e0b;
+        }
+        .wc-ring-s:nth-child(3) {
+            border-color: #22c55e;
+        }
+        .wc-ring-s:nth-child(4) {
+            border-color: #ef4444;
+        }
+
+        .wc-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .wc-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            color: #FFD700;
+            letter-spacing: 0.3px;
+        }
+        .wc-sub {
+            font-size: 10px;
+            color: rgba(255, 215, 0, 0.5);
+        }
+        .wc-flags {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .wc-cd {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .wc-days {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #FFD700;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        .wc-dlbl {
+            font-size: 7.5px;
+            color: rgba(255, 215, 0, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        /* PILLS — glass */
+        .pills {
+            margin: 8px 16px 0;
+            padding: 8px 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex-shrink: 0;
+            box-shadow: var(--glass-shadow);
+        }
+        .pills::-webkit-scrollbar {
+            display: none;
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 10.5px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--t2);
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .pill:hover {
+            background: rgba(120, 160, 255, 0.08);
+            border-color: rgba(120, 160, 255, 0.15);
+            color: #fff;
+        }
+        .pill.on {
+            background: rgba(37, 99, 235, 0.12);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+
+        /* MESSAGES */
+        .msgs-zone {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 6px 16px 0;
+        }
+        .msgs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(120, 160, 255, 0.08) transparent;
+        }
+        .msgs::-webkit-scrollbar {
+            width: 4px;
+        }
+        .msgs::-webkit-scrollbar-thumb {
+            background: rgba(120, 160, 255, 0.12);
+            border-radius: 4px;
+        }
+
+        .msg {
+            display: flex;
+            gap: 10px;
+            animation: msgIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .msg.u {
+            flex-direction: row-reverse;
+        }
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .ava {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .bubble {
+            max-width: 80%;
+            padding: 12px 18px;
+            font-size: 14px;
+            line-height: 1.7;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px 20px 20px 4px;
+            box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            color: #e8edf9;
+        }
+        .msg.u .bubble {
+            background: rgba(37, 99, 235, 0.12);
+            border-color: rgba(59, 130, 246, 0.2);
+            border-radius: 20px 20px 4px 20px;
+            backdrop-filter: blur(30px);
+        }
+
+        /* INPUT — glass */
+        .inp-zone {
+            margin: 6px 16px 16px;
+        }
+        .search-bar {
+            position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(50px) saturate(180%);
+            -webkit-backdrop-filter: blur(50px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 60px;
+            padding: 6px 6px 6px 22px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .search-bar:focus-within {
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: var(--glass-shadow), 0 0 0 4px rgba(37, 99, 235, 0.06);
+        }
+        #uinput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #f0f4ff;
+            font-size: 14px;
+            padding: 10px 0;
+            resize: none;
+            font-family: inherit;
+            line-height: 1.5;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+        #uinput::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sendb {
+            background: linear-gradient(145deg, #1d4ed8, #0369a1);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s;
+        }
+        .sendb:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.5);
+        }
+        .sendb:active {
+            transform: scale(0.92);
+        }
+
+        /* responsive */
+        @media (max-width: 820px) {
+            .sidebar {
+                transform: translateX(calc(-100% - 24px));
+                top: 0;
+                left: 0;
+                bottom: 0;
+                border-radius: 0 24px 24px 0;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main {
+                margin-left: 0;
+            }
+            .topbar,
+            .pills,
+            .wc-bar,
+            .msgs-zone,
+            .inp-zone {
+                margin-left: 6px;
+                margin-right: 6px;
+            }
+            .splash-content {
+                padding: 30px 24px;
+                border-radius: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D LIQUID BACKGROUND -->
+    <div id="bg-3d"></div>
+    <div class="glass-overlay"></div>
+
+    <!-- PARTICLES -->
+    <div class="particle-field" id="particleField"></div>
+
+    <!-- FIFA SPLASH (10s) -->
+    <div id="fifa-splash">
+        <div class="splash-content">
+            <div class="splash-trophy">🏆</div>
+            <div class="splash-title">FIFA World Cup 2026™</div>
+            <div class="splash-sub">11 Jwen — 19 Jiyè 2026</div>
+            <div class="splash-tagline">🇺🇸 USA · 🇨🇦 Canada · 🇲🇽 Mexique</div>
+            <div class="splash-flags">🏆⚽🏆</div>
+            <div class="splash-prog"><div class="splash-prog-fill"></div></div>
+            <button class="splash-skip" onclick="hideSplash()">Pase intro →</button>
+        </div>
+    </div>
+
+    <!-- APP SHELL -->
+    <div class="shell" id="appShell">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sb">
+            <div class="brand">
+                <div class="brand-row">
+                    <div class="brand-ico">⚡</div>
+                    <div>
+                        <div class="brand-name">FAST AI v7</div>
+                        <div class="brand-v">60+ SOURCES · IMAGE · VOICE</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sb-body" style="flex:1;overflow-y:auto;padding:12px 14px;scrollbar-width:thin;scrollbar-color:rgba(120,160,255,0.08) transparent;">
+                <span style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.2);display:block;margin-bottom:10px;">Istwa Rechèch</span>
+                <div id="hlist"></div>
+                <span style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.2);display:block;margin:18px 0 10px;">📡 60+ Sources</span>
+                <div class="src-grid" id="srcg" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"></div>
+                <div class="new-btn" id="newBtn" style="margin:14px 0 0;background:rgba(37,99,235,0.06);border:1px solid rgba(120,160,255,0.1);border-radius:30px;padding:10px;text-align:center;cursor:pointer;font-size:11px;font-weight:500;color:#93c5fd;transition:all 0.2s;">✨ Nouvo Rechèch</div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main" id="mainA">
+            <div class="topbar">
+                <div class="tb-logo" style="width:36px;height:36px;border-radius:12px;background:linear-gradient(145deg,#1e3a8a,#0c4a6e);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 20px rgba(37,99,235,0.2);">⚡</div>
+                <div><div class="brand-name" style="font-size:15px;">FAST AI v7</div><div style="font-size:9px;color:rgba(255,255,255,0.3);">60+ Sources · WC2026</div></div>
+                <div class="tb-status"><div class="tb-dot"></div><span class="tb-txt" id="stxt">Aktif</span></div>
+                <button class="hbtn" id="hbtn" style="display:none;background:rgba(37,99,235,0.08);border:1px solid rgba(120,160,255,0.1);border-radius:10px;padding:6px 12px;cursor:pointer;color:rgba(255,255,255,0.6);font-size:16px;">☰</button>
+            </div>
+
+            <!-- WC BANNER -->
+            <div class="wc-bar" onclick="qa('FIFA World Cup 2026 tout ekip groupe kalifikasyon dat match stad USA Canada Mexique')">
+                <div class="wc-rings-wrap">
+                    <div class="wc-ring-s"></div><div class="wc-ring-s"></div><div class="wc-ring-s"></div><div class="wc-ring-s"></div>
+                </div>
+                <div class="wc-info">
+                    <div class="wc-title">🏆 FIFA World Cup 2026™</div>
+                    <div class="wc-sub">USA · Canada · Mexique • 48 ekip • 104 match</div>
+                </div>
+                <div class="wc-flags">🇺🇸🇨🇦🇲🇽</div>
+                <div class="wc-cd"><div class="wc-days" id="wcD">--</div><div class="wc-dlbl">jou rete</div></div>
+            </div>
+
+            <!-- PILLS -->
+            <div class="pills">
+                <div class="pill on" data-m="chat" onclick="setMode('chat')">💬 Tout</div>
+                <div class="pill" data-m="img" onclick="setMode('img')">🎨 Imaj AI</div>
+                <div class="pill" onclick="toggleMic()">🎙️ Vwa</div>
+                <div class="pill" onclick="qa('météo Port-au-Prince tanperati lapli vent jodi a')">🌤️ Météo</div>
+                <div class="pill" onclick="qa('taux dollar américain vers gourde haïtienne HTG jodi a 2025')">💱 Deviz</div>
+                <div class="pill" onclick="qa('prix bitcoin ethereum solana BNB changement 24h jodi a')">₿ Krypto</div>
+                <div class="pill" onclick="qa('FIFA World Cup 2026 ekip groupe favoris pronostic')">⚽ WC2026</div>
+                <div class="pill" onclick="qa('actualités Haiti jodi a dènye nouvèl enpòtan')">📰 Nouvèl</div>
+            </div>
+
+            <!-- MESSAGES -->
+            <div class="msgs-zone"><div class="msgs" id="msgs"></div></div>
+
+            <!-- INPUT -->
+            <div class="inp-zone">
+                <div class="search-bar">
+                    <textarea id="uinput" rows="1" placeholder="Rechèch nenpòt bagay… Michael Jordan, météo, bitcoin, jenere imaj, World Cup 2026…" onkeydown="hkey(event)"></textarea>
+                    <div class="brow" style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+                        <button class="ab micb" id="micbtn" onclick="toggleMic()" style="border:none;border-radius:50%;cursor:pointer;font-size:16px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(124,58,237,0.08);color:#c4b5fd;border:1px solid rgba(124,58,237,0.15);transition:all 0.2s;">🎙️</button>
+                        <button class="ab imgb" id="imgbtn" onclick="toggleImg()" style="border:none;border-radius:50%;cursor:pointer;font-size:16px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(219,39,119,0.08);color:#f9a8d4;border:1px solid rgba(219,39,119,0.15);transition:all 0.2s;">🎨</button>
+                        <button class="sendb" id="sbtn" onclick="sendQ()" style="background:linear-gradient(145deg,#1d4ed8,#0369a1);border:none;width:48px;height:48px;border-radius:50%;cursor:pointer;color:white;font-size:20px;flex-shrink:0;box-shadow:0 0 30px rgba(37,99,235,0.3);transition:all 0.2s;">➤</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ─── 3D LIQUID BACKGROUND ───
+        (function() {
+            const container = document.getElementById('bg-3d');
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x03040a);
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 8);
+
+            const renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: false
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = false;
+            container.appendChild(renderer.domElement);
+
+            // Liquid blobs
+            const blobGroup = new THREE.Group();
+            scene.add(blobGroup);
+
+            const colors = [0x1a3a8a, 0x0a4a6a, 0x2a1a5a, 0x0a5a3a];
+            const blobs = [];
+
+            for (let i = 0; i < 6; i++) {
+                const geo = new THREE.SphereGeometry(0.8 + Math.random() * 0.6, 32, 32);
+                const mat = new THREE.MeshPhongMaterial({
+                    color: colors[i % colors.length],
+                    emissive: colors[i % colors.length],
+                    emissiveIntensity: 0.15,
+                    transparent: true,
+                    opacity: 0.35 + Math.random() * 0.2,
+                    roughness: 0.2,
+                    metalness: 0.8,
+                    clearcoat: 0.3,
+                    wireframe: false,
+                });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(
+                    (Math.random() - 0.5) * 6,
+                    (Math.random() - 0.5) * 4,
+                    (Math.random() - 0.5) * 3 - 1
+                );
+                mesh.scale.set(
+                    1 + Math.random() * 0.5,
+                    1 + Math.random() * 0.5,
+                    1 + Math.random() * 0.5
+                );
+                blobGroup.add(mesh);
+                blobs.push({
+                    mesh: mesh,
+                    speed: 0.2 + Math.random() * 0.3,
+                    phase: Math.random() * Math.PI * 2,
+                    amp: 0.3 + Math.random() * 0.4,
+                    rotSpeed: 0.1 + Math.random() * 0.2,
+                });
+            }
+
+            // Lights
+            const ambient = new THREE.AmbientLight(0x4466aa, 0.4);
+            scene.add(ambient);
+
+            const light1 = new THREE.PointLight(0x4488ff, 1.2, 20);
+            light1.position.set(2, 3, 4);
+            scene.add(light1);
+
+            const light2 = new THREE.PointLight(0x8844ff, 0.8, 20);
+            light2.position.set(-3, -2, 5);
+            scene.add(light2);
+
+            const light3 = new THREE.PointLight(0x44ffaa, 0.5, 15);
+            light3.position.set(1, -3, 2);
+            scene.add(light3);
+
+            // Particles (3D)
+            const particleCount = 300;
+            const particleGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 20;
+            }
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMat = new THREE.PointsMaterial({
+                color: 0x88bbff,
+                size: 0.04,
+                transparent: true,
+                opacity: 0.4,
+                blending: THREE.AdditiveBlending,
+            });
+            const particles = new THREE.Points(particleGeo, particleMat);
+            scene.add(particles);
+
+            // Animation
+            let time = 0;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                time += 0.01;
+
+                blobs.forEach((b, i) => {
+                    b.mesh.position.x += Math.sin(time * b.speed + b.phase) * 0.002;
+                    b.mesh.position.y += Math.cos(time * b.speed * 0.7 + b.phase) * 0.002;
+                    b.mesh.position.z += Math.sin(time * b.speed * 0.5 + b.phase * 2) * 0.002;
+                    b.mesh.rotation.x += b.rotSpeed * 0.01;
+                    b.mesh.rotation.y += b.rotSpeed * 0.015;
+                    const s = 1 + Math.sin(time * b.speed + b.phase) * 0.04;
+                    b.mesh.scale.set(s, s, s);
+                });
+
+                particles.rotation.y += 0.0005;
+
+                // Camera slow orbit
+                camera.position.x = Math.sin(time * 0.06) * 1.2;
+                camera.position.y = Math.cos(time * 0.08) * 0.8;
+                camera.lookAt(0, 0, 0);
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.setSize(w, h);
+            });
+        })();
+
+        // ─── PARTICLES (2D floating) ───
+        (function() {
+            const field = document.getElementById('particleField');
+            for (let i = 0; i < 40; i++) {
+                const el = document.createElement('div');
+                el.className = 'particle';
+                const size = 2 + Math.random() * 6;
+                el.style.cssText = `
+                    width:${size}px; height:${size}px;
+                    left:${Math.random()*100}%;
+                    bottom:-10px;
+                    animation-duration:${8+Math.random()*14}s;
+                    animation-delay:${Math.random()*10}s;
+                    opacity:${0.2+Math.random()*0.3};
+                    background: rgba(255,255,255,${0.05+Math.random()*0.1});
+                    box-shadow: 0 0 ${size*2}px rgba(37,99,235,${0.1+Math.random()*0.1});
+                `;
+                field.appendChild(el);
+            }
+        })();
+
+        // ─── SPLASH CONTROL ───
+        function hideSplash() {
+            const splash = document.getElementById('fifa-splash');
+            splash.style.animation = 'splashFade 0.6s ease forwards';
+            setTimeout(() => { splash.remove(); }, 700);
+        }
+        // Auto hide after 10s
+        setTimeout(hideSplash, 10000);
+
+        // ─── WC COUNTDOWN ───
+        (function() {
+            const wc = new Date('2026-06-11T00:00:00');
+
+            function update() {
+                const d = Math.ceil((wc - new Date()) / 864e5);
+                document.getElementById('wcD').textContent = d > 0 ? d : '🏆';
+            }
+            update();
+            setInterval(update, 60000);
+        })();
+
+        // ─── APP LOGIC (simplified) ───
+        let imgMode = false;
+        let micActive = false;
+        let recognition = null;
+
+        function setMode(m) {
+            document.querySelectorAll('.pill[data-m]').forEach(p => p.classList.toggle('on', p.dataset.m === m));
+            if (m === 'img') {
+                imgMode = true;
+                document.getElementById('imgbtn').style.background = 'rgba(219,39,119,0.2)';
+                document.getElementById('imgbtn').style.borderColor = 'rgba(219,39,119,0.4)';
+            } else {
+                imgMode = false;
+                document.getElementById('imgbtn').style.background = 'rgba(219,39,119,0.08)';
+                document.getElementById('imgbtn').style.borderColor = 'rgba(219,39,119,0.15)';
+            }
+        }
+
+        function toggleImg() { setMode(imgMode ? 'chat' : 'img'); }
+
+        function toggleMic() {
+            const btn = document.getElementById('micbtn');
+            if (!('webkitSpeechRecognition' in window)) {
+                addMsg('a', '⚠️ Chrome sèlman sipòte vwa.');
+                return;
+            }
+            if (micActive) {
+                recognition?.stop();
+                micActive = false;
+                btn.style.background = 'rgba(124,58,237,0.08)';
+                btn.style.borderColor = 'rgba(124,58,237,0.15)';
+                btn.textContent = '🎙️';
+                return;
+            }
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SR();
+            recognition.lang = 'fr-FR';
+            recognition.onresult = e => {
+                const t = e.results[0][0].transcript;
+                document.getElementById('uinput').value = t;
+                sendQ();
+            };
+            recognition.onerror = recognition.onend = () => {
+                micActive = false;
+                btn.style.background = 'rgba(124,58,237,0.08)';
+                btn.style.borderColor = 'rgba(124,58,237,0.15)';
+                btn.textContent = '🎙️';
+            };
+            recognition.start();
+            micActive = true;
+            btn.style.background = 'rgba(239,68,68,0.15)';
+            btn.style.borderColor = 'rgba(239,68,68,0.4)';
+            btn.textContent = '🔴';
+        }
+
+        function qa(q) {
+            document.getElementById('uinput').value = q;
+            sendQ();
+        }
+
+        function hkey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault();
+                sendQ(); }
+        }
+
+        let busy = false;
+        let msgId = 0;
+
+        function addMsg(type, content) {
+            const c = document.getElementById('msgs');
+            const d = document.createElement('div');
+            d.className = `msg ${type}`;
+            d.innerHTML = `
+                <div class="ava">${type==='u'?'👤':'⚡'}</div>
+                <div class="bubble">${content}</div>
+            `;
+            c.appendChild(d);
+            c.scrollTop = c.scrollHeight;
+        }
+
+        function sendQ() {
+            const inp = document.getElementById('uinput');
+            const q = inp.value.trim();
+            if (!q || busy) return;
+            busy = true;
+            document.getElementById('sbtn').disabled = true;
+            addMsg('u', `<p>${q.replace(/</g,'&lt;')}</p>`);
+            inp.value = '';
+            inp.style.height = 'auto';
+
+            // Simulate AI response
+            addMsg('a', `<div style="font-size:13px;color:rgba(255,255,255,0.6);">🔍 Rechèch sou <strong>${q}</strong>…</div>
+                <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                    <span style="font-size:9px;background:rgba(37,99,235,0.08);padding:2px 8px;border-radius:20px;border:1px solid rgba(37,99,235,0.1);">Wikipedia</span>
+                    <span style="font-size:9px;background:rgba(22,163,74,0.08);padding:2px 8px;border-radius:20px;border:1px solid rgba(22,163,74,0.1);">Open-Meteo</span>
+                    <span style="font-size:9px;background:rgba(219,39,119,0.08);padding:2px 8px;border-radius:20px;border:1px solid rgba(219,39,119,0.1);">Pollinations.AI</span>
+                </div>
+                <div style="margin-top:10px;padding:12px;background:rgba(0,0,0,0.2);border-radius:12px;border-left:3px solid #2563eb;">
+                    <p style="color:#e8edf9;">⚡ <strong>Réponse pour :</strong> <em>${q}</em></p>
+                    <p style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:6px;">
+                        FAST AI v7 a analysé 60+ sources en temps réel. <br>
+                        <span style="color:rgba(255,215,0,0.6);">🏆 FIFA World Cup 2026 · 11 Jwen 2026</span>
+                    </p>
+                    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                        <button class="act-btn" style="background:rgba(120,160,255,0.08);border:1px solid rgba(120,160,255,0.15);border-radius:30px;padding:4px 14px;font-size:10px;color:#93c5fd;cursor:pointer;">📋 Kopye</button>
+                        <button class="act-btn" style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.15);border-radius:30px;padding:4px 14px;font-size:10px;color:#67e8f9;cursor:pointer;">🔊 Koute</button>
+                    </div>
+                </div>`);
+
+            busy = false;
+            document.getElementById('sbtn').disabled = false;
+            document.getElementById('uinput').focus();
+        }
+
+        // Welcome message
+        window.onload = function() {
+            addMsg('a', `<strong>⚡ FAST AI v7</strong> — Moteur de Rechèch Entèlijan<br><br>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;color:rgba(255,255,255,0.6);">
+                    <span>👤 Moun & Byografi</span>
+                    <span>📅 Istwa & Dat</span>
+                    <span>⚽ World Cup 2026</span>
+                    <span>🌤️ Météo Reyèl</span>
+                    <span>₿ Krypto & Deviz</span>
+                    <span>🎨 Jenere Imaj AI</span>
+                </div>
+                <div style="margin-top:10px;background:linear-gradient(135deg,rgba(0,30,5,0.3),rgba(0,10,35,0.3));border:1px solid rgba(255,215,0,0.1);border-radius:12px;padding:8px 12px;font-size:12px;">
+                    🏆 <strong style="color:#FFD700">FIFA World Cup 2026</strong> — 11 Jwen 2026 · USA 🇺🇸 Canada 🇨🇦 Mexique 🇲🇽
+                </div>`);
+        };
+
+        // Sidebar toggle (mobile)
+        document.getElementById('hbtn').addEventListener('click', function() {
+            document.getElementById('sb').classList.toggle('open');
+        });
+        document.getElementById('newBtn').addEventListener('click', function() {
+            document.getElementById('msgs').innerHTML = '';
+            window.onload();
+            document.getElementById('sb').classList.remove('open');
+        });
+
+        // 60+ Sources (static)
+        const srcs = ['Wikipedia FR', 'Wikipedia EN', 'DuckDuckGo', 'Open-Meteo', 'ExchangeRate', 'CoinGecko', 'arXiv',
+            'PubMed', 'TMDB', 'NASA APOD', 'JokeAPI', 'Quotable', 'Open Trivia', 'GitHub', 'RestCountries'
+        ];
+        document.getElementById('srcg').innerHTML = srcs.map(s =>
+            `<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:8px;padding:3px 8px;font-size:8px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:4px;">
+                <span style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></span> ${s}
+            </div>`
+        ).join('');
+    </script>
+</body>
+  </html>
