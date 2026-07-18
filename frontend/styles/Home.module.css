@@ -1,0 +1,373 @@
+.container {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  overflow-x: hidden;
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 255, 200, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+  top: 20%;
+  left: -100px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-30px) translateX(30px); }
+}
+
+.header {
+  position: relative;
+  z-index: 10;
+  padding: 40px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 255, 200, 0.3);
+  backdrop-filter: blur(10px);
+  background: rgba(15, 12, 41, 0.7);
+}
+
+.headerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 3rem;
+  background: linear-gradient(135deg, #00ffff, #00ff88, #ffff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  text-shadow: 0 0 30px rgba(0, 255, 200, 0.5);
+  margin-bottom: 10px;
+  animation: neonGlow 3s ease-in-out infinite;
+}
+
+@keyframes neonGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(0, 255, 200, 0.5), 0 0 40px rgba(0, 255, 136, 0.3); }
+  50% { text-shadow: 0 0 30px rgba(0, 255, 200, 0.8), 0 0 60px rgba(0, 255, 136, 0.6); }
+}
+
+.subtitle {
+  color: rgba(0, 255, 200, 0.8);
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+.main {
+  position: relative;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 12px 30px;
+  border: 2px solid rgba(0, 255, 200, 0.3);
+  background: rgba(0, 255, 200, 0.1);
+  color: #00ffff;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.tab:hover {
+  background: rgba(0, 255, 200, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.4);
+  border-color: rgba(0, 255, 200, 0.6);
+}
+
+.activeTab {
+  background: rgba(0, 255, 200, 0.25);
+  border-color: #00ffff;
+  box-shadow: 0 0 30px rgba(0, 255, 200, 0.6), inset 0 0 20px rgba(0, 255, 200, 0.2);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formSection {
+  background: rgba(15, 12, 41, 0.8);
+  border: 2px solid rgba(0, 255, 200, 0.3);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 40px rgba(0, 255, 200, 0.2), inset 0 0 30px rgba(0, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.formSection::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 255, 200, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.form {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form h2 {
+  color: #00ffff;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(0, 255, 200, 0.5);
+}
+
+.form input,
+.form textarea {
+  background: rgba(48, 43, 99, 0.6);
+  border: 2px solid rgba(0, 255, 200, 0.2);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.form input:focus,
+.form textarea:focus {
+  outline: none;
+  border-color: #00ffff;
+  background: rgba(48, 43, 99, 0.8);
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.4), inset 0 0 15px rgba(0, 255, 200, 0.1);
+}
+
+.form input::placeholder,
+.form textarea::placeholder {
+  color: rgba(0, 255, 200, 0.5);
+}
+
+.form button {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, rgba(0, 255, 200, 0.3), rgba(0, 255, 136, 0.2));
+  border: 2px solid #00ffff;
+  color: #00ffff;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+}
+
+.form button:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(0, 255, 200, 0.5), rgba(0, 255, 136, 0.4));
+  box-shadow: 0 0 40px rgba(0, 255, 200, 0.6), inset 0 0 20px rgba(0, 255, 200, 0.2);
+  transform: translateY(-2px);
+}
+
+.form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.messagesSection {
+  background: rgba(15, 12, 41, 0.8);
+  border: 2px solid rgba(0, 255, 200, 0.3);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 40px rgba(0, 255, 200, 0.2), inset 0 0 30px rgba(0, 255, 255, 0.05);
+}
+
+.messagesSection h2 {
+  color: #00ffff;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(0, 255, 200, 0.5);
+}
+
+.messagesList {
+  max-height: 600px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.messagesList > p {
+  color: rgba(0, 255, 200, 0.6);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.messageCard {
+  background: rgba(0, 255, 200, 0.08);
+  border: 2px solid rgba(0, 255, 200, 0.3);
+  border-radius: 12px;
+  padding: 18px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.messageCard:hover {
+  background: rgba(0, 255, 200, 0.12);
+  border-color: rgba(0, 255, 200, 0.6);
+  box-shadow: 0 0 30px rgba(0, 255, 200, 0.3), inset 0 0 15px rgba(0, 255, 200, 0.1);
+}
+
+.scheduleCard {
+  background: rgba(0, 150, 200, 0.08);
+  border: 2px solid rgba(0, 180, 220, 0.3);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.scheduleCard:hover {
+  background: rgba(0, 150, 200, 0.12);
+  border-color: rgba(0, 180, 220, 0.6);
+  box-shadow: 0 0 30px rgba(0, 180, 220, 0.3), inset 0 0 15px rgba(0, 180, 220, 0.1);
+}
+
+.messageInfo {
+  flex: 1;
+}
+
+.phone {
+  color: #00ffff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(0, 255, 200, 0.3);
+}
+
+.msgText {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.msgDetails {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: rgba(0, 255, 200, 0.7);
+}
+
+.status {
+  background: rgba(0, 255, 200, 0.2);
+  padding: 4px 12px;
+  border-radius: 6px;
+  color: #00ffff;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.statusBadge {
+  background: rgba(0, 255, 136, 0.2);
+  padding: 4px 12px;
+  border-radius: 6px;
+  color: #00ff88;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.msgFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 255, 200, 0.1);
+  font-size: 0.85rem;
+  color: rgba(0, 255, 200, 0.6);
+}
+
+.deleteBtn {
+  background: rgba(255, 100, 100, 0.2);
+  border: 2px solid rgba(255, 100, 100, 0.4);
+  color: #ff6464;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 15px;
+}
+
+.deleteBtn:hover {
+  background: rgba(255, 100, 100, 0.4);
+  border-color: #ff6464;
+  box-shadow: 0 0 20px rgba(255, 100, 100, 0.4);
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .content {
+    gap: 20px;
+  }
+
+  .formSection,
+  .messagesSection {
+    padding: 20px;
+  }
+
+  .messagesList {
+    max-height: 400px;
+  }
+}
