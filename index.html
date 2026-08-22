@@ -1,0 +1,744 @@
+<!-- admin.html - Admin Panel Separe -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLAST PROXY - Admin Panel</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #2a2a2a;
+            --text: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --accent: #ff4444;
+            --border: #333333;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --success: #4CAF50;
+            --error: #f44336;
+            --warning: #ff9800;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        .admin-nav {
+            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+            border-bottom: 2px solid var(--accent);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        }
+        
+        .admin-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .section {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            color: var(--accent);
+        }
+        
+        .script-manager {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+        
+        .script-list {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .script-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .script-item:hover {
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+        
+        .script-item.active {
+            border-color: var(--accent);
+            background: rgba(255, 68, 68, 0.1);
+        }
+        
+        .script-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .script-info {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .script-editor {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #ff6666;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 68, 68, 0.3);
+        }
+        
+        .btn-danger {
+            background: transparent;
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+        
+        .btn-danger:hover {
+            background: var(--error);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #66bb6a;
+            transform: translateY(-2px);
+        }
+        
+        .target-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .input-group textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .license-manager {
+            margin-top: 30px;
+        }
+        
+        .license-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .license-table th {
+            background: rgba(255, 68, 68, 0.1);
+            padding: 15px;
+            text-align: left;
+            font-size: 13px;
+            color: var(--accent);
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .license-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+        
+        .status-expired {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--error);
+        }
+        
+        .status-pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+        
+        .log-console {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid var(--accent);
+            padding-left: 10px;
+        }
+        
+        .log-time {
+            color: var(--text-muted);
+            margin-right: 10px;
+        }
+        
+        .log-message {
+            color: var(--text);
+        }
+        
+        .log-success {
+            border-left-color: var(--success);
+        }
+        
+        .log-error {
+            border-left-color: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <nav class="admin-nav">
+        <div class="admin-logo">🔐 BLAST PROXY ADMIN</div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-success" onclick="deployAllScripts()">Déployer Tout</button>
+            <button class="btn btn-danger" onclick="logout()">Déconnexion</button>
+        </div>
+    </nav>
+    
+    <div class="admin-container">
+        <!-- Gestion des Scripts -->
+        <div class="section">
+            <h2 class="section-title">📁 GESTION DES SCRIPTS</h2>
+            
+            <div class="script-manager">
+                <div class="script-list" id="scriptList">
+                    <!-- Scripts seront chargés ici -->
+                </div>
+                
+                <div class="script-editor">
+                    <div class="editor-header">
+                        <h3>Éditeur de Script</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" onclick="saveScript()">Sauvegarder</button>
+                            <button class="btn btn-danger" onclick="deleteScript()">Supprimer</button>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>NOM DU FICHIER SCRIPT</label>
+                        <input type="text" id="scriptFileName" value="ashaders.Wl7fEAZt8J45i5cEQH1htckkHtQ~3D">
+                    </div>
+                    
+                    <div class="target-config">
+                        <div class="input-group">
+                            <label>PACKAGE CIBLE</label>
+                            <input type="text" id="targetPackage" value="com.dts.freefireth">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>EMPLACEMENT D'INJECTION</label>
+                            <input type="text" id="injectionPath" value="/data/local/tmp/scripts/">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>CONTENU DU SCRIPT (BINAIRE)</label>
+                        <textarea id="scriptContent">7f45 4c46 0201 0100 0000 0000 0000 0000
+0300 3e00 0100 0000 3000 0000 0000 0000
+4000 0000 0000 0000 0000 0000 0000 0000
+0000 0000 3800 0100 0000 0000 0000 0000
+0100 0000 0700 0000 0000 0000 0000 0000
+0000 0000 0000 0000 0000 0000 0000 0000
+0600 0000 1000 0000 3100 0000 0000 0000
+0000 0000 0000 0000 4000 0000 0000 0000
+0300 0000 0000 0000 5100 0000 0000 0000
+0100 0000 0000 0000 0400 0000 0000 0000
+0100 0000 0700 0000 0000 1800 0000 0000
+0000 0000 0000 0000 0000 0000 0000 0000</textarea>
+                    </div>
+                    
+                    <div class="log-console" id="logConsole">
+                        <div class="log-entry">
+                            <span class="log-time">[10:30:45]</span>
+                            <span class="log-message">Système prêt. En attente de commandes...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gestion des Licences -->
+        <div class="section">
+            <h2 class="section-title">🔑 GESTION DES LICENCES</h2>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="generateLicense()">Générer une Licence</button>
+                <button class="btn btn-success" onclick="exportLicenses()">Exporter</button>
+                <button class="btn btn-danger" onclick="clearExpiredLicenses()">Nettoyer Expirées</button>
+            </div>
+            
+            <table class="license-table">
+                <thead>
+                    <tr>
+                        <th>CLÉ</th>
+                        <th>DURÉE</th>
+                        <th>EXPIRATION</th>
+                        <th>UTILISATEUR IP</th>
+                        <th>STATUT</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="licenseTableBody">
+                    <!-- Licences seront chargées ici -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Configuration Système -->
+        <div class="section">
+            <h2 class="section-title">⚙️ CONFIGURATION SYSTÈME</h2>
+            
+            <div class="target-config">
+                <div class="input-group">
+                    <label>URL DU PANEL CUSTOMER</label>
+                    <input type="text" id="customerPanelUrl" value="https://blast-proxy.vercel.app">
+                </div>
+                
+                <div class="input-group">
+                    <label>PORT PROXY</label>
+                    <input type="text" id="proxyPort" value="8080">
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveSystemConfig()">Sauvegarder Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let scripts = [];
+        let licenses = [];
+        let selectedScript = null;
+        
+        // Initialisation
+        window.onload = function() {
+            checkAdminAuth();
+            loadScripts();
+            loadLicenses();
+            addLog('Système initialisé avec succès', 'success');
+        };
+        
+        // Vérifier authentification
+        function checkAdminAuth() {
+            const adminAuth = localStorage.getItem('blast_admin_auth');
+            if (!adminAuth) {
+                window.location.href = '/admin-login';
+            }
+        }
+        
+        // Charger les scripts
+        function loadScripts() {
+            scripts = [
+                {
+                    id: 'ashaders.Wl7fEAZt8J45i5cEQH1htckkHtQ~3D',
+                    name: 'ashaders.Wl7fEAZt8J45i5cEQH1htckkHtQ~3D',
+                    size: '2.3 KB',
+                    status: 'active',
+                    target: 'com.dts.freefireth',
+                    path: '/data/local/tmp/scripts/'
+                },
+                {
+                    id: 'aimbot.script',
+                    name: 'aimbot.script',
+                    size: '1.8 KB',
+                    status: 'active',
+                    target: 'com.dts.freefireth',
+                    path: '/data/local/tmp/scripts/'
+                },
+                {
+                    id: 'speedhack.script',
+                    name: 'speedhack.script',
+                    size: '1.5 KB',
+                    status: 'active',
+                    target: 'com.dts.freefireth',
+                    path: '/data/local/tmp/scripts/'
+                }
+            ];
+            
+            renderScriptList();
+        }
+        
+        // Afficher la liste des scripts
+        function renderScriptList() {
+            const scriptList = document.getElementById('scriptList');
+            scriptList.innerHTML = '';
+            
+            scripts.forEach(script => {
+                const scriptItem = document.createElement('div');
+                scriptItem.className = 'script-item' + (selectedScript === script.id ? ' active' : '');
+                scriptItem.innerHTML = `
+                    <div class="script-name">📄 ${script.name}</div>
+                    <div class="script-info">
+                        Taille: ${script.size} | Cible: ${script.target}
+                    </div>
+                    <div class="script-info">
+                        Statut: ${script.status === 'active' ? '✅ Active' : '❌ Inactive'}
+                    </div>
+                `;
+                scriptItem.onclick = () => selectScript(script.id);
+                scriptList.appendChild(scriptItem);
+            });
+        }
+        
+        // Sélectionner un script
+        function selectScript(scriptId) {
+            selectedScript = scriptId;
+            const script = scripts.find(s => s.id === scriptId);
+            
+            if (script) {
+                document.getElementById('scriptFileName').value = script.name;
+                document.getElementById('targetPackage').value = script.target;
+                document.getElementById('injectionPath').value = script.path;
+            }
+            
+            renderScriptList();
+        }
+        
+        // Sauvegarder un script
+        function saveScript() {
+            const scriptName = document.getElementById('scriptFileName').value;
+            const targetPackage = document.getElementById('targetPackage').value;
+            const injectionPath = document.getElementById('injectionPath').value;
+            const scriptContent = document.getElementById('scriptContent').value;
+            
+            if (!scriptName || !targetPackage || !injectionPath) {
+                addLog('Erreur: Champs requis manquants', 'error');
+                return;
+            }
+            
+            // Simuler la sauvegarde
+            addLog(`Script ${scriptName} sauvegardé avec succès`, 'success');
+            addLog(`Cible: ${targetPackage}`, '');
+            addLog(`Chemin: ${injectionPath}`, '');
+            
+            // Déployer le script
+            deployScript(scriptName, targetPackage, injectionPath);
+        }
+        
+        // Déployer un script
+        function deployScript(scriptName, targetPackage, injectionPath) {
+            addLog(`Déploiement du script ${scriptName}...`, '');
+            
+            setTimeout(() => {
+                addLog(`Script injecté dans ${targetPackage}`, 'success');
+                addLog(`Emplacement: ${injectionPath}${scriptName}`, '');
+            }, 2000);
+        }
+        
+        // Déployer tous les scripts
+        function deployAllScripts() {
+            addLog('Déploiement de tous les scripts...', '');
+            
+            scripts.forEach((script, index) => {
+                setTimeout(() => {
+                    addLog(`Déploiement de ${script.name}...`, '');
+                    setTimeout(() => {
+                        addLog(`${script.name} déployé avec succès dans ${script.target}`, 'success');
+                    }, 1000);
+                }, index * 500);
+            });
+        }
+        
+        // Supprimer un script
+        function deleteScript() {
+            if (!selectedScript) {
+                addLog('Aucun script sélectionné', 'error');
+                return;
+            }
+            
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce script ?')) {
+                scripts = scripts.filter(s => s.id !== selectedScript);
+                selectedScript = null;
+                renderScriptList();
+                addLog('Script supprimé avec succès', 'success');
+            }
+        }
+        
+        // Charger les licences
+        function loadLicenses() {
+            licenses = [
+                {
+                    key: 'BLAST-ABCDE-12345-FGHIJ',
+                    duration: 30,
+                    expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+                    userIP: '192.168.1.100',
+                    status: 'active'
+                },
+                {
+                    key: 'BLAST-KLMNO-67890-PQRST',
+                    duration: 7,
+                    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+                    userIP: '192.168.1.101',
+                    status: 'active'
+                },
+                {
+                    key: 'BLAST-UVWXY-11111-ZABCD',
+                    duration: 1,
+                    expiresAt: Date.now() - 24 * 60 * 60 * 1000,
+                    userIP: '192.168.1.102',
+                    status: 'expired'
+                }
+            ];
+            
+            renderLicenseTable();
+        }
+        
+        // Afficher la table des licences
+        function renderLicenseTable() {
+            const licenseTableBody = document.getElementById('licenseTableBody');
+            licenseTableBody.innerHTML = '';
+            
+            licenses.forEach((license, index) => {
+                const row = document.createElement('tr');
+                
+                const statusClass = license.status === 'active' ? 'status-active' : 
+                                   license.status === 'expired' ? 'status-expired' : 'status-pending';
+                
+                row.innerHTML = `
+                    <td><strong>${license.key}</strong></td>
+                    <td>${license.duration} jours</td>
+                    <td>${new Date(license.expiresAt).toLocaleDateString('fr-FR')}</td>
+                    <td>${license.userIP || 'N/A'}</td>
+                    <td><span class="status-badge ${statusClass}">${license.status.toUpperCase()}</span></td>
+                    <td>
+                        <button class="btn" onclick="toggleLicense(${index})">
+                            ${license.status === 'active' ? 'Désactiver' : 'Activer'}
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteLicense(${index})">
+                            Supprimer
+                        </button>
+                    </td>
+                `;
+                
+                licenseTableBody.appendChild(row);
+            });
+        }
+        
+        // Générer une licence
+        function generateLicense() {
+            const duration = prompt('Durée de la licence (jours):', '30');
+            if (!duration) return;
+            
+            const newLicense = {
+                key: generateLicenseKey(),
+                duration: parseInt(duration),
+                expiresAt: Date.now() + parseInt(duration) * 24 * 60 * 60 * 1000,
+                userIP: null,
+                status: 'active'
+            };
+            
+            licenses.push(newLicense);
+            renderLicenseTable();
+            addLog(`Licence générée: ${newLicense.key}`, 'success');
+        }
+        
+        // Générer une clé de licence
+        function generateLicenseKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const segments = [];
+            
+            for (let i = 0; i < 4; i++) {
+                let segment = '';
+                for (let j = 0; j < 5; j++) {
+                    segment += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                segments.push(segment);
+            }
+            
+            return `BLAST-${segments.join('-')}`;
+        }
+        
+        // Activer/Désactiver une licence
+        function toggleLicense(index) {
+            licenses[index].status = licenses[index].status === 'active' ? 'expired' : 'active';
+            renderLicenseTable();
+            addLog(`Licence ${licenses[index].key} ${licenses[index].status === 'active' ? 'activée' : 'désactivée'}`, 'success');
+        }
+        
+        // Supprimer une licence
+        function deleteLicense(index) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette licence ?')) {
+                const deletedKey = licenses[index].key;
+                licenses.splice(index, 1);
+                renderLicenseTable();
+                addLog(`Licence ${deletedKey} supprimée`, 'success');
+            }
+        }
+        
+        // Exporter les licences
+        function exportLicenses() {
+            const dataStr = JSON.stringify(licenses, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'licenses.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            addLog('Licences exportées avec succès', 'success');
+        }
+        
+        // Nettoyer les licences expirées
+        function clearExpiredLicenses() {
+            const beforeCount = licenses.length;
+            licenses = licenses.filter(l => l.status !== 'expired');
+            const removedCount = beforeCount - licenses.length;
+            
+            renderLicenseTable();
+            addLog(`${removedCount} licences expirées supprimées`, 'success');
+        }
+        
+        // Sauvegarder la configuration système
+        function saveSystemConfig() {
+            const customerPanelUrl = document.getElementById('customerPanelUrl').value;
+            const proxyPort = document.getElementById('proxyPort').value;
+            
+            const config = {
+                customerPanelUrl: customerPanelUrl,
+                proxyPort: proxyPort,
+                updatedAt: Date.now()
+            };
+            
+            localStorage.setItem('blast_system_config', JSON.stringify(config));
+            addLog('Configuration système sauvegardée', 'success');
+        }
+        
+        // Ajouter un log
+        function addLog(message, type = '') {
+            const logConsole = document.getElementById('logConsole');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry ' + type;
+            
+            const now = new Date();
+            const time = now.toTimeString().split(' ')[0];
+            
+            logEntry.innerHTML = `
+                <span class="log-time">[${time}]</span>
+                <span class="log-message">${message}</span>
+            `;
+            
+            logConsole.appendChild(logEntry);
+            logConsole.scrollTop = logConsole.scrollHeight;
+        }
+        
+        // Déconnexion
+        function logout() {
+            localStorage.removeItem('blast_admin_auth');
+            window.location.href = '/admin-login';
+        }
+    </script>
+</body>
+</html>
