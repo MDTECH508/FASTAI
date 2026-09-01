@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLAST PROXY - Administration</title>
+    <style>
+        :root { --bg:#0a0a0f; --card:rgba(255,255,255,0.04); --border:rgba(255,255,255,0.12); --accent:#8b93a6; }
+        body { background:var(--bg); color:#fff; font-family:system-ui; padding:20px; margin:0; }
+        h1 { text-align:center; color:var(--accent); margin-bottom:30px; }
+        .controls { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+        button { padding:8px 15px; background:#2a2e38; color:#d7dce4; border:1px solid #444; border-radius:8px; cursor:pointer; }
+        table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--border); }
+        th, td { padding:10px; text-align:left; border-bottom:1px solid #222; font-size:13px; }
+        th { background:rgba(255,255,255,0.05); color:var(--accent); }
+        .status-active { color:#6bcf9a; }
+        .status-expired { color:#ff8078; }
+        .status-blocked { color:#fdcb6e; }
+        .btn-sm { padding:3px 8px; font-size:11px; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Administration des Licences</h1>
+    <div class="controls">
+        <button onclick="createNewKey()">+ Créer une nouvelle clé</button>
+        <button onclick="resetAll()">Réinitialiser tout</button>
+    </div>
+    <table>
+        <thead>
+            <tr><th>Clé</th><th>Durée</th><th>IP</th><th>Statut</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script>
+        function getDB() { return JSON.parse(localStorage.getItem('blast_keys_db') || '[]'); }
+        function saveDB(db) { localStorage.setItem('blast_keys_db', JSON.stringify(db)); }
+
+        function render() {
+            const db = getDB();
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            db.forEach((k, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${k.key}</td>
+                    <td>${k.duration}j</td>
+                    <td>${k.ip || '—'}</td>
+                    <td class="status-${k.status}">${k.status}</td>
+                    <td>
+                        ${k.status === 'active' && !k.ip ? `<button class="btn-sm" onclick="blockKey(${idx})">Bloquer</button>` : ''}
+                        ${k.status === 'blocked' ? `<button class="btn-sm" onclick="unblockKey(${idx})">Débloquer</button>` : ''}
+                        ${k.ip ? `<button class="btn-sm" onclick="resetKey(${idx})">Réinitialiser IP</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function blockKey(idx) { const db = getDB(); db[idx].status = 'blocked'; saveDB(db); render(); }
+        function unblockKey(idx) { const db = getDB(); db[idx].status = 'active'; saveDB(db); render(); }
+        function resetKey(idx) { const db = getDB(); db[idx].ip = null; db[idx].activatedAt = null; db[idx].expiresAt = null; db[idx].status = 'active'; saveDB(db); render(); }
+        function createNewKey() {
+            const db = getDB();
+            const dur = prompt('Durée en jours (1, 7, 30) :', '1');
+            const d = parseInt(dur);
+            if (![1,7,30].includes(d)) return alert('Durée invalide');
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const seg = () => Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+            const key = `BLAST-${d}D-${String(db.length+1).padStart(4,'0')}-${seg()}`;
+            db.push({ key, duration:d, status:'active', ip:null, activatedAt:null, expiresAt:null });
+            saveDB(db);
+            render();
+        }
+        function resetAll() {
+            if (confirm('Réinitialiser toutes les clés ? Cette action est irréversible.')) {
+                localStorage.removeItem('blast_keys_db');
+                location.reload();
+            }
+        }
+
+        if (!localStorage.getItem('blast_keys_db')) {
+            const keys = [];
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const rand4 = () => Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+            for(let i=1; i<=200; i++) keys.push({ key:`BLAST-1D-${String(i).padStart(4,'0')}-${rand4()}`, duration:1, status:'active', ip:null, activatedAt:null, expiresAt:null });
+            for(let i=1; i<=150; i++) keys.push({ key:`BLAST-7D-${String(i).padStart(4,'0')}-${rand4()}`, duration:7, status:'active', ip:null, activatedAt:null, expiresAt:null });
+            for(let i=1; i<=50; i++) keys.push({ key:`BLAST-30D-${String(i).padStart(4,'0')}-${rand4()}`, duration:30, status:'active', ip:null, activatedAt:null, expiresAt:null });
+            localStorage.setItem('blast_keys_db', JSON.stringify(keys));
+        }
+        render();
+    </script>
+</body>
+</html>
