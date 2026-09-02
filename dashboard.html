@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>BLAST PROXY - Menu</title>
+    <style>
+        :root {
+            --bg-primary: #07070a;
+            --bg-secondary: #101014;
+            --text: #eef0f4;
+            --text-secondary: #9aa1ae;
+            --text-muted: #565b68;
+            --accent: #8b93a6;
+            --accent-2: #d7dce4;
+            --glass: rgba(255, 255, 255, 0.035);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --success: #6bcf9a;
+            --error: #ff8078;
+            --warning: #fdcb6e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            padding: 0 0 40px 0;
+        }
+
+        /* ---------- Fond liquid glass ---------- */
+        .liquid-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse 90% 60% at 50% 0%, rgba(140, 150, 170, 0.10), transparent 60%),
+                linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+        .liquid-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.3;
+            animation: floatOrb 18s ease-in-out infinite;
+        }
+        .liquid-orb:nth-child(1) { width: 400px; height: 400px; background: radial-gradient(circle, #4b5262, transparent 70%); top: -100px; left: -80px; }
+        .liquid-orb:nth-child(2) { width: 350px; height: 350px; background: radial-gradient(circle, #6e7688, transparent 70%); bottom: -60px; right: -50px; animation-delay: -6s; }
+        .liquid-orb:nth-child(3) { width: 260px; height: 260px; background: radial-gradient(circle, #9aa3b5, transparent 70%); top: 40%; left: 60%; animation-delay: -12s; opacity: 0.18; }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+            25% { transform: translate3d(90px, -70px, 40px) scale(1.1); }
+            50% { transform: translate3d(-70px, 80px, -30px) scale(0.9); }
+            75% { transform: translate3d(60px, 50px, 20px) scale(1.05); }
+        }
+
+        /* ---------- Navbar ---------- */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(10, 10, 15, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .navbar-brand {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #ffffff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .navbar-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-2);
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: var(--error);
+            border-color: var(--error);
+            color: #fff;
+        }
+        .logout-btn svg { width: 18px; height: 18px; }
+
+        /* ---------- Contenu principal ---------- */
+        .dashboard {
+            position: relative;
+            z-index: 10;
+            max-width: 560px;
+            margin: 24px auto 0;
+            padding: 0 16px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 420px) {
+            .features-grid { grid-template-columns: 1fr; }
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 14px;
+            transition: all 0.25s;
+        }
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(180, 190, 205, 0.35);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .feature-icon {
+            width: 34px;
+            height: 34px;
+            background: rgba(139, 147, 166, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .feature-icon svg { width: 17px; height: 17px; stroke: var(--accent-2); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .feature-title { font-size: 13px; font-weight: 600; flex: 1; }
+        .risk-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 10px;
+            color: var(--warning);
+            background: rgba(253, 203, 110, 0.12);
+            border: 1px solid rgba(253, 203, 110, 0.3);
+            white-space: nowrap;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        .status-indicator.active {
+            color: var(--success);
+            background: rgba(107, 207, 154, 0.1);
+            border: 1px solid rgba(107, 207, 154, 0.3);
+        }
+        .status-indicator.inactive {
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .status-indicator.active .status-dot {
+            box-shadow: 0 0 8px currentColor;
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: #aaa;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--success);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+            background: #fff;
+        }
+
+        .script-info {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .script-info .script-name {
+            font-family: 'Courier New', monospace;
+            color: var(--accent-2);
+            font-size: 10px;
+        }
+        .script-info .script-target {
+            font-family: 'Courier New', monospace;
+            color: var(--success);
+            font-size: 10px;
+        }
+
+        .script-textarea {
+            width: 100%;
+            min-height: 48px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(139, 147, 166, 0.25);
+            border-radius: 10px;
+            color: var(--accent-2);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            padding: 8px;
+            resize: vertical;
+            outline: none;
+        }
+        .script-textarea::placeholder { color: var(--text-muted); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 12px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 100;
+            display: none;
+        }
+        .toast.show { display: block; animation: toastIn 0.3s ease; }
+        .toast.success { border-color: var(--success); color: var(--success); }
+        .toast.error { border-color: var(--error); color: var(--error); }
+
+        @keyframes toastIn {
+            from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="liquid-bg">
+        <div class="liquid-orb"></div>
+        <div class="liquid-orb"></div>
+        <div class="liquid-orb"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">BLAST PROXY</div>
+        <div class="navbar-info" id="userInfo"></div>
+        <button class="logout-btn" onclick="logout()" title="Déconnexion">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+        </button>
+    </nav>
+
+    <div class="dashboard">
+        <!-- iOS OPTIONS -->
+        <div class="section">
+            <div class="section-title">iOS Options</div>
+            <div class="features-grid">
+                <!-- Aim Body (risque bannissement) -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="1" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="1" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="23" y2="12"/></svg></div>
+                        <span class="feature-title">Aim Body</span>
+                        <span class="risk-badge">⚠ Risque</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="iosAimBody" onchange="toggleFeature('iosAimBody')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-iosAimBody"><span class="status-dot"></span> OFF</div>
+                </div>
+
+                <!-- Aim Chest -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="1" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="1" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="23" y2="12"/></svg></div>
+                        <span class="feature-title">Aim Chest</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="iosAimChest" onchange="toggleFeature('iosAimChest')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-iosAimChest"><span class="status-dot"></span> OFF</div>
+                </div>
+
+                <!-- Aim Magic -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="1" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="1" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="23" y2="12"/></svg></div>
+                        <span class="feature-title">Aim Magic</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="iosAimMagic" onchange="toggleFeature('iosAimMagic')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-iosAimMagic"><span class="status-dot"></span> OFF</div>
+                </div>
+
+                <!-- Aim Neck -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="1" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="1" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="23" y2="12"/></svg></div>
+                        <span class="feature-title">Aim Neck</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="iosAimNeck" onchange="toggleFeature('iosAimNeck')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-iosAimNeck"><span class="status-dot"></span> OFF</div>
+                </div>
+
+                <!-- Aim Drag -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="1" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="1" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="23" y2="12"/></svg></div>
+                        <span class="feature-title">Aim Drag</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="iosAimDrag" onchange="toggleFeature('iosAimDrag')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-iosAimDrag"><span class="status-dot"></span> OFF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOLOGRAM iOS -->
+        <div class="section">
+            <div class="section-title">Hologram iOS</div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+                        <span class="feature-title">Holo iOS</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="holoIos" onchange="toggleFeature('holoIos')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-holoIos"><span class="status-dot"></span> OFF</div>
+                    <div class="script-info">
+                        <p>Fichier : <span class="script-name">(vide)</span></p>
+                        <p>Cible : <span class="script-target">com.demo.aa</span></p>
+                        <p>Statut : <span id="holoIosStatus" class="script-target">INACTIF</span></p>
+                    </div>
+                    <textarea class="script-textarea" id="holoIosScript" placeholder="-- Entrez le script Lua ici..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- AIM OPTIONS (standard) -->
+        <div class="section">
+            <div class="section-title">Aim Options</div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="1" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="1" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="23" y2="12"/></svg></div>
+                        <span class="feature-title">Aim Drag</span>
+                        <label class="toggle-switch"><input type="checkbox" id="aimDrag" onchange="toggleFeature('aimDrag')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-aimDrag"><span class="status-dot"></span> OFF</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="1" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="1" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="23" y2="12"/></svg></div>
+                        <span class="feature-title">Aim Body</span>
+                        <label class="toggle-switch"><input type="checkbox" id="aimBody" onchange="toggleFeature('aimBody')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-aimBody"><span class="status-dot"></span> OFF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOLO FEATURES -->
+        <div class="section">
+            <div class="section-title">Holo Features</div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+                        <span class="feature-title">Holo Armas</span>
+                        <label class="toggle-switch"><input type="checkbox" id="holoV1Armas" onchange="toggleFeature('holoV1Armas')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-holoV1Armas"><span class="status-dot"></span> OFF</div>
+                    <div class="script-info"><p>Fichier : <span class="script-name">bde.js</span></p><p>Dest : <span class="script-target">com.exo.drmo</span></p></div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+                        <span class="feature-title">Holo All</span>
+                        <label class="toggle-switch"><input type="checkbox" id="holoV1All" onchange="toggleFeature('holoV1All')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-holoV1All"><span class="status-dot"></span> OFF</div>
+                    <div class="script-info"><p>Fichier : <span class="script-name">bde.js</span></p><p>Dest : <span class="script-target">com.exo.drmo</span></p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOST FEATURES -->
+        <div class="section">
+            <div class="section-title">Most Features</div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                        <span class="feature-title">Back Jump</span>
+                        <label class="toggle-switch"><input type="checkbox" id="backJump" onchange="toggleFeature('backJump')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-backJump"><span class="status-dot"></span> OFF</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg></div>
+                        <span class="feature-title">Swap Fast</span>
+                        <label class="toggle-switch"><input type="checkbox" id="swapFast" onchange="toggleFeature('swapFast')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-swapFast"><span class="status-dot"></span> OFF</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 6-6"/></svg></div>
+                        <span class="feature-title">Speed</span>
+                        <label class="toggle-switch"><input type="checkbox" id="speed" onchange="toggleFeature('speed')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-speed"><span class="status-dot"></span> OFF</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                        <span class="feature-title">Bypass</span>
+                        <label class="toggle-switch"><input type="checkbox" id="bypass" onchange="toggleFeature('bypass')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-bypass"><span class="status-dot"></span> OFF</div>
+                    <div class="script-info"><p>Fichier : <span class="script-name">bypass.lua</span></p><p>Statut : <span id="bypassStatus" class="script-target">INACTIF</span></p></div>
+                    <textarea class="script-textarea" id="bypassScript" placeholder="-- Entrez le script Lua ici..."></textarea>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                        <span class="feature-title">Bypass TH</span>
+                        <label class="toggle-switch"><input type="checkbox" id="bypassTh" onchange="toggleFeature('bypassTh')"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="status-indicator inactive" id="status-bypassTh"><span class="status-dot"></span> OFF</div>
+                    <div class="script-info"><p>Fichier : <span class="script-name">bypass_th.lua</span></p><p>Statut : <span id="bypassThStatus" class="script-target">INACTIF</span></p></div>
+                    <textarea class="script-textarea" id="bypassThScript" placeholder="-- Entrez le script Lua ici..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const FEATURE_NAMES = {
+            iosAimBody: 'Aim Body',
+            iosAimChest: 'Aim Chest',
+            iosAimMagic: 'Aim Magic',
+            iosAimNeck: 'Aim Neck',
+            iosAimDrag: 'Aim Drag',
+            holoIos: 'Holo iOS',
+            aimDrag: 'Aim Drag',
+            aimBody: 'Aim Body',
+            holoV1Armas: 'Holo Armas',
+            holoV1All: 'Holo All',
+            backJump: 'Back Jump',
+            swapFast: 'Swap Fast',
+            speed: 'Speed',
+            bypass: 'Bypass',
+            bypassTh: 'Bypass TH'
+        };
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + (type === 'success' ? 'success' : 'error');
+            setTimeout(() => { toast.className = 'toast'; }, 2000);
+        }
+
+        function toggleFeature(featureName) {
+            const checkbox = document.getElementById(featureName);
+            const statusIndicator = document.getElementById(`status-${featureName}`);
+            const features = JSON.parse(localStorage.getItem('blast_features') || '{}');
+
+            features[featureName] = checkbox.checked;
+            localStorage.setItem('blast_features', JSON.stringify(features));
+
+            const displayName = FEATURE_NAMES[featureName] || featureName;
+
+            if (checkbox.checked) {
+                statusIndicator.className = 'status-indicator active';
+                statusIndicator.innerHTML = '<span class="status-dot"></span> ON';
+                showToast(`${displayName} ACTIVE`, 'success');
+
+                if (featureName === 'holoIos') {
+                    const scriptContent = document.getElementById('holoIosScript').value;
+                    const statusEl = document.getElementById('holoIosStatus');
+                    statusEl.textContent = 'RECHERCHE...';
+                    setTimeout(() => {
+                        if (scriptContent.trim() !== '') {
+                            statusEl.textContent = 'INJECTÉ';
+                            showToast('SCRIPT INJECTÉ AVEC SUCCÈS', 'success');
+                        } else {
+                            statusEl.textContent = 'ACTIF';
+                        }
+                    }, 1500);
+                }
+
+                if (featureName === 'bypass') {
+                    document.getElementById('bypassStatus').textContent = 'ACTIF';
+                    showToast('BYPASS ACTIVE - LOGIN NOW!', 'success');
+                }
+                if (featureName === 'bypassTh') {
+                    document.getElementById('bypassThStatus').textContent = 'ACTIF';
+                    showToast('BYPASS TH ACTIVE!', 'success');
+                }
+            } else {
+                statusIndicator.className = 'status-indicator inactive';
+                statusIndicator.innerHTML = '<span class="status-dot"></span> OFF';
+                showToast(`${displayName} DÉSACTIVÉ`, 'error');
+
+                if (featureName === 'holoIos') {
+                    document.getElementById('holoIosStatus').textContent = 'INACTIF';
+                }
+                if (featureName === 'bypass') {
+                    document.getElementById('bypassStatus').textContent = 'INACTIF';
+                }
+                if (featureName === 'bypassTh') {
+                    document.getElementById('bypassThStatus').textContent = 'INACTIF';
+                }
+            }
+        }
+
+        function loadFeatures() {
+            const features = JSON.parse(localStorage.getItem('blast_features') || '{}');
+            Object.keys(features).forEach(feature => {
+                const checkbox = document.getElementById(feature);
+                const statusIndicator = document.getElementById(`status-${feature}`);
+                if (checkbox && features[feature]) {
+                    checkbox.checked = true;
+                    statusIndicator.className = 'status-indicator active';
+                    statusIndicator.innerHTML = '<span class="status-dot"></span> ON';
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('blast_license');
+            localStorage.removeItem('blast_features');
+            window.location.href = 'index.html';
+        }
+
+        // Vérification de licence
+        const lic = JSON.parse(localStorage.getItem('blast_license') || 'null');
+        if (!lic || lic.expiresAt < Date.now()) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('userInfo').textContent = `${lic.ip} · Expire ${new Date(lic.expiresAt).toLocaleDateString('fr-FR')}`;
+            loadFeatures();
+        }
+    </script>
+</body>
+</html>
