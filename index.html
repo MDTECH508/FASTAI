@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>BLAST PROXY - Activation</title>
+    <style>
+        :root {
+            --bg-primary: #07070a;
+            --bg-secondary: #101014;
+            --text: #eef0f4;
+            --text-secondary: #9aa1ae;
+            --text-muted: #565b68;
+            --accent: #8b93a6;
+            --accent-2: #d7dce4;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --success: #6bcf9a;
+            --error: #ff8078;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .login-container {
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+        }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(150deg, #3a3f4a, #12141a);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .logo-icon svg { width: 28px; height: 28px; stroke: var(--accent-2); }
+        .logo h1 { font-size: 22px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; }
+        .logo p { color: var(--text-muted); margin-top: 6px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
+        .input-group { margin: 22px 0; }
+        .input-group label {
+            display: block; margin-bottom: 8px;
+            color: var(--accent-2); font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+        }
+        .input-group input {
+            width: 100%; padding: 15px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(155,163,178,0.25);
+            border-radius: 12px;
+            color: var(--text); font-size: 15px;
+            transition: all 0.3s; letter-spacing: 1px;
+        }
+        .input-group input:focus {
+            outline: none; border-color: var(--accent-2);
+            box-shadow: 0 0 0 4px rgba(180,188,202,0.1);
+        }
+        .input-group input::placeholder { color: var(--text-muted); }
+        .btn-activate {
+            width: 100%; padding: 16px;
+            background: linear-gradient(150deg, #3d4250, #1a1c22);
+            color: var(--accent-2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            letter-spacing: 2.5px; text-transform: uppercase;
+            transition: all 0.25s;
+        }
+        .btn-activate:hover { border-color: var(--accent-2); }
+        .btn-activate:disabled { opacity: 0.6; cursor: not-allowed; }
+        .status-message {
+            margin-top: 16px; padding: 13px; border-radius: 10px;
+            text-align: center; font-weight: 600; font-size: 13px; display: none;
+        }
+        .status-message.success { display: block; color: var(--success); background: rgba(107,207,154,0.08); border: 1px solid rgba(107,207,154,0.3); }
+        .status-message.error { display: block; color: var(--error); background: rgba(255,128,120,0.08); border: 1px solid rgba(255,128,120,0.3); }
+        .status-message.loading { display: block; color: var(--accent-2); background: rgba(139,147,166,0.08); border: 1px solid rgba(139,147,166,0.3); }
+        .powered-by { text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 10px; letter-spacing: 1px; }
+        .powered-by strong { color: var(--accent-2); }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+            </div>
+            <h1>BLAST PROXY</h1>
+            <p>Système d'Activation Premium</p>
+        </div>
+
+        <div class="input-group">
+            <label>CLÉ DE LICENCE</label>
+            <input type="text" id="licenseInput" placeholder="Entrez votre clé de licence..." maxlength="50" autocomplete="off">
+        </div>
+
+        <button class="btn-activate" id="activateBtn" onclick="activateLicense()">Activer</button>
+
+        <div class="status-message" id="statusMessage"></div>
+
+        <div class="powered-by">Powered by <strong>BLAST PROXY SAFE</strong></div>
+    </div>
+
+    <script>
+        // 400 kle default (200 × 1j, 150 × 7j, 50 × 30j)
+        function generateDefaultKeys() {
+            if (localStorage.getItem('blast_keys_db')) return;
+            const keys = [];
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            function rand4() { let s=''; for(let i=0;i<4;i++) s+=chars[Math.floor(Math.random()*chars.length)]; return s; }
+            for(let i=1; i<=200; i++) {
+                keys.push({ key: `BLAST-1D-${String(i).padStart(4,'0')}-${rand4()}`, duration: 1, status: 'active', ip: null, activatedAt: null, expiresAt: null });
+            }
+            for(let i=1; i<=150; i++) {
+                keys.push({ key: `BLAST-7D-${String(i).padStart(4,'0')}-${rand4()}`, duration: 7, status: 'active', ip: null, activatedAt: null, expiresAt: null });
+            }
+            for(let i=1; i<=50; i++) {
+                keys.push({ key: `BLAST-30D-${String(i).padStart(4,'0')}-${rand4()}`, duration: 30, status: 'active', ip: null, activatedAt: null, expiresAt: null });
+            }
+            localStorage.setItem('blast_keys_db', JSON.stringify(keys));
+        }
+        generateDefaultKeys();
+
+        async function detectUserIP() {
+            try {
+                const r = await fetch('https://api.ipify.org?format=json');
+                return (await r.json()).ip;
+            } catch(e) {
+                return 'Unknown';
+            }
+        }
+
+        async function activateLicense() {
+            const keyInput = document.getElementById('licenseInput').value.trim();
+            const status = document.getElementById('statusMessage');
+            const btn = document.getElementById('activateBtn');
+
+            if (!keyInput) { showStatus('Veuillez entrer votre clé de licence', 'error'); return; }
+
+            showStatus('Validation en cours...', 'loading');
+            btn.disabled = true;
+
+            const ip = await detectUserIP();
+            const db = JSON.parse(localStorage.getItem('blast_keys_db') || '[]');
+            const lic = db.find(k => k.key === keyInput);
+
+            if (!lic) { showStatus('Clé invalide', 'error'); btn.disabled = false; return; }
+            if (lic.status === 'blocked') { showStatus('Cette clé est bloquée', 'error'); btn.disabled = false; return; }
+            if (lic.ip && lic.ip !== ip) { showStatus('Cette clé est déjà liée à une autre IP', 'error'); btn.disabled = false; return; }
+
+            if (!lic.ip) {
+                lic.ip = ip;
+                lic.activatedAt = Date.now();
+                lic.expiresAt = Date.now() + lic.duration * 86400000;
+            }
+
+            if (lic.expiresAt < Date.now()) {
+                lic.status = 'expired';
+                localStorage.setItem('blast_keys_db', JSON.stringify(db));
+                showStatus('Cette clé a expiré', 'error');
+                btn.disabled = false;
+                return;
+            }
+
+            localStorage.setItem('blast_license', JSON.stringify({
+                key: lic.key,
+                ip: lic.ip,
+                duration: lic.duration,
+                activatedAt: lic.activatedAt,
+                expiresAt: lic.expiresAt
+            }));
+
+            showStatus('Licence valide ! Redirection...', 'success');
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+        }
+
+        function showStatus(msg, type) {
+            const s = document.getElementById('statusMessage');
+            s.textContent = msg;
+            s.className = 'status-message ' + type;
+        }
+
+        // Auto-redireksyon si lisans valid
+        (function() {
+            const saved = JSON.parse(localStorage.getItem('blast_license') || 'null');
+            if (saved && saved.expiresAt > Date.now()) {
+                window.location.href = 'dashboard.html';
+            }
+        })();
+
+        // Touche Entrée
+        document.getElementById('licenseInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') activateLicense();
+        });
+    </script>
+</body>
+</html>
