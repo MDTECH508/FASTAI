@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>BLAST PROXY - Administration</title>
+    <style>
+        :root {
+            --bg-primary: #07070a;
+            --bg-secondary: #101014;
+            --text: #eef0f4;
+            --text-secondary: #9aa1ae;
+            --text-muted: #565b68;
+            --accent: #8b93a6;
+            --accent-2: #d7dce4;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --success: #6bcf9a;
+            --error: #ff8078;
+            --warning: #fdcb6e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 60px;
+        }
+        .liquid-bg {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden;
+            background: radial-gradient(ellipse 90% 60% at 50% 0%, rgba(140,150,170,0.08), transparent 60%),
+                        linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+        .liquid-orb {
+            position: absolute; border-radius: 50%; filter: blur(110px); opacity: 0.3;
+            animation: floatOrb 18s ease-in-out infinite;
+        }
+        .liquid-orb:nth-child(1) { width:400px; height:400px; background:radial-gradient(circle,#4b5262,transparent 70%); top:-100px; left:-80px; }
+        .liquid-orb:nth-child(2) { width:350px; height:350px; background:radial-gradient(circle,#6e7688,transparent 70%); bottom:-60px; right:-50px; animation-delay:-6s; }
+        @keyframes floatOrb {
+            0%,100% { transform:translate3d(0,0,0) scale(1); }
+            25% { transform:translate3d(90px,-70px,40px) scale(1.1); }
+            50% { transform:translate3d(-70px,80px,-30px) scale(0.9); }
+            75% { transform:translate3d(60px,50px,20px) scale(1.05); }
+        }
+        .navbar {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(10,10,15,0.75);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 12px 16px;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        }
+        .navbar-brand { font-size: 15px; font-weight: 800; letter-spacing: 2px; }
+        .navbar-info { font-size: 10px; color: var(--text-secondary); }
+        .logout-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            color: var(--accent-2); width: 34px; height: 34px; border-radius: 10px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .logout-btn:hover { background: var(--error); border-color: var(--error); color:#fff; }
+        .logout-btn svg { width: 16px; height: 16px; }
+
+        .admin-container {
+            position: relative; z-index: 10;
+            max-width: 700px; margin: 20px auto 0; padding: 0 14px;
+        }
+        .admin-header { text-align: center; margin-bottom: 20px; }
+        .admin-header h1 {
+            font-size: 20px; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg,#ffffff,var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .admin-header p { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+
+        .controls {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 18px; justify-content: center;
+        }
+        .btn {
+            padding: 9px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 9px;
+            color: var(--accent-2); font-size: 11px; font-weight: 600;
+            cursor: pointer; letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: rgba(139,147,166,0.2); border-color: var(--accent); }
+        .btn-danger { border-color: rgba(255,128,120,0.4); color: var(--error); }
+        .btn-danger:hover { background: rgba(255,128,120,0.15); }
+
+        /* Stats */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 8px; margin-bottom: 18px;
+        }
+        @media (max-width: 480px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card {
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 14px;
+            padding: 14px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+        .stat-value { font-size: 22px; font-weight: 800; }
+        .stat-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+        .stat-value.green { color: var(--success); }
+        .stat-value.red { color: var(--error); }
+        .stat-value.yellow { color: var(--warning); }
+        .stat-value.blue { color: var(--accent-2); }
+
+        /* Category tabs */
+        .category-tabs {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 16px; justify-content: center;
+        }
+        .cat-tab {
+            padding: 7px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            cursor: pointer; font-size: 11px; font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .cat-tab.active {
+            background: rgba(139,147,166,0.2);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        /* Table */
+        .glass-table {
+            background: var(--glass); backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border); border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            padding: 11px 14px; text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 11px;
+        }
+        th {
+            background: rgba(255,255,255,0.05);
+            color: var(--accent); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .status-active { color: var(--success); font-weight: 700; }
+        .status-expired { color: var(--error); font-weight: 700; }
+        .status-blocked { color: var(--warning); font-weight: 700; }
+        .btn-sm {
+            padding: 3px 8px; font-size: 10px;
+            border-radius: 6px; margin-right: 3px;
+            cursor: pointer; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05); color: var(--accent-2);
+            transition: all 0.2s;
+        }
+        .btn-sm:hover { border-color: var(--accent); }
+        .btn-sm.block { border-color: rgba(253,203,110,0.4); color: var(--warning); }
+        .btn-sm.unblock { border-color: rgba(107,207,154,0.4); color: var(--success); }
+        .btn-sm.reset { border-color: rgba(139,147,166,0.4); color: var(--accent-2); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; padding: 16px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: rgba(20,20,28,0.95);
+            border: 1px solid var(--glass-border); border-radius: 18px;
+            padding: 20px; width: 100%; max-width: 360px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        }
+        .modal-title { font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 14px; }
+        .modal-field { margin-bottom: 12px; }
+        .modal-field label { display: block; font-size: 9px; color: var(--text-muted); margin-bottom: 5px; letter-spacing: 1px; }
+        .modal-field input, .modal-field select {
+            width: 100%; padding: 9px; background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border); border-radius: 9px;
+            color: var(--text); font-size: 11px;
+        }
+        .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
+        .modal-btn {
+            flex: 1; padding: 10px; border-radius: 9px; font-size: 11px; font-weight: 700;
+            cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s;
+        }
+        .modal-btn.save { background: linear-gradient(150deg,#3d4250,#1a1c22); color: var(--accent-2); border: 1px solid var(--glass-border); }
+        .modal-btn.cancel { background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--glass-border); }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: rgba(10,10,15,0.9); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 10px 20px; font-size: 11px; font-weight: 600; z-index: 300;
+            display: none; white-space: nowrap;
+        }
+        .toast.show { display: block; animation: toastIn 0.3s ease; }
+        .toast.success { border-color: var(--success); color: var(--success); }
+        .toast.error { border-color: var(--error); color: var(--error); }
+        @keyframes toastIn { from { transform: translateX(-50%) translateY(20px); opacity:0; } to { transform: translateX(-50%) translateY(0); opacity:1; } }
+    </style>
+</head>
+<body>
+    <div class="liquid-bg">
+        <div class="liquid-orb"></div>
+        <div class="liquid-orb"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-brand">ADMIN</div>
+        <div class="navbar-info">Contrôle total</div>
+        <button class="logout-btn" onclick="goToIndex()" title="Retour">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+        </button>
+    </nav>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>🔐 Administration</h1>
+            <p>Gestion complète des licences</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value blue" id="statTotal">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value green" id="statActive">0</div>
+                <div class="stat-label">Actives</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value red" id="statBlocked">0</div>
+                <div class="stat-label">Bloquées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value yellow" id="statExpired">0</div>
+                <div class="stat-label">Expirées</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn" onclick="openCreateModal()">+ Créer une clé</button>
+            <button class="btn" onclick="resetAll()">Réinitialiser tout</button>
+        </div>
+
+        <!-- Categories -->
+        <div class="category-tabs">
+            <div class="cat-tab active" data-cat="all" onclick="setCategory('all')">Toutes</div>
+            <div class="cat-tab" data-cat="1" onclick="setCategory('1')">1 jour</div>
+            <div class="cat-tab" data-cat="7" onclick="setCategory('7')">7 jours</div>
+            <div class="cat-tab" data-cat="30" onclick="setCategory('30')">30 jours</div>
+        </div>
+
+        <!-- Table -->
+        <div class="glass-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Clé</th>
+                        <th>Durée</th>
+                        <th>IP</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box">
+            <div class="modal-title">Créer une nouvelle clé</div>
+            <div class="modal-field">
+                <label>DURÉE (JOURS)</label>
+                <select id="newKeyDuration">
+                    <option value="1">1 jour</option>
+                    <option value="7">7 jours</option>
+                    <option value="30">30 jours</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeCreateModal()">Annuler</button>
+                <button class="modal-btn save" onclick="createNewKey()">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentCategory = 'all';
+
+        function getDB() { return JSON.parse(localStorage.getItem('blast_keys_db') || '[]'); }
+        function saveDB(db) { localStorage.setItem('blast_keys_db', JSON.stringify(db)); }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show ' + (type === 'success' ? 'success' : 'error');
+            setTimeout(() => toast.className = 'toast', 2000);
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.cat === cat);
+            });
+            render();
+        }
+
+        function updateStats() {
+            const db = getDB();
+            document.getElementById('statTotal').textContent = db.length;
+            document.getElementById('statActive').textContent = db.filter(k => k.status === 'active').length;
+            document.getElementById('statBlocked').textContent = db.filter(k => k.status === 'blocked').length;
+            document.getElementById('statExpired').textContent = db.filter(k => k.status === 'expired').length;
+        }
+
+        function render() {
+            const db = getDB();
+            const filtered = db.filter(k => {
+                if (currentCategory === 'all') return true;
+                return k.duration === parseInt(currentCategory);
+            });
+            
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            filtered.forEach((k, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${k.key}</td>
+                    <td>${k.duration}j</td>
+                    <td>${k.ip || '—'}</td>
+                    <td class="status-${k.status}">${k.status}</td>
+                    <td>
+                        ${k.status === 'active' && !k.ip ? `<button class="btn-sm block" onclick="blockKey('${k.key}')">Bloquer</button>` : ''}
+                        ${k.status === 'blocked' ? `<button class="btn-sm unblock" onclick="unblockKey('${k.key}')">Débloquer</button>` : ''}
+                        ${k.ip ? `<button class="btn-sm reset" onclick="resetKey('${k.key}')">Reset IP</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            updateStats();
+        }
+
+        function blockKey(key) {
+            const db = getDB();
+            const lic = db.find(k => k.key === key);
+            if (lic) {
+                lic.status = 'blocked';
+                saveDB(db);
+                render();
+                showToast('Clé bloquée', 'success');
+            }
+        }
+
+        function unblockKey(key) {
+            const db = getDB();
+            const lic = db.find(k => k.key === key);
+            if (lic) {
+                lic.status = 'active';
+                saveDB(db);
+                render();
+                showToast('Clé débloquée', 'success');
+            }
+        }
+
+        function resetKey(key) {
+            const db = getDB();
+            const lic = db.find(k => k.key === key);
+            if (lic) {
+                lic.ip = null;
+                lic.activatedAt = null;
+                lic.expiresAt = null;
+                lic.status = 'active';
+                saveDB(db);
+                render();
+                showToast('IP réinitialisée', 'success');
+            }
+        }
+
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('show');
+        }
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('show');
+        }
+
+        function createNewKey() {
+            const db = getDB();
+            const duration = parseInt(document.getElementById('newKeyDuration').value);
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const rand4 = () => Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+            const key = `BLAST-${duration}D-${String(db.length+1).padStart(4,'0')}-${rand4()}`;
+            
+            db.push({ key, duration, status: 'active', ip: null, activatedAt: null, expiresAt: null });
+            saveDB(db);
+            closeCreateModal();
+            render();
+            showToast('Clé créée: ' + key, 'success');
+        }
+
+        function resetAll() {
+            if (confirm('Réinitialiser toutes les clés ?')) {
+                localStorage.removeItem('blast_keys_db');
+                location.reload();
+            }
+        }
+
+        function goToIndex() {
+            window.location.href = 'index.html';
+        }
+
+        // Init
+        if (!localStorage.getItem('blast_keys_db')) {
+            const keys = [];
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const rand4 = () => Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+            for(let i=1; i<=200; i++) keys.push({ key:`BLAST-1D-${String(i).padStart(4,'0')}-${rand4()}`, duration:1, status:'active', ip:null, activatedAt:null, expiresAt:null });
+            for(let i=1; i<=150; i++) keys.push({ key:`BLAST-7D-${String(i).padStart(4,'0')}-${rand4()}`, duration:7, status:'active', ip:null, activatedAt:null, expiresAt:null });
+            for(let i=1; i<=50; i++) keys.push({ key:`BLAST-30D-${String(i).padStart(4,'0')}-${rand4()}`, duration:30, status:'active', ip:null, activatedAt:null, expiresAt:null });
+            localStorage.setItem('blast_keys_db', JSON.stringify(keys));
+        }
+        render();
+    </script>
+</body>
+</html>
