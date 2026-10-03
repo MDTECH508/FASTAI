@@ -1,0 +1,460 @@
+<!-- index.html - Login Page (Mache sou tout aparèy) -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#07070a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>BLAST PROXY - Activation</title>
+    <style>
+        :root {
+            --bg-primary: #07070a;
+            --bg-secondary: #101014;
+            --text: #eef0f4;
+            --text-secondary: #9aa1ae;
+            --text-muted: #565b68;
+            --accent: #8b93a6;
+            --accent-2: #d7dce4;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --success: #6bcf9a;
+            --error: #ff8078;
+            --warning: #fdcb6e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; overflow-x: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overscroll-behavior: none;
+        }
+
+        /* Fond liquid glass */
+        .liquid-bg {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden;
+            background: radial-gradient(ellipse 90% 60% at 50% 0%, rgba(140,150,170,0.08), transparent 60%),
+                        linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+        .liquid-orb {
+            position: absolute; border-radius: 50%; filter: blur(110px); opacity: 0.3;
+            animation: floatOrb 18s ease-in-out infinite;
+            will-change: transform;
+        }
+        .liquid-orb:nth-child(1) { width:400px; height:400px; background:radial-gradient(circle,#4b5262,transparent 70%); top:-100px; left:-80px; }
+        .liquid-orb:nth-child(2) { width:350px; height:350px; background:radial-gradient(circle,#6e7688,transparent 70%); bottom:-60px; right:-50px; animation-delay:-6s; }
+        @keyframes floatOrb {
+            0%,100% { transform:translate3d(0,0,0) scale(1); }
+            25% { transform:translate3d(90px,-70px,40px) scale(1.1); }
+            50% { transform:translate3d(-70px,80px,-30px) scale(0.9); }
+            75% { transform:translate3d(60px,50px,20px) scale(1.05); }
+        }
+
+        .login-container {
+            position: relative; z-index: 10;
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+            animation: containerIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        @keyframes containerIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(150deg, #3a3f4a, #12141a);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .logo-icon svg { width: 28px; height: 28px; stroke: var(--accent-2); }
+        .logo h1 {
+            font-size: 22px; font-weight: 800; letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg,#ffffff,var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .logo p {
+            color: var(--text-muted); margin-top: 6px;
+            font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+        }
+        .input-group { margin: 22px 0; }
+        .input-group label {
+            display: block; margin-bottom: 8px;
+            color: var(--accent-2); font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+        }
+        .input-group input {
+            width: 100%; padding: 15px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(155,163,178,0.25);
+            border-radius: 12px;
+            color: var(--text); font-size: 16px;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            -webkit-appearance: none;
+            appearance: none;
+            font-family: inherit;
+        }
+        .input-group input:focus {
+            outline: none; border-color: var(--accent-2);
+            box-shadow: 0 0 0 4px rgba(180,188,202,0.1);
+        }
+        .input-group input::placeholder { color: var(--text-muted); }
+
+        /* Bouton - iOS optimized */
+        .btn-activate {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(150deg, #3d4250, #1a1c22);
+            color: var(--accent-2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            transition: all 0.25s;
+            -webkit-appearance: none;
+            appearance: none;
+            font-family: inherit;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .btn-activate:hover { border-color: var(--accent-2); }
+        .btn-activate:active { transform: scale(0.98); }
+        .btn-activate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .status-message {
+            margin-top: 16px; padding: 13px; border-radius: 10px;
+            text-align: center; font-weight: 600; font-size: 13px; display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .status-message.success { display: block; color: var(--success); background: rgba(107,207,154,0.08); border: 1px solid rgba(107,207,154,0.3); }
+        .status-message.error { display: block; color: var(--error); background: rgba(255,128,120,0.08); border: 1px solid rgba(255,128,120,0.3); }
+        .status-message.loading { display: block; color: var(--accent-2); background: rgba(139,147,166,0.08); border: 1px solid rgba(139,147,166,0.3); }
+
+        .powered-by {
+            text-align: center; margin-top: 20px;
+            color: var(--text-muted); font-size: 10px; letter-spacing: 1px;
+        }
+        .powered-by strong { color: var(--accent-2); }
+
+        /* ============================================
+           RESPONSIVE - Tout gwosè ekran
+           ============================================ */
+
+        /* Ti telefòn (iPhone SE, etc.) */
+        @media (max-width: 380px) {
+            .login-container { padding: 30px 22px; border-radius: 18px; }
+            .logo h1 { font-size: 18px; letter-spacing: 2px; }
+            .logo p { font-size: 9px; }
+            .logo-icon { width: 56px; height: 56px; margin-bottom: 12px; }
+            .logo-icon svg { width: 24px; height: 24px; }
+            .input-group { margin: 18px 0; }
+            .input-group input { padding: 14px; font-size: 16px; }
+            .btn-activate { padding: 14px; font-size: 14px; letter-spacing: 2px; }
+        }
+
+        /* Telefòn nòmal */
+        @media (min-width: 381px) and (max-width: 480px) {
+            .login-container { padding: 35px 28px; }
+            .logo h1 { font-size: 20px; }
+        }
+
+        /* Tablette */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .login-container { max-width: 420px; padding: 45px 38px; }
+            .logo h1 { font-size: 24px; }
+        }
+
+        /* Ekran piti an wotè (landscape telefòn) */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body { padding: 10px; align-items: flex-start; }
+            .login-container { padding: 20px 24px; margin-top: 10px; }
+            .logo { margin-bottom: 15px; }
+            .logo-icon { width: 44px; height: 44px; margin-bottom: 8px; }
+            .logo-icon svg { width: 20px; height: 20px; }
+            .logo h1 { font-size: 16px; }
+            .logo p { display: none; }
+            .input-group { margin: 12px 0; }
+            .input-group input { padding: 12px; }
+            .btn-activate { padding: 12px; }
+            .powered-by { margin-top: 12px; }
+        }
+
+        /* Ekran trè wo (iPhone 14 Pro Max, etc.) */
+        @media (min-height: 900px) {
+            .login-container { padding: 50px 40px; }
+        }
+
+        /* Tablette ak Desktop */
+        @media (min-width: 769px) {
+            .login-container { max-width: 440px; padding: 50px 45px; }
+            .logo h1 { font-size: 26px; }
+            .input-group input { font-size: 16px; }
+        }
+
+        /* iPhone notch - Safe Area */
+        @supports (padding: max(0px)) {
+            body {
+                padding-top: max(20px, env(safe-area-inset-top));
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+            }
+        }
+
+        /* Dark mode - kenbe koulè nou yo */
+        @media (prefers-color-scheme: dark) {
+            body { background: var(--bg-primary); color: var(--text); }
+        }
+        @media (prefers-color-scheme: light) {
+            body { background: var(--bg-primary); color: var(--text); }
+        }
+
+        /* Reduce motion pou moun ki gen preferans */
+        @media (prefers-reduced-motion: reduce) {
+            .liquid-orb, .login-container { animation: none; }
+        }
+
+        /* Hover sèlman sou aparèy ki gen sourit */
+        @media (hover: hover) {
+            .btn-activate:hover { border-color: var(--accent-2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="liquid-bg">
+        <div class="liquid-orb"></div>
+        <div class="liquid-orb"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+            </div>
+            <h1>BLAST PROXY</h1>
+            <p>Système d'Activation Premium</p>
+        </div>
+
+        <div class="input-group">
+            <label>CLÉ DE LICENCE</label>
+            <input type="text"
+                   id="licenseInput"
+                   placeholder="Entrez votre clé..."
+                   maxlength="50"
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="characters"
+                   spellcheck="false"
+                   inputmode="text">
+        </div>
+
+        <button class="btn-activate" id="activateBtn" onclick="activateLicense()">
+            Activer
+        </button>
+
+        <div class="status-message" id="statusMessage"></div>
+
+        <div class="powered-by">Powered by <strong>BLAST PROXY SAFE</strong></div>
+    </div>
+
+    <script>
+        // =============================================
+        // 400 kle default
+        // =============================================
+        function generateDefaultKeys() {
+            try {
+                if (localStorage.getItem('blast_keys_db')) return;
+                const keys = [];
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                function rand4() { let s=''; for(let i=0;i<4;i++) s+=chars[Math.floor(Math.random()*chars.length)]; return s; }
+
+                for(let i=1; i<=200; i++) {
+                    keys.push({ key: `BLAST-1D-${String(i).padStart(4,'0')}-${rand4()}`, duration: 1, status: 'active', ip: null, activatedAt: null, expiresAt: null });
+                }
+                for(let i=1; i<=150; i++) {
+                    keys.push({ key: `BLAST-7D-${String(i).padStart(4,'0')}-${rand4()}`, duration: 7, status: 'active', ip: null, activatedAt: null, expiresAt: null });
+                }
+                for(let i=1; i<=50; i++) {
+                    keys.push({ key: `BLAST-30D-${String(i).padStart(4,'0')}-${rand4()}`, duration: 30, status: 'active', ip: null, activatedAt: null, expiresAt: null });
+                }
+                localStorage.setItem('blast_keys_db', JSON.stringify(keys));
+            } catch(e) {
+                console.error('Erreur génération clés:', e);
+            }
+        }
+        generateDefaultKeys();
+
+        // =============================================
+        // Detekte IP (ak plizyè API si youn echwe)
+        // =============================================
+        async function detectUserIP() {
+            const apis = [
+                'https://api.ipify.org?format=json',
+                'https://api64.ipify.org?format=json',
+                'https://ipapi.co/json/'
+            ];
+            
+            for (const api of apis) {
+                try {
+                    const r = await fetch(api, { 
+                        method: 'GET',
+                        mode: 'cors',
+                        cache: 'no-cache'
+                    });
+                    const data = await r.json();
+                    const ip = data.ip || data.query;
+                    if (ip) return ip;
+                } catch(e) {
+                    continue;
+                }
+            }
+            return 'Unknown-' + Math.random().toString(36).substr(2, 6);
+        }
+
+        // =============================================
+        // Aktive lisans
+        // =============================================
+        async function activateLicense() {
+            const keyInput = document.getElementById('licenseInput').value.trim().toUpperCase();
+            const status = document.getElementById('statusMessage');
+            const btn = document.getElementById('activateBtn');
+
+            if (!keyInput) {
+                showStatus('Veuillez entrer votre clé', 'error');
+                return;
+            }
+
+            showStatus('Validation en cours...', 'loading');
+            btn.disabled = true;
+
+            try {
+                const ip = await detectUserIP();
+                const db = JSON.parse(localStorage.getItem('blast_keys_db') || '[]');
+                const lic = db.find(k => k.key.toUpperCase() === keyInput);
+
+                if (!lic) {
+                    showStatus('Clé invalide', 'error');
+                    btn.disabled = false;
+                    return;
+                }
+                if (lic.status === 'blocked') {
+                    showStatus('Cette clé est bloquée', 'error');
+                    btn.disabled = false;
+                    return;
+                }
+                if (lic.ip && lic.ip !== ip) {
+                    showStatus('Clé déjà liée à une autre IP', 'error');
+                    btn.disabled = false;
+                    return;
+                }
+
+                if (!lic.ip) {
+                    lic.ip = ip;
+                    lic.activatedAt = Date.now();
+                    lic.expiresAt = Date.now() + lic.duration * 86400000;
+                    localStorage.setItem('blast_keys_db', JSON.stringify(db));
+                }
+
+                if (lic.expiresAt < Date.now()) {
+                    lic.status = 'expired';
+                    localStorage.setItem('blast_keys_db', JSON.stringify(db));
+                    showStatus('Cette clé a expiré', 'error');
+                    btn.disabled = false;
+                    return;
+                }
+
+                localStorage.setItem('blast_license', JSON.stringify({
+                    key: lic.key,
+                    ip: lic.ip,
+                    duration: lic.duration,
+                    activatedAt: lic.activatedAt,
+                    expiresAt: lic.expiresAt
+                }));
+
+                showStatus('Licence valide ! Redirection...', 'success');
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+
+            } catch(e) {
+                showStatus('Erreur: ' + e.message, 'error');
+                btn.disabled = false;
+            }
+        }
+
+        function showStatus(msg, type) {
+            const s = document.getElementById('statusMessage');
+            s.textContent = msg;
+            s.className = 'status-message ' + type;
+        }
+
+        // =============================================
+        // Auto-redireksyon si lisans valid
+        // =============================================
+        (function() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('blast_license') || 'null');
+                if (saved && saved.expiresAt > Date.now()) {
+                    window.location.href = 'dashboard.html';
+                }
+            } catch(e) {}
+        })();
+
+        // =============================================
+        // Touche Entrée (pou desktop)
+        // =============================================
+        document.getElementById('licenseInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') activateLicense();
+        });
+
+        // =============================================
+        // Prevent zoom sou iPhone lè w tape input
+        // =============================================
+        document.getElementById('licenseInput').addEventListener('focus', function() {
+            this.style.fontSize = '16px';
+        });
+
+        // =============================================
+        // Fix pou iPhone - evite zoom otomatik
+        // =============================================
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            document.addEventListener('touchstart', function(e) {
+                if (e.target.tagName === 'INPUT') {
+                    e.target.style.fontSize = '16px';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
