@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<title>NET PLUS 5G LTE</title>
+<style>
+:root{
+  --bg:#0a0a0b; --ink:#f2f2f3; --mute:#9d9da4; --line:rgba(255,255,255,.14);
+  --glass:rgba(255,255,255,.055); --glass-hi:rgba(255,255,255,.11);
+  --steel:#cacace; --ok:#8fd19e; --soon:#e3c77a;
+  --r-lg:26px; --r-md:18px; --r-sm:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:90px;-webkit-text-size-adjust:100%}
+body{font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;min-height:100vh;overflow-x:hidden}
+a{color:inherit}
+img,svg{max-width:100%}
+.wrap{width:100%;max-width:1160px;margin:0 auto;padding:0 20px}
+[hidden]{display:none!important}
+
+/* Fon */
+.bg{position:fixed;inset:0;z-index:-1;background:
+  radial-gradient(60% 50% at 12% 8%,#3c3c42 0%,transparent 60%),
+  radial-gradient(50% 45% at 92% 28%,#2c2c31 0%,transparent 62%),
+  radial-gradient(55% 50% at 50% 100%,#35353b 0%,transparent 60%),
+  linear-gradient(180deg,#0a0a0b,#131315)}
+.bg::after{content:"";position:absolute;inset:0;opacity:.07;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:56px 56px;-webkit-mask-image:radial-gradient(70% 60% at 50% 30%,#000,transparent);mask-image:radial-gradient(70% 60% at 50% 30%,#000,transparent)}
+
+/* Liquid glass */
+.glass{position:relative;
+  background:linear-gradient(145deg,var(--glass-hi),var(--glass) 45%,rgba(255,255,255,.03));
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  -webkit-backdrop-filter:blur(26px) saturate(170%) brightness(1.05);backdrop-filter:blur(26px) saturate(170%) brightness(1.05);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(255,255,255,.05),inset 0 0 30px rgba(255,255,255,.04),0 18px 50px rgba(0,0,0,.55)}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 28%,rgba(255,255,255,0) 70%,rgba(255,255,255,.08) 100%);
+  mix-blend-mode:screen;opacity:.7}
+
+/* Header */
+header{position:sticky;top:0;z-index:40;padding:12px 0}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px 8px 18px;border-radius:999px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:.02em;text-decoration:none;white-space:nowrap}
+.logo svg{width:26px;height:26px;flex:none}
+.logo small{color:var(--mute);font-weight:600}
+.menu{display:flex;gap:2px;list-style:none}
+.menu a{display:block;padding:9px 14px;border-radius:999px;text-decoration:none;color:var(--mute);font-size:.92rem;transition:.2s}
+.menu a:hover{color:var(--ink);background:rgba(255,255,255,.08)}
+.tools{display:flex;align-items:center;gap:8px}
+.lang{display:flex;padding:3px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid var(--line)}
+.lang button{border:0;background:transparent;color:var(--mute);font:inherit;font-size:.8rem;font-weight:700;padding:6px 10px;border-radius:999px;cursor:pointer;min-height:30px}
+.lang button[aria-pressed="true"]{background:#fff;color:#111}
+
+/* Bouton */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.28);
+  font:inherit;font-weight:700;cursor:pointer;color:#0b0b0c;text-decoration:none;text-align:center;
+  background:linear-gradient(180deg,#fafafa,#b9b9bf);box-shadow:inset 0 1px 0 #fff,0 8px 24px rgba(0,0,0,.45);transition:transform .15s,filter .2s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.97)}
+.btn.ghost{color:var(--ink);background:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.btn.sm{min-height:40px;padding:9px 16px;font-size:.92rem}
+.btn.block{width:100%}
+:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:center;padding:48px 0 30px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;font-size:.85rem;color:var(--steel)}
+.badge i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 12px var(--ok);flex:none}
+h1{font-size:clamp(2.1rem,5.6vw,4.2rem);line-height:1.04;letter-spacing:-.03em;margin:20px 0 16px;font-weight:800;
+  background:linear-gradient(180deg,#fff 30%,#8c8c93);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mute);font-size:1.08rem;max-width:50ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.stats{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:12px 32px;margin-top:32px}
+.stats b{display:block;font-size:1.45rem;line-height:1.2}
+.stats span{color:var(--mute);font-size:.86rem}
+
+/* Portail */
+.portal{padding:26px}
+.portal h2{font-size:1.3rem;margin-bottom:4px}
+.sub{color:var(--mute);font-size:.92rem}
+label{display:block;font-size:.85rem;color:var(--steel);margin:14px 0 6px}
+input,select,textarea{width:100%;padding:13px 16px;min-height:48px;border-radius:var(--r-sm);font:inherit;font-size:16px;color:var(--ink);
+  background:rgba(0,0,0,.35);border:1px solid var(--line);box-shadow:inset 0 2px 6px rgba(0,0,0,.4)}
+textarea{resize:vertical;min-height:84px}
+input::placeholder,textarea::placeholder{color:#70707a}
+select option{background:#1a1a1d}
+.portal .btn{margin-top:18px}
+.links{display:flex;justify-content:space-between;gap:10px;margin-top:14px;font-size:.88rem;flex-wrap:wrap}
+.links a{color:var(--mute)}.links a:hover{color:#fff}
+.err{display:none;margin-top:12px;padding:10px 14px;border-radius:var(--r-sm);background:rgba(255,120,120,.12);border:1px solid rgba(255,120,120,.35);font-size:.9rem}
+
+/* Seksyon */
+section{padding:58px 0}
+.sec-head{max-width:640px;margin-bottom:28px}
+.sec-head h2{font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:-.02em;line-height:1.12}
+.sec-head p{color:var(--mute);margin-top:10px}
+
+/* Boutik: tab */
+.tabs{display:inline-flex;padding:4px;border-radius:999px;margin-bottom:24px;max-width:100%}
+.tabs button{border:0;background:transparent;color:var(--mute);font:inherit;font-weight:700;padding:11px 22px;border-radius:999px;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:#fff;color:#111}
+
+/* Plan */
+.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:16px}
+.plan{padding:24px;display:flex;flex-direction:column;gap:8px;transition:transform .25s}
+.plan:hover{transform:translateY(-4px)}
+.plan.pop{background:linear-gradient(145deg,rgba(255,255,255,.2),rgba(255,255,255,.07) 50%,rgba(255,255,255,.04));border-color:rgba(255,255,255,.35)}
+.tag{align-self:flex-start;font-size:.75rem;padding:4px 10px;border-radius:999px;background:#fff;color:#111;font-weight:700}
+.plan h3{font-size:1rem;color:var(--steel);font-weight:600}
+.plan .mb{font-size:2.3rem;font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.plan .mb small{font-size:1rem;color:var(--mute);font-weight:600;margin-left:4px}
+.plan .price{font-size:1.2rem;font-weight:700}
+.plan ul{list-style:none;color:var(--mute);font-size:.9rem;margin:6px 0 14px;flex:1}
+.plan li{padding:6px 0;border-top:1px solid var(--line)}
+.plan li:first-child{border-top:0}
+
+/* Rezidansyèl */
+.home{display:grid;grid-template-columns:1.1fr .9fr;gap:0;overflow:hidden}
+.home .l{padding:32px}
+.home .r{padding:32px;border-left:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;gap:16px}
+.home h3{font-size:1.6rem;letter-spacing:-.02em;margin-bottom:6px}
+.big{font-size:clamp(2.2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.big small{font-size:1rem;color:var(--mute);font-weight:600}
+.feat{list-style:none;margin:18px 0 22px}
+.feat li{padding:9px 0 9px 28px;border-top:1px solid var(--line);position:relative;color:var(--steel)}
+.feat li::before{content:"";position:absolute;left:4px;top:16px;width:12px;height:7px;border-left:2px solid var(--ok);border-bottom:2px solid var(--ok);transform:rotate(-45deg)}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.row span{color:var(--mute)}
+.row b{font-size:1.25rem;text-align:right}
+
+/* Komand */
+.order{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.order>.glass{padding:26px}
+.summary{margin-top:18px;padding:16px;border-radius:var(--r-md);background:rgba(0,0,0,.3);border:1px solid var(--line);font-size:.95rem}
+.summary b{font-size:1.1rem}
+.oid{display:inline-block;margin-top:8px;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid var(--line);font-weight:700;letter-spacing:.06em}
+.contactline{margin-top:16px;font-size:.88rem;color:var(--mute);overflow-wrap:anywhere}
+.contactline a{color:var(--steel)}
+.steps{list-style:none;counter-reset:s;display:grid;gap:14px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:38px 1fr;gap:14px;align-items:start}
+.steps li::before{content:counter(s);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:rgba(255,255,255,.1);border:1px solid var(--line)}
+.steps strong{display:block}.steps span{color:var(--mute);font-size:.92rem}
+
+/* Kouvèti */
+.cov-tools{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;margin-bottom:18px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--mute);font:inherit;font-size:.9rem;font-weight:600;padding:9px 16px;border-radius:999px;cursor:pointer;min-height:42px}
+.chips button[aria-pressed="true"]{background:#fff;color:#111;border-color:#fff}
+.zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.zone{padding:16px 18px;border-radius:var(--r-md);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.zone b{display:block}.zone span.d{color:var(--mute);font-size:.85rem}
+.pill{font-size:.78rem;font-weight:700;padding:5px 11px;border-radius:999px;white-space:nowrap;border:1px solid}
+.pill.ok{color:var(--ok);border-color:rgba(143,209,158,.45);background:rgba(143,209,158,.1)}
+.pill.soon{color:var(--soon);border-color:rgba(227,199,122,.45);background:rgba(227,199,122,.1)}
+.zone{flex-wrap:wrap}
+.zone .btn{flex:1 1 100%}
+s.old,.old{color:var(--mute);text-decoration:line-through;font-weight:600}
+.live{margin-bottom:16px}
+.sug{margin-top:34px}
+.sug h3{font-size:1.25rem}
+.sug-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.sug-card{padding:22px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.sug-card h4{font-size:1.1rem}
+.sug-card p{color:var(--mute);font-size:.92rem;flex:1}
+@media(max-width:700px){.sug-grid{grid-template-columns:1fr}}
+.empty{padding:26px;text-align:center;color:var(--mute);grid-column:1/-1}
+.cov-foot{margin-top:20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;color:var(--mute)}
+
+/* Legal */
+.legal{padding:28px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+.legal svg{width:56px;height:56px}
+.legal p{color:var(--mute)}.legal strong{color:var(--ink)}
+footer{padding:32px 0 40px;color:var(--mute);font-size:.88rem;text-align:center;border-top:1px solid var(--line);overflow-wrap:anywhere}
+
+/* WhatsApp flotan + ba mobil */
+.wa-float{position:fixed;right:18px;bottom:18px;z-index:35;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;text-decoration:none}
+.wa-float svg{width:28px;height:28px}
+.bar{display:none}
+
+/* Animasyon (yon sèl fwa) */
+.fade{opacity:0;filter:blur(10px);transform:translateY(14px);animation:in .9s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i,0)*110ms)}
+@keyframes in{to{opacity:1;filter:blur(0);transform:none}}
+@media(prefers-reduced-motion:reduce){.fade{animation:none;opacity:1;filter:none;transform:none}.plan{transition:none}html{scroll-behavior:auto}}
+
+/* ====== Tablèt ====== */
+@media(max-width:1000px){
+  .menu{display:none}
+  .hero{grid-template-columns:1fr;padding-top:24px}
+  .order,.home{grid-template-columns:1fr}
+  .home .r{border-left:0;border-top:1px solid var(--line)}
+  .bar{display:flex;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;justify-content:space-around;padding:6px;border-radius:999px}
+  .bar a{flex:1;text-align:center;text-decoration:none;color:var(--steel);font-size:.85rem;font-weight:600;padding:12px 6px;border-radius:999px}
+  .bar a:active{background:rgba(255,255,255,.12)}
+  body{padding-bottom:96px}
+  .wa-float{bottom:calc(88px + env(safe-area-inset-bottom))}
+}
+/* ====== Telefòn ====== */
+@media(max-width:560px){
+  .wrap{padding:0 14px}
+  section{padding:44px 0}
+  .nav{padding-left:14px}
+  .logo small{display:none}
+  .btn.sm.hide-s{display:none}
+  .stats{grid-template-columns:repeat(3,1fr);gap:10px}
+  .stats b{font-size:1.1rem}
+  .cta .btn{flex:1 1 100%}
+  .portal,.order>.glass,.home .l,.home .r,.legal{padding:20px}
+  .legal{grid-template-columns:1fr}
+  .cov-tools{grid-template-columns:1fr}
+  .tabs{display:flex;width:100%}.tabs button{flex:1;padding:11px 6px;font-size:.85rem}
+  .plans{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<header>
+  <div class="wrap">
+    <nav class="glass nav fade" style="--i:0" aria-label="Menu">
+      <a class="logo" href="#top">
+        <svg viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 12a17 17 0 0 1 24 0"/><path d="M8 17a11 11 0 0 1 16 0"/><path d="M12 22a5.5 5.5 0 0 1 8 0"/><circle cx="16" cy="26.5" r="1.4" fill="#fff"/></svg>
+        NET PLUS <small>5G LTE</small>
+      </a>
+      <ul class="menu">
+        <li><a href="#shop" data-i18n="nav_shop"></a></li>
+        <li><a href="#coverage" data-i18n="nav_cov"></a></li>
+        <li><a href="#order" data-i18n="nav_order"></a></li>
+        <li><a href="#legal" data-i18n="nav_legal"></a></li>
+      </ul>
+      <div class="tools">
+        <div class="lang" role="group" aria-label="Langue / Language / Lang">
+          <button type="button" data-lang="ht" aria-pressed="true">HT</button>
+          <button type="button" data-lang="fr" aria-pressed="false">FR</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <a class="btn sm hide-s" href="#konekte" data-i18n="connect_btn"></a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="top" class="wrap">
+
+  <div class="hero">
+    <div>
+      <span class="badge glass fade" style="--i:1"><i></i><span data-i18n="badge"></span></span>
+      <h1 class="fade" style="--i:2" data-i18n="h1"></h1>
+      <p class="lead fade" style="--i:3" data-i18n="lead"></p>
+      <div class="cta fade" style="--i:4">
+        <a class="btn" href="#shop" data-i18n="cta1"></a>
+        <a class="btn ghost" href="#coverage" data-i18n="cta2"></a>
+      </div>
+      <div class="stats fade" style="--i:5">
+        <div><b>10 / 5 Mbps</b><span data-i18n="st_hot"></span></div>
+        <div><b>30 / 10 Mbps</b><span data-i18n="st_home"></span></div>
+        <div><b>50 USD</b><span data-i18n="st_inst"></span></div>
+      </div>
+    </div>
+
+    <div class="glass portal fade" style="--i:3" id="konekte">
+      <h2 data-i18n="p_title"></h2>
+      <p class="sub" style="margin-bottom:6px" data-i18n="p_sub"></p>
+      <form id="loginForm" method="post" novalidate>
+        <input type="hidden" name="dst" id="dst">
+        <input type="hidden" name="popup" value="true">
+        <label for="username" data-i18n="p_user"></label>
+        <input id="username" name="username" autocomplete="username" autocapitalize="characters" data-i18n-ph="p_user_ph">
+        <label for="password" data-i18n="p_pass"></label>
+        <input id="password" name="password" type="password" autocomplete="current-password">
+        <div class="err" id="err" role="alert"></div>
+        <button class="btn block" type="submit" data-i18n="p_go"></button>
+      </form>
+      <div class="links">
+        <a href="#" id="statusLink" data-i18n="p_status"></a>
+        <a href="#shop" data-i18n="p_nocode"></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUTIK -->
+  <section id="shop">
+    <div class="sec-head">
+      <h2 data-i18n="shop_title"></h2>
+      <p data-i18n="shop_sub"></p>
+    </div>
+    <div class="glass tabs" role="tablist">
+      <button type="button" role="tab" id="tabHot" aria-selected="true" data-i18n="tab_hot"></button>
+      <button type="button" role="tab" id="tabHome" aria-selected="false" data-i18n="tab_home"></button>
+      <button type="button" role="tab" id="tabEquip" aria-selected="false" data-i18n="tab_equip"></button>
+    </div>
+
+    <div id="panelHot" role="tabpanel"><p class="live"><span class="pill ok" data-i18n="mob_avail"></span></p><div class="plans" id="plans"></div></div>
+
+    <div id="panelHome" role="tabpanel" hidden>
+      <div class="glass home">
+        <div class="l">
+          <h3 data-i18n="h_title"></h3>
+          <p class="sub" data-i18n="h_sub"></p>
+          <div class="big" style="margin-top:20px">30 <small>Mbps ↓</small> &nbsp; 10 <small>Mbps ↑</small></div>
+          <ul class="feat">
+            <li data-i18n="h_f1"></li>
+            <li data-i18n="h_f2"></li>
+            <li data-i18n="h_f3"></li>
+            <li data-i18n="h_f4"></li>
+          </ul>
+          <button class="btn" type="button" id="homeCta" data-i18n="h_cta"></button>
+        </div>
+        <div class="r">
+          <div class="row"><span data-i18n="h_inst"></span><b>50 USD</b></div>
+          <div class="row"><span data-i18n="h_speed"></span><b>30 ↓ · 10 ↑ Mbps</b></div>
+          <div class="row"><span data-i18n="h_month"></span><b data-i18n="h_month_v"></b></div>
+          <div class="row"><span data-i18n="h_avail"></span><b style="color:var(--ok)" data-i18n="h_avail_v"></b></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panelEquip" role="tabpanel" hidden>
+      <div class="glass home">
+        <div class="l">
+          <span class="tag" data-i18n="promo"></span>
+          <h3 style="margin-top:10px" data-i18n="e_title"></h3>
+          <p class="sub" data-i18n="e_sub"></p>
+          <div class="big" style="margin-top:20px"><span data-eq="promo"></span> <small>USD</small> &nbsp; <span class="old" style="font-size:1.3rem"><span data-eq="regular"></span> USD</span></div>
+          <ul class="feat">
+            <li data-i18n="e_f1"></li>
+            <li data-i18n="e_f2"></li>
+            <li data-i18n="e_f3"></li>
+          </ul>
+          <button class="btn" type="button" id="equipCta" data-i18n="e_cta"></button>
+        </div>
+        <div class="r">
+          <div class="row"><span data-i18n="e_promo_price"></span><b><span data-eq="promo"></span> USD</b></div>
+          <div class="row"><span data-i18n="e_regular"></span><b class="old"><span data-eq="regular"></span> USD</b></div>
+          <div class="row"><span data-i18n="e_save"></span><b style="color:var(--ok)"><span data-eq="save"></span> USD</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KOMAND -->
+  <section id="order">
+    <div class="sec-head">
+      <h2 id="orderTitle"></h2>
+      <p id="orderSub"></p>
+    </div>
+    <div class="order">
+      <div class="glass">
+        <form id="orderForm">
+          <div id="gHot">
+            <label for="oPlan" data-i18n="f_plan"></label>
+            <select id="oPlan"></select>
+          </div>
+          <label for="oName" data-i18n="f_name"></label>
+          <input id="oName" autocomplete="name" data-i18n-ph="f_name_ph">
+          <label for="oPhone" data-i18n="f_wa"></label>
+          <input id="oPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="509 3XXX XXXX">
+          <div id="gHot2">
+            <label for="oPay" data-i18n="f_pay"></label>
+            <select id="oPay"><option value="MonCash">MonCash</option><option value="NatCash">NatCash</option><option value="cash" data-i18n="f_cash"></option></select>
+          </div>
+          <div id="gHome" hidden>
+            <label for="oZone" data-i18n="f_zone"></label>
+            <select id="oZone"></select>
+            <label for="oAddr" data-i18n="f_addr"></label>
+            <textarea id="oAddr" data-i18n-ph="f_addr_ph"></textarea>
+          </div>
+          <div class="summary" id="summary" aria-live="polite"></div>
+          <button class="btn block" type="submit" style="margin-top:18px" id="mainBtn"></button>
+          <button class="btn ghost block" type="button" id="verifyBtn" style="margin-top:10px" data-i18n="f_verify"></button>
+          <p class="contactline"><span data-i18n="f_direct"></span> <a id="waDirect" href="#" target="_blank" rel="noopener">WhatsApp 509 4195 1159</a> · <a id="mailDirect" href="#">info.netplus.ht@gmail.com</a></p>
+        </form>
+      </div>
+      <div class="glass">
+        <h3 style="margin-bottom:18px;font-size:1.2rem" data-i18n="how"></h3>
+        <ol class="steps" id="steps"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- KOUVÈTI -->
+  <section id="coverage">
+    <div class="sec-head">
+      <h2 data-i18n="cov_title"></h2>
+      <p data-i18n="cov_sub"></p>
+    </div>
+    <div class="cov-tools">
+      <input id="covSearch" type="search" autocomplete="off" data-i18n-ph="cov_ph" aria-label="Search">
+      <div class="chips" role="group">
+        <button type="button" data-f="all" aria-pressed="true" data-i18n="cov_all"></button>
+        <button type="button" data-f="ok" aria-pressed="false" data-i18n="cov_ok"></button>
+        <button type="button" data-f="soon" aria-pressed="false" data-i18n="cov_soon"></button>
+      </div>
+    </div>
+    <div class="zones" id="zones"></div>
+    <div class="cov-foot"><span data-i18n="cov_miss"></span> <a class="btn ghost sm" id="covReq" href="#" target="_blank" rel="noopener" data-i18n="cov_req"></a></div>
+    <div class="sug">
+      <h3 data-i18n="sug_title"></h3>
+      <p class="sub" data-i18n="sug_sub"></p>
+      <div class="sug-grid">
+        <div class="glass sug-card"><span class="pill ok" data-i18n="sug_tag_home"></span><h4 data-i18n="sug_home_t"></h4><p data-i18n="sug_home_d"></p><button type="button" class="btn sm" id="sugHome" data-i18n="sug_go"></button></div>
+        <div class="glass sug-card"><span class="pill soon" data-i18n="promo"></span><h4 data-i18n="sug_eq_t"></h4><p data-i18n="sug_eq_d"></p><button type="button" class="btn sm" id="sugEquip" data-i18n="sug_go"></button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEGAL -->
+  <section id="legal">
+    <div class="glass legal">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 4l16 6v12c0 10-7 17-16 22C15 39 8 32 8 22V10z"/><path d="M17 24l5 5 9-10"/></svg>
+      <div>
+        <h3 style="margin-bottom:6px;font-size:1.2rem" data-i18n="lg_title"></h3>
+        <p id="lgText"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">© <span id="yr"></span> NET PLUS 5G LTE · <span data-i18n="rights"></span> · <a href="mailto:info.netplus.ht@gmail.com">info.netplus.ht@gmail.com</a></div></footer>
+
+<nav class="glass bar" aria-label="Menu">
+  <a href="#shop" data-i18n="nav_shop"></a>
+  <a href="#coverage" data-i18n="nav_cov"></a>
+  <a href="#order" data-i18n="nav_order"></a>
+  <a href="#konekte" data-i18n="connect_btn"></a>
+</nav>
+
+<a class="glass wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.3 5.3 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4.1c1.7.7 2.4.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>
+</a>
+
+<script>
+/* =====================================================
+   KONFIGIRASYON / CONFIGURATION / PARAMÈTRES
+   ===================================================== */
+const CONFIG = {
+  whatsapp: "50941951159",
+  email: "info.netplus.ht@gmail.com",
+  hotspot: { down: 10, up: 5 },
+  home:    { down: 30, up: 10, installUSD: 50 },
+  equip:   { promoUSD: 45, regularUSD: 55 },
+  loginUrl:  "http://10.5.50.1/login",   // adrès hotspot MikroTik
+  statusUrl: "http://10.5.50.1/status",
+  company: "NET PLUS 5G LTE",
+  license: "[METE NIMEWO OTORIZASYON AN]",
+  /* days: 0 = jiskaske MB fini · data: null = ilimite */
+  plans: [
+    { k:"mini",  data:"3.5 GB", price:50,   days:0 },
+    { k:"promo", data:"8.5 GB", price:100,  days:0,  promo:true },
+    { k:"d1",    data:null,     price:100,  days:1 },
+    { k:"d3",    data:null,     price:250,  days:3 },
+    { k:"d5",    data:null,     price:450,  days:5 },
+    { k:"d14",   data:null,     price:1500, days:14, pop:true },
+    { k:"d30",   data:null,     price:2500, days:30 }
+  ],
+  /* ⚠ LIS EGZANP – ranplase ak vrè zòn ou kouvri yo. status: "ok" = disponib, "soon" = byento */
+  zones: [
+    { n:"Port-au-Prince", d:"Ouest",       s:"ok" },
+    { n:"Delmas",         d:"Ouest",       s:"ok" },
+    { n:"Pétion-Ville",   d:"Ouest",       s:"ok" },
+    { n:"Tabarre",        d:"Ouest",       s:"ok" },
+    { n:"Carrefour",      d:"Ouest",       s:"soon" },
+    { n:"Cap-Haïtien",    d:"Nord",        s:"soon" },
+    { n:"Gonaïves",       d:"Artibonite",  s:"soon" },
+    { n:"Seprenn",        d:"Gonaïves",    s:"soon" },
+    { n:"Asipha",         d:"Gonaïves",    s:"soon" },
+    { n:"Morne Blanc",    d:"Gonaïves",    s:"soon" },
+    { n:"Bien Ac",        d:"Gonaïves",    s:"soon" },
+    { n:"Les Cayes",      d:"Sud",         s:"soon" },
+    { n:"Jacmel",         d:"Sud-Est",     s:"soon" },
+    { n:"Hinche",         d:"Centre",      s:"soon" }
+  ]
+};
+
+/* =====================================================
+   TRADIKSYON / TRADUCTIONS / TRANSLATIONS
+   ===================================================== */
+const T = {
+ht:{
+ tab_equip:"Ekipman", mob_avail:"WiFi mobil disponib",
+ e_title:"Achte ekipman ou", e_sub:"Pran pwòp ekipman ou pou itilize sou rezo NET PLUS.",
+ e_f1:"Ekipman pou itilize sou rezo NET PLUS", e_f2:"Pri promo, pi ba pase pri nòmal la", e_f3:"Konfime disponibilite sou WhatsApp",
+ e_cta:"Achte ekipman an", e_promo_price:"Pri promo", e_regular:"Pri nòmal", e_save:"Ou ekonomize",
+ o_title_equip:"Achte ekipman", o_sub_equip:"Ranpli fòm nan. N ap konfime disponibilite, peman ak livrezon sou WhatsApp.",
+ f_request_eq:"Voye kòmand ekipman",
+ e1t:"Chwazi ekipman an", e1d:"Ou jwenn pri promo a.", e2t:"Voye kòmand lan", e2d:"Ranpli fòm nan epi voye l sou WhatsApp.",
+ e3t:"Nou konfime", e3d:"N ap konfime disponibilite ak peman an.", e4t:"Resevwa ekipman an", e4d:"N ap kowòdone livrezon ak ou.",
+ notify:"Notifye m sou WhatsApp", notify_msg:"Bonjou NET PLUS! Tanpri voye yon mesaj WhatsApp ban mwen lè sèvis la disponib nan zòn: ",
+ sug_title:"Pandan w ap tann", sug_sub:"Nou sijere w de opsyon pou w pa pèdi tan.", sug_go:"Gade plan lan",
+ sug_tag_home:"Rezidansyèl", sug_home_t:"Plan rezidansyèl", sug_home_d:"30 Mbps desann ak 10 Mbps monte, enstalasyon 50 USD, nan zòn ki disponib yo.",
+ sug_eq_t:"Ekipman an promo", sug_eq_d:"Ekipman an 45 USD (promo), pri nòmal 55 USD. Pare l anvan sèvis la rive nan zòn ou.",
+ m_equip:"Mwen vle achte ekipman an.", m_equipment:"Ekipman",
+ nav_shop:"Boutik", nav_cov:"Kouvèti", nav_order:"Achte", nav_legal:"Legal", connect_btn:"Konekte",
+ badge:"Pi gwo rezo WiFi nan peyi a",
+ h1:"NET PLUS: pi gwo rezo WiFi an Ayiti.",
+ lead:"Hotspot ak kòd pou tout moun, ak WiFi rezidansyèl lakay ou. Verifye si nou kouvri zòn ou an kèk segonn.",
+ cta1:"Gade boutik la", cta2:"Verifye kouvèti",
+ st_hot:"Hotspot (↓ / ↑)", st_home:"Rezidansyèl (↓ / ↑)", st_inst:"Enstalasyon",
+ p_title:"Konekte sou WiFi la", p_sub:"Antre kòd ou te achte a pou aktive plan ou.",
+ p_user:"Kòd / Non itilizatè", p_user_ph:"Egz: NP-4821", p_pass:"Modpas (si gen youn)",
+ p_go:"Aktive entènèt la", p_status:"Gade MB ki rete m", p_nocode:"Mwen poko gen kòd",
+ p_err_empty:"Antre kòd ou a anvan ou kontinye.", p_err_bad:"Kòd la pa bon oswa li ekspire. Verifye l epi eseye ankò.",
+ shop_title:"Boutik NET PLUS", shop_sub:"Chwazi yon plan WiFi mobil pou konekte kounye a, mande WiFi rezidansyèl lakay ou, oswa achte ekipman ou.",
+ tab_hot:"WiFi mobil (kòd)", tab_home:"Rezidansyèl (kay)",
+ unl:"Ilimite", promo:"Pwomosyon", popular:"Pi popilè", choose:"Chwazi plan sa a",
+ n_mini:"Mini", n_promo:"Pwomo", n_d1:"Jou", n_d3:"3 jou", n_d5:"5 jou", n_d14:"14 jou", n_d30:"30 jou",
+ pk_mini:"Bon pou rezo sosyal", pk_promo:"Plis MB pou menm pri a", pk_unl:"Entènèt san limit", pk_best:"Pi bon valè pou mwa a",
+ day1:"1 jou", dayn:"{n} jou", till:"Jiskaske MB yo fini",
+ h_title:"WiFi rezidansyèl", h_sub:"Entènèt rapid lakay ou, pou tout fanmi an.",
+ h_f1:"Vitès 30 Mbps desann ak 10 Mbps monte", h_f2:"Enstalasyon pou 50 USD", h_f3:"Disponib nan zòn nou kouvri yo", h_f4:"Verifye zòn ou anvan ou mande",
+ h_cta:"Mande enstalasyon", h_inst:"Pri enstalasyon", h_speed:"Vitès", h_month:"Abònman mansyèl", h_month_v:"Kontakte nou", h_avail:"Disponibilite", h_avail_v:"Disponib",
+ o_title_hot:"Achte plan ou", o_sub_hot:"Chwazi plan an, antre nimewo WhatsApp ou, epi n ap konfime l ak ou.",
+ o_title_home:"Mande enstalasyon WiFi", o_sub_home:"Ranpli fòm nan. N ap kontakte w sou WhatsApp pou konfime disponibilite ak dat enstalasyon an.",
+ f_plan:"Plan", f_name:"Non ou", f_name_ph:"Non konplè", f_wa:"Nimewo WhatsApp ou (pou konfime oswa verifye)",
+ f_pay:"Mwayen peman", f_cash:"Lajan kach", f_zone:"Zòn / vil", f_addr:"Adrès kay la", f_addr_ph:"Katye, ri, repè…",
+ f_confirm:"Konfime plan sou WhatsApp", f_request:"Voye demann enstalasyon", f_verify:"Verifye plan mwen",
+ f_direct:"Oswa kontakte nou dirèkteman:", f_fill:"Tanpri ranpli tout chan yo.",
+ chose:"Ou chwazi", total:"Total pou peye", install:"Enstalasyon", inst_for:"Demann enstalasyon WiFi rezidansyèl",
+ how:"Kijan sa mache",
+ s1t:"Konekte sou rezo “NET PLUS”", s1d:"Louvri WiFi telefòn ou epi chwazi rezo a.",
+ s2t:"Chwazi plan ou", s2d:"Sit la ba ou yon ID kòmand. Antre nimewo WhatsApp ou.",
+ s3t:"Resevwa kòd ou", s3d:"Apre n konfime peman an, n ap voye kòd la sou WhatsApp.",
+ s4t:"Antre kòd la", s4d:"Mete l nan fòm “Konekte sou WiFi la”.",
+ s5t:"Swiv MB ou", s5d:"Peze “Gade MB ki rete m” pou wè sa ki rete.",
+ r1t:"Verifye zòn ou", r1d:"Gade lis kouvèti a pi ba a.",
+ r2t:"Voye demann lan", r2d:"Ranpli fòm nan epi voye l sou WhatsApp.",
+ r3t:"Nou konfime", r3d:"N ap di w si zòn nan disponib epi n ap fikse dat enstalasyon an.",
+ r4t:"Enstalasyon", r4d:"Peman enstalasyon an se 50 USD. Apre sa ou sou entènèt lakay ou.",
+ cov_title:"Kouvèti: kote nou disponib", cov_sub:"Chèche vil oswa zòn ou. Pou zòn “Byento”, klike “Notifye m” epi n ap ekri w sou WhatsApp lè sèvis la disponib.",
+ cov_ph:"Chèche yon vil oswa zòn…", cov_all:"Tout", cov_ok:"Disponib", cov_soon:"Byento",
+ cov_none:"Pa gen rezilta. Mande nou si nou ka kouvri zòn ou.", cov_miss:"Zòn ou pa nan lis la?", cov_req:"Mande kouvèti",
+ st_ok:"Disponib", st_soon:"Byento", cov_msg:"Bonjou NET PLUS! Mwen ta renmen konnen si n ka jwenn sèvis nan zòn mwen: ",
+ lg_title:"Sèvis legal nan peyi Dayiti",
+ lg_text:"{c} opere ak otorizasyon Leta ayisyen. Nimewo otorizasyon: {l}. Nou respekte règleman CONATEL ak lòt lwa ki an vigè yo.",
+ rights:"Tout dwa rezève",
+ m_hello:"Bonjou NET PLUS!", m_confirm:"Mwen vle KONFIME plan mwen.", m_verify:"Mwen vle VERIFYE plan mwen.",
+ m_plan:"Plan", m_price:"Pri", m_name:"Non", m_pay:"Peman", m_zone:"Zòn", m_addr:"Adrès", m_ip:"IP", m_na:"pa disponib"
+},
+fr:{
+ tab_equip:"Équipement", mob_avail:"WiFi mobile disponible",
+ e_title:"Achetez votre équipement", e_sub:"Obtenez votre propre équipement pour utiliser le réseau NET PLUS.",
+ e_f1:"Équipement pour utiliser le réseau NET PLUS", e_f2:"Prix promo, inférieur au prix normal", e_f3:"Disponibilité confirmée sur WhatsApp",
+ e_cta:"Acheter l'équipement", e_promo_price:"Prix promo", e_regular:"Prix normal", e_save:"Vous économisez",
+ o_title_equip:"Acheter l'équipement", o_sub_equip:"Remplissez le formulaire. Nous confirmons la disponibilité, le paiement et la livraison sur WhatsApp.",
+ f_request_eq:"Envoyer la commande d'équipement",
+ e1t:"Choisissez l'équipement", e1d:"Vous profitez du prix promo.", e2t:"Envoyez la commande", e2d:"Remplissez le formulaire et envoyez-le sur WhatsApp.",
+ e3t:"Nous confirmons", e3d:"Nous confirmons la disponibilité et le paiement.", e4t:"Recevez l'équipement", e4d:"Nous organisons la livraison avec vous.",
+ notify:"Me prévenir sur WhatsApp", notify_msg:"Bonjour NET PLUS ! Merci de m'envoyer un message WhatsApp dès que le service sera disponible dans la zone : ",
+ sug_title:"En attendant", sug_sub:"Nous vous suggérons deux options pour ne pas perdre de temps.", sug_go:"Voir le forfait",
+ sug_tag_home:"Résidentiel", sug_home_t:"Forfait résidentiel", sug_home_d:"30 Mbps en réception et 10 Mbps en envoi, installation 50 USD, dans les zones disponibles.",
+ sug_eq_t:"Équipement en promo", sug_eq_d:"Équipement à 45 USD (promo), prix normal 55 USD. Préparez-le avant l'arrivée du service dans votre zone.",
+ m_equip:"Je veux acheter l'équipement.", m_equipment:"Équipement",
+ nav_shop:"Boutique", nav_cov:"Couverture", nav_order:"Acheter", nav_legal:"Légal", connect_btn:"Connexion",
+ badge:"Le plus grand réseau WiFi du pays",
+ h1:"NET PLUS : le plus grand réseau WiFi d'Haïti.",
+ lead:"Hotspot avec codes pour tous, et WiFi résidentiel chez vous. Vérifiez en quelques secondes si nous couvrons votre zone.",
+ cta1:"Voir la boutique", cta2:"Vérifier la couverture",
+ st_hot:"Hotspot (↓ / ↑)", st_home:"Résidentiel (↓ / ↑)", st_inst:"Installation",
+ p_title:"Se connecter au WiFi", p_sub:"Entrez le code que vous avez acheté pour activer votre forfait.",
+ p_user:"Code / Nom d'utilisateur", p_user_ph:"Ex : NP-4821", p_pass:"Mot de passe (s'il y en a un)",
+ p_go:"Activer internet", p_status:"Voir mes Mo restants", p_nocode:"Je n'ai pas de code",
+ p_err_empty:"Entrez votre code avant de continuer.", p_err_bad:"Code invalide ou expiré. Vérifiez-le et réessayez.",
+ shop_title:"Boutique NET PLUS", shop_sub:"Choisissez un forfait WiFi mobile pour vous connecter maintenant, demandez le WiFi résidentiel chez vous, ou achetez votre équipement.",
+ tab_hot:"WiFi mobile (code)", tab_home:"Résidentiel (maison)",
+ unl:"Illimité", promo:"Promotion", popular:"Le plus populaire", choose:"Choisir ce forfait",
+ n_mini:"Mini", n_promo:"Promo", n_d1:"Jour", n_d3:"3 jours", n_d5:"5 jours", n_d14:"14 jours", n_d30:"30 jours",
+ pk_mini:"Idéal pour les réseaux sociaux", pk_promo:"Plus de Go pour le même prix", pk_unl:"Internet sans limite", pk_best:"Meilleure valeur pour le mois",
+ day1:"1 jour", dayn:"{n} jours", till:"Jusqu'à épuisement des Go",
+ h_title:"WiFi résidentiel", h_sub:"Internet rapide chez vous, pour toute la famille.",
+ h_f1:"Vitesse 30 Mbps en réception et 10 Mbps en envoi", h_f2:"Installation à 50 USD", h_f3:"Disponible dans les zones couvertes", h_f4:"Vérifiez votre zone avant de demander",
+ h_cta:"Demander l'installation", h_inst:"Prix d'installation", h_speed:"Vitesse", h_month:"Abonnement mensuel", h_month_v:"Contactez-nous", h_avail:"Disponibilité", h_avail_v:"Disponible",
+ o_title_hot:"Acheter votre forfait", o_sub_hot:"Choisissez le forfait, entrez votre numéro WhatsApp et nous le confirmons avec vous.",
+ o_title_home:"Demander l'installation WiFi", o_sub_home:"Remplissez le formulaire. Nous vous contactons sur WhatsApp pour confirmer la disponibilité et la date d'installation.",
+ f_plan:"Forfait", f_name:"Votre nom", f_name_ph:"Nom complet", f_wa:"Votre numéro WhatsApp (pour confirmer ou vérifier)",
+ f_pay:"Moyen de paiement", f_cash:"Espèces", f_zone:"Zone / ville", f_addr:"Adresse du domicile", f_addr_ph:"Quartier, rue, repère…",
+ f_confirm:"Confirmer le forfait sur WhatsApp", f_request:"Envoyer la demande d'installation", f_verify:"Vérifier mon forfait",
+ f_direct:"Ou contactez-nous directement :", f_fill:"Veuillez remplir tous les champs.",
+ chose:"Vous avez choisi", total:"Total à payer", install:"Installation", inst_for:"Demande d'installation WiFi résidentiel",
+ how:"Comment ça marche",
+ s1t:"Connectez-vous au réseau « NET PLUS »", s1d:"Ouvrez le WiFi de votre téléphone et choisissez le réseau.",
+ s2t:"Choisissez votre forfait", s2d:"Le site vous donne un ID de commande. Entrez votre numéro WhatsApp.",
+ s3t:"Recevez votre code", s3d:"Après confirmation du paiement, nous vous envoyons le code sur WhatsApp.",
+ s4t:"Entrez le code", s4d:"Saisissez-le dans le formulaire « Se connecter au WiFi ».",
+ s5t:"Suivez vos Mo", s5d:"Appuyez sur « Voir mes Mo restants » pour voir ce qu'il vous reste.",
+ r1t:"Vérifiez votre zone", r1d:"Consultez la liste de couverture ci-dessous.",
+ r2t:"Envoyez la demande", r2d:"Remplissez le formulaire et envoyez-le sur WhatsApp.",
+ r3t:"Nous confirmons", r3d:"Nous vous disons si la zone est disponible et fixons la date d'installation.",
+ r4t:"Installation", r4d:"Les frais d'installation sont de 50 USD. Ensuite, vous êtes en ligne chez vous.",
+ cov_title:"Couverture : où nous sommes disponibles", cov_sub:"Cherchez votre ville ou zone. Pour les zones « Bientôt », cliquez sur « Me prévenir » et nous vous écrirons sur WhatsApp dès que le service sera disponible.",
+ cov_ph:"Chercher une ville ou une zone…", cov_all:"Toutes", cov_ok:"Disponible", cov_soon:"Bientôt",
+ cov_none:"Aucun résultat. Demandez-nous si nous pouvons couvrir votre zone.", cov_miss:"Votre zone n'est pas dans la liste ?", cov_req:"Demander la couverture",
+ st_ok:"Disponible", st_soon:"Bientôt", cov_msg:"Bonjour NET PLUS ! J'aimerais savoir si le service est possible dans ma zone : ",
+ lg_title:"Service légal en Haïti",
+ lg_text:"{c} opère avec l'autorisation de l'État haïtien. Numéro d'autorisation : {l}. Nous respectons la réglementation du CONATEL et les lois en vigueur.",
+ rights:"Tous droits réservés",
+ m_hello:"Bonjour NET PLUS !", m_confirm:"Je veux CONFIRMER mon forfait.", m_verify:"Je veux VÉRIFIER mon forfait.",
+ m_plan:"Forfait", m_price:"Prix", m_name:"Nom", m_pay:"Paiement", m_zone:"Zone", m_addr:"Adresse", m_ip:"IP", m_na:"non disponible"
+},
+en:{
+ tab_equip:"Equipment", mob_avail:"Mobile WiFi available",
+ e_title:"Buy your equipment", e_sub:"Get your own equipment to use on the NET PLUS network.",
+ e_f1:"Equipment to use on the NET PLUS network", e_f2:"Promo price, lower than the regular price", e_f3:"Availability confirmed on WhatsApp",
+ e_cta:"Buy the equipment", e_promo_price:"Promo price", e_regular:"Regular price", e_save:"You save",
+ o_title_equip:"Buy equipment", o_sub_equip:"Fill in the form. We'll confirm availability, payment and delivery on WhatsApp.",
+ f_request_eq:"Send equipment order",
+ e1t:"Choose the equipment", e1d:"You get the promo price.", e2t:"Send the order", e2d:"Fill in the form and send it on WhatsApp.",
+ e3t:"We confirm", e3d:"We confirm availability and payment.", e4t:"Receive the equipment", e4d:"We arrange delivery with you.",
+ notify:"Notify me on WhatsApp", notify_msg:"Hello NET PLUS! Please message me on WhatsApp as soon as service is available in: ",
+ sug_title:"While you wait", sug_sub:"We suggest two options so you don't lose time.", sug_go:"View the plan",
+ sug_tag_home:"Residential", sug_home_t:"Residential plan", sug_home_d:"30 Mbps download and 10 Mbps upload, 50 USD installation, in available areas.",
+ sug_eq_t:"Equipment on promo", sug_eq_d:"Equipment at 45 USD (promo), regular price 55 USD. Get it ready before service reaches your area.",
+ m_equip:"I want to buy the equipment.", m_equipment:"Equipment",
+ nav_shop:"Shop", nav_cov:"Coverage", nav_order:"Buy", nav_legal:"Legal", connect_btn:"Connect",
+ badge:"The country's biggest WiFi network",
+ h1:"NET PLUS: Haiti's biggest WiFi network.",
+ lead:"Hotspot codes for everyone, and residential WiFi at home. Check in seconds whether we cover your area.",
+ cta1:"Browse the shop", cta2:"Check coverage",
+ st_hot:"Hotspot (↓ / ↑)", st_home:"Residential (↓ / ↑)", st_inst:"Installation",
+ p_title:"Connect to WiFi", p_sub:"Enter the code you bought to activate your plan.",
+ p_user:"Code / Username", p_user_ph:"e.g. NP-4821", p_pass:"Password (if you have one)",
+ p_go:"Activate internet", p_status:"Check my remaining data", p_nocode:"I don't have a code",
+ p_err_empty:"Enter your code to continue.", p_err_bad:"Invalid or expired code. Check it and try again.",
+ shop_title:"NET PLUS Shop", shop_sub:"Pick a mobile WiFi plan to get online now, request residential WiFi at home, or buy your equipment.",
+ tab_hot:"Mobile WiFi (code)", tab_home:"Residential (home)",
+ unl:"Unlimited", promo:"Promo", popular:"Most popular", choose:"Choose this plan",
+ n_mini:"Mini", n_promo:"Promo", n_d1:"Day", n_d3:"3 days", n_d5:"5 days", n_d14:"14 days", n_d30:"30 days",
+ pk_mini:"Great for social media", pk_promo:"More data for the same price", pk_unl:"Internet with no data cap", pk_best:"Best value for the month",
+ day1:"1 day", dayn:"{n} days", till:"Until the data runs out",
+ h_title:"Residential WiFi", h_sub:"Fast internet at home, for the whole family.",
+ h_f1:"30 Mbps download and 10 Mbps upload", h_f2:"Installation for 50 USD", h_f3:"Available in covered areas", h_f4:"Check your area before you request",
+ h_cta:"Request installation", h_inst:"Installation price", h_speed:"Speed", h_month:"Monthly subscription", h_month_v:"Contact us", h_avail:"Availability", h_avail_v:"Available",
+ o_title_hot:"Buy your plan", o_sub_hot:"Pick a plan, enter your WhatsApp number, and we'll confirm it with you.",
+ o_title_home:"Request WiFi installation", o_sub_home:"Fill in the form. We'll contact you on WhatsApp to confirm availability and the installation date.",
+ f_plan:"Plan", f_name:"Your name", f_name_ph:"Full name", f_wa:"Your WhatsApp number (to confirm or verify)",
+ f_pay:"Payment method", f_cash:"Cash", f_zone:"Area / city", f_addr:"Home address", f_addr_ph:"Neighborhood, street, landmark…",
+ f_confirm:"Confirm plan on WhatsApp", f_request:"Send installation request", f_verify:"Verify my plan",
+ f_direct:"Or contact us directly:", f_fill:"Please fill in all fields.",
+ chose:"You picked", total:"Total to pay", install:"Installation", inst_for:"Residential WiFi installation request",
+ how:"How it works",
+ s1t:"Join the “NET PLUS” network", s1d:"Open your phone's WiFi settings and select the network.",
+ s2t:"Pick your plan", s2d:"The site gives you an order ID. Enter your WhatsApp number.",
+ s3t:"Get your code", s3d:"Once we confirm payment, we send the code on WhatsApp.",
+ s4t:"Enter the code", s4d:"Type it into the “Connect to WiFi” form.",
+ s5t:"Track your data", s5d:"Tap “Check my remaining data” to see what's left.",
+ r1t:"Check your area", r1d:"See the coverage list below.",
+ r2t:"Send the request", r2d:"Fill in the form and send it on WhatsApp.",
+ r3t:"We confirm", r3d:"We tell you if your area is available and set the installation date.",
+ r4t:"Installation", r4d:"The installation fee is 50 USD. Then you're online at home.",
+ cov_title:"Coverage: where we're available", cov_sub:"Search your city or area. For “Coming soon” areas, tap “Notify me” and we'll message you on WhatsApp when service is available.",
+ cov_ph:"Search a city or area…", cov_all:"All", cov_ok:"Available", cov_soon:"Coming soon",
+ cov_none:"No results. Ask us whether we can cover your area.", cov_miss:"Your area isn't listed?", cov_req:"Request coverage",
+ st_ok:"Available", st_soon:"Coming soon", cov_msg:"Hello NET PLUS! I'd like to know if service is possible in my area: ",
+ lg_title:"Legal service in Haiti",
+ lg_text:"{c} operates with the authorization of the Haitian State. Authorization number: {l}. We comply with CONATEL regulations and applicable laws.",
+ rights:"All rights reserved",
+ m_hello:"Hello NET PLUS!", m_confirm:"I want to CONFIRM my plan.", m_verify:"I want to VERIFY my plan.",
+ m_plan:"Plan", m_price:"Price", m_name:"Name", m_pay:"Payment", m_zone:"Area", m_addr:"Address", m_ip:"IP", m_na:"not available"
+}};
+
+/* =====================================================
+   LOJIK
+   ===================================================== */
+const $ = id => document.getElementById(id);
+let lang = "ht", mode = "hot", covFilter = "all";
+const t = (k, v) => { let s = (T[lang] && T[lang][k]) ?? T.ht[k] ?? k; if (v) for (const x in v) s = s.replace("{"+x+"}", v[x]); return s; };
+const fmt = n => n.toLocaleString("fr-FR");
+const htg = n => fmt(n) + " HTG";
+const daysTxt = n => n === 1 ? t("day1") : t("dayn", {n});
+const planName = p => t("n_" + p.k);
+const planData = p => p.data || t("unl");
+const planValid = p => p.days ? daysTxt(p.days) : t("till");
+const planLabel = p => planData(p) + (p.days ? " / " + daysTxt(p.days) : "");
+const wa = txt => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(txt)}`;
+const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const speedHot = () => `${CONFIG.hotspot.down} Mbps ↓ · ${CONFIG.hotspot.up} Mbps ↑`;
+
+/* ID kòmand (baze sou IP MikroTik si li disponib) */
+const mtIp = "$(ip)";
+const hasIp = mtIp.indexOf("$(") === -1;
+function genId(){
+  const seed = hasIp ? mtIp.split(".").map(n => (+n).toString(36).toUpperCase()).join("") : "";
+  const rnd = Math.random().toString(36).slice(2,6).toUpperCase();
+  const ts = Date.now().toString(36).slice(-3).toUpperCase();
+  return "NP-" + (seed ? seed.slice(-4) : rnd) + ts + (seed ? rnd.slice(0,2) : "");
+}
+let orderId = genId();
+
+/* --- Rann tèks estatik --- */
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.title = "NET PLUS 5G LTE – " + t("badge");
+  document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => el.placeholder = t(el.dataset.i18nPh));
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+  const E = CONFIG.equip, eqv = {promo:E.promoUSD, regular:E.regularUSD, save:E.regularUSD - E.promoUSD};
+  document.querySelectorAll("[data-eq]").forEach(el => el.textContent = eqv[el.dataset.eq]);
+  $("lgText").innerHTML = t("lg_text", { c:`<strong>${CONFIG.company}</strong>`, l:`<strong>${CONFIG.license}</strong>` });
+}
+
+/* --- Plan yo --- */
+function renderPlans(){
+  $("plans").innerHTML = CONFIG.plans.map((p,i) => {
+    const big = p.data ? p.data.split(" ") : [t("unl")];
+    return `<article class="glass plan ${p.pop?"pop":""}">
+      ${p.pop ? `<span class="tag">${t("popular")}</span>` : ""}${p.promo ? `<span class="tag">${t("promo")}</span>` : ""}
+      <h3>${planName(p)}</h3>
+      <div class="mb">${big[0]}${big[1] ? `<small>${big[1]}</small>` : ""}</div>
+      <div class="price">${htg(p.price)}${p.days ? " · " + daysTxt(p.days) : ""}</div>
+      <ul><li>${speedHot()}</li><li>${t(p.promo ? "pk_promo" : p.k==="mini" ? "pk_mini" : p.k==="d30" ? "pk_best" : "pk_unl")}</li>${p.days ? "" : `<li>${t("till")}</li>`}</ul>
+      <button type="button" class="btn ${p.pop||p.promo ? "" : "ghost"}" data-plan="${i}">${t("choose")}</button>
+    </article>`; }).join("");
+  document.querySelectorAll("[data-plan]").forEach(b => b.addEventListener("click", () => {
+    $("oPlan").value = b.dataset.plan; setMode("hot"); orderId = genId(); renderOrder(); $("order").scrollIntoView({behavior:"smooth"});
+  }));
+  const cur = $("oPlan").value || "0";
+  $("oPlan").innerHTML = CONFIG.plans.map((p,i) => `<option value="${i}">${planName(p)} – ${planLabel(p)} – ${htg(p.price)}</option>`).join("");
+  $("oPlan").value = cur;
+}
+
+/* --- Zòn kouvèti --- */
+function renderZones(){
+  const q = norm($("covSearch").value.trim());
+  const list = CONFIG.zones.filter(z => (covFilter === "all" || z.s === covFilter) && (!q || norm(z.n + " " + z.d).includes(q)));
+  $("zones").innerHTML = list.length ? list.map(z => `<div class="glass zone"><div><b>${z.n}</b><span class="d">${z.d}</span></div><span class="pill ${z.s}">${t(z.s==="ok" ? "st_ok" : "st_soon")}</span>${z.s==="soon" ? `<button type="button" class="btn ghost sm" data-notify="${z.n} (${z.d})">${t("notify")}</button>` : ""}</div>`).join("")
+    : `<div class="empty glass">${t("cov_none")}</div>`;
+  const cur = $("oZone").value;
+  $("oZone").innerHTML = CONFIG.zones.map(z => `<option value="${z.n}">${z.n} (${t(z.s==="ok" ? "st_ok" : "st_soon")})</option>`).join("");
+  if (cur) $("oZone").value = cur;
+}
+
+/* --- Komand / mòd --- */
+function setMode(m){
+  mode = m;
+  [["Hot","hot"],["Home","home"],["Equip","equip"]].forEach(([n,k]) => {
+    $("tab"+n).setAttribute("aria-selected", m === k);
+    $("panel"+n).hidden = m !== k;
+  });
+  renderOrder();
+}
+function renderOrder(){
+  const hot = mode === "hot", home = mode === "home", eq = mode === "equip";
+  $("gHot").hidden = !hot;
+  $("gHot2").hidden = home;
+  $("gHome").hidden = hot;
+  $("orderTitle").textContent = t(hot ? "o_title_hot" : home ? "o_title_home" : "o_title_equip");
+  $("orderSub").textContent = t(hot ? "o_sub_hot" : home ? "o_sub_home" : "o_sub_equip");
+  $("mainBtn").textContent = t(hot ? "f_confirm" : home ? "f_request" : "f_request_eq");
+  $("verifyBtn").hidden = !hot;
+  const keys = hot ? ["s1","s2","s3","s4","s5"] : home ? ["r1","r2","r3","r4"] : ["e1","e2","e3","e4"];
+  $("steps").innerHTML = keys.map(k => `<li><div><strong>${t(k+"t")}</strong><span>${t(k+"d")}</span></div></li>`).join("");
+  const E = CONFIG.equip;
+  if (hot) {
+    const p = CONFIG.plans[$("oPlan").value || 0];
+    $("summary").innerHTML = `${t("chose")} <b>${planName(p)}</b>: ${planData(p)}${p.days ? " · " + daysTxt(p.days) : ""} · ${speedHot()}<br>${t("total")}: <b>${htg(p.price)}</b><br><span class="oid">ID: ${orderId}</span>`;
+  } else if (home) {
+    $("summary").innerHTML = `${t("inst_for")}: <b>${CONFIG.home.down} Mbps ↓ · ${CONFIG.home.up} Mbps ↑</b><br>${t("install")}: <b>${CONFIG.home.installUSD} USD</b><br><span class="oid">ID: ${orderId}</span>`;
+  } else {
+    $("summary").innerHTML = `${t("chose")} <b>${t("tab_equip")}</b> (${t("promo")})<br>${t("total")}: <b>${E.promoUSD} USD</b> <span class="old">${E.regularUSD} USD</span><br><span class="oid">ID: ${orderId}</span>`;
+  }
+}
+function buildMsg(kind){
+  const L = [];
+  const head = kind === "verify" ? t("m_verify") : mode === "hot" ? t("m_confirm") : mode === "home" ? t("inst_for") + "." : t("m_equip");
+  L.push(t("m_hello") + " " + head);
+  L.push("ID: " + orderId);
+  L.push(t("m_ip") + ": " + (hasIp ? mtIp : t("m_na")));
+  if (mode === "hot") {
+    const p = CONFIG.plans[$("oPlan").value];
+    L.push(`${t("m_plan")}: ${planName(p)} (${planLabel(p)})`);
+    L.push(`${t("m_price")}: ${htg(p.price)}`);
+    L.push(`${t("m_pay")}: ${$("oPay").selectedOptions[0].textContent}`);
+  } else if (mode === "home") {
+    L.push(`${t("m_plan")}: ${CONFIG.home.down}/${CONFIG.home.up} Mbps`);
+    L.push(`${t("install")}: ${CONFIG.home.installUSD} USD`);
+  } else {
+    L.push(`${t("m_equipment")}: ${CONFIG.equip.promoUSD} USD (${t("promo")}; ${t("e_regular")}: ${CONFIG.equip.regularUSD} USD)`);
+    L.push(`${t("m_pay")}: ${$("oPay").selectedOptions[0].textContent}`);
+  }
+  if (mode !== "hot") {
+    L.push(`${t("m_zone")}: ${$("oZone").value}`);
+    L.push(`${t("m_addr")}: ${$("oAddr").value.trim()}`);
+  }
+  L.push(`${t("m_name")}: ${$("oName").value.trim()}`);
+  L.push(`WhatsApp: ${$("oPhone").value.trim()}`);
+  return L.join("\n");
+}
+function valid(){
+  const ok = $("oName").value.trim() && $("oPhone").value.trim() && (mode === "hot" || $("oAddr").value.trim());
+  if (!ok) alert(t("f_fill"));
+  return !!ok;
+}
+
+/* --- Evènman --- */
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+function setLang(l){
+  lang = l; applyStatic(); renderPlans(); renderZones(); renderOrder();
+  $("covReq").href = wa(t("cov_msg"));
+}
+$("tabHot").addEventListener("click", () => setMode("hot"));
+$("tabHome").addEventListener("click", () => setMode("home"));
+$("tabEquip").addEventListener("click", () => setMode("equip"));
+function goOrder(m){ setMode(m); orderId = genId(); renderOrder(); $("order").scrollIntoView({behavior:"smooth"}); }
+$("equipCta").addEventListener("click", () => goOrder("equip"));
+$("sugHome").addEventListener("click", () => { setMode("home"); $("shop").scrollIntoView({behavior:"smooth"}); });
+$("sugEquip").addEventListener("click", () => { setMode("equip"); $("shop").scrollIntoView({behavior:"smooth"}); });
+$("zones").addEventListener("click", e => {
+  const b = e.target.closest("[data-notify]");
+  if (b) window.open(wa(t("notify_msg") + b.dataset.notify), "_blank", "noopener");
+});
+$("homeCta").addEventListener("click", () => { setMode("home"); orderId = genId(); renderOrder(); $("order").scrollIntoView({behavior:"smooth"}); });
+$("oPlan").addEventListener("change", () => { orderId = genId(); renderOrder(); });
+$("orderForm").addEventListener("submit", e => { e.preventDefault(); if (valid()) window.open(wa(buildMsg("confirm")), "_blank", "noopener"); });
+$("verifyBtn").addEventListener("click", () => { if (valid()) window.open(wa(buildMsg("verify")), "_blank", "noopener"); });
+$("covSearch").addEventListener("input", renderZones);
+document.querySelectorAll(".chips button").forEach(b => b.addEventListener("click", () => {
+  covFilter = b.dataset.f;
+  document.querySelectorAll(".chips button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  renderZones();
+}));
+
+/* --- Pòtail MikroTik --- */
+$("loginForm").action = CONFIG.loginUrl;
+$("statusLink").href = CONFIG.statusUrl; $("statusLink").target = "_blank";
+$("dst").value = "http://www.google.com";
+$("loginForm").addEventListener("submit", e => {
+  if (!$("username").value.trim()) {
+    e.preventDefault();
+    const er = $("err"); er.style.display = "block"; er.textContent = t("p_err_empty"); $("username").focus();
+  }
+});
+if (new URLSearchParams(location.search).get("error")) { const er = $("err"); er.style.display = "block"; er.dataset.bad = "1"; }
+
+/* --- Kontak dirèk --- */
+$("waDirect").href = wa("Bonjour NET PLUS");
+$("waFloat").href = wa("Bonjour NET PLUS");
+$("mailDirect").href = "mailto:" + CONFIG.email;
+$("yr").textContent = new Date().getFullYear();
+
+/* --- Lang ofisyèl otomatik --- */
+const nav = (navigator.language || "ht").slice(0,2).toLowerCase();
+setLang(nav === "fr" ? "fr" : nav === "en" ? "en" : "ht");
+if ($("err").dataset.bad) $("err").textContent = t("p_err_bad");
+</script>
+</body>
+</html>
