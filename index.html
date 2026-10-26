@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<title>NET PLUS 5G LTE — Tablo bò</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --ink:#f2f2f3; --mute:#9d9da4;
+    --line:rgba(255,255,255,.12); --neon:#5ee7ff; --neon2:#b18cff;
+    --ok:#8fd19e; --bad:#ff8f8f; --warn:#e3c77a;
+    --r-lg:22px; --r-md:16px; --r-sm:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:88px;-webkit-text-size-adjust:100%}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink);
+    line-height:1.55; min-height:100vh; overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:""; position:fixed; inset:-20%; z-index:-2;
+    background:
+      radial-gradient(45% 40% at 20% 20%, rgba(94,231,255,.16), transparent 70%),
+      radial-gradient(40% 35% at 80% 25%, rgba(177,140,255,.14), transparent 70%),
+      radial-gradient(45% 40% at 55% 90%, rgba(94,231,255,.10), transparent 70%);
+    animation:drift 24s ease-in-out infinite alternate;
+    will-change:transform;
+  }
+  @keyframes drift{from{transform:translate3d(-2%,-2%,0) scale(1)}to{transform:translate3d(2%,3%,0) scale(1.06)}}
+  @media(prefers-reduced-motion:reduce){body::before{animation:none}}
+
+  .wrap{width:100%; max-width:1120px; margin:0 auto; padding:0 20px}
+  img,svg{max-width:100%}
+  a{color:inherit}
+  button{font:inherit; cursor:pointer}
+  [hidden]{display:none!important}
+
+  /* ============ HEADER ============ */
+  header{position:sticky; top:0; z-index:40; padding:12px 0}
+  .nav{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:8px 8px 8px 18px; border-radius:999px;
+    background:rgba(20,20,26,.86);
+    border:1px solid var(--line);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    backdrop-filter:blur(20px) saturate(160%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.15), 0 12px 30px rgba(0,0,0,.4);
+  }
+  .logo{display:flex; align-items:center; gap:9px; text-decoration:none; font-weight:800; letter-spacing:.02em; white-space:nowrap; color:var(--neon)}
+  .logo svg{width:26px; height:26px; flex:none; filter:drop-shadow(0 0 8px rgba(94,231,255,.4))}
+  .logo b{color:var(--ink); font-size:1rem}
+  .logo small{color:var(--mute); font-weight:600; font-size:.72rem; margin-left:2px}
+  .menu{display:flex; gap:2px; list-style:none}
+  .menu a{display:block; padding:9px 14px; border-radius:999px; text-decoration:none; color:var(--mute); font-size:.9rem; transition:.18s}
+  .menu a:hover{color:var(--ink); background:rgba(255,255,255,.07)}
+  .tools{display:flex; align-items:center; gap:8px}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 22px; min-height:46px; border:0; border-radius:999px;
+    font:inherit; font-weight:800; font-size:.94rem; text-decoration:none;
+    color:#06121a; cursor:pointer;
+    background:linear-gradient(180deg,#eaf8fc 0%,#a9dbe9 100%);
+    box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(94,231,255,.45),0 12px 30px rgba(94,231,255,.28);
+    transition:transform .14s, filter .18s, box-shadow .2s;
+  }
+  .btn:hover{filter:brightness(1.05)}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:rgba(255,255,255,.05); color:var(--ink); box-shadow:none; border:1px solid var(--line)}
+  .btn.ghost:hover{background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.3)}
+  .btn.sm{min-height:40px; padding:9px 16px; font-size:.86rem}
+  .btn.lg{min-height:52px; padding:14px 28px; font-size:1rem}
+
+  :focus-visible{outline:2px solid var(--neon); outline-offset:3px}
+
+  /* ============ HERO ============ */
+  .hero{padding:48px 0 32px; text-align:center; position:relative}
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 16px; border-radius:999px; font-size:.85rem;
+    background:rgba(94,231,255,.1); border:1px solid rgba(94,231,255,.35);
+    color:var(--neon);
+    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+    animation:fadeIn .6s ease-out;
+  }
+  .badge i{width:8px; height:8px; border-radius:50%; background:var(--neon); box-shadow:0 0 12px var(--neon); flex:none; animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  h1.hero-title{
+    font-size:clamp(2.1rem, 5.4vw, 3.4rem); font-weight:800;
+    line-height:1.06; letter-spacing:-.03em; margin:20px 0 16px;
+    background:linear-gradient(180deg, #fff 25%, #9bdcec 70%, #8c8c93);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:fadeIn .8s ease-out .1s both;
+  }
+  .lead{color:var(--mute); font-size:1.05rem; max-width:56ch; margin:0 auto; animation:fadeIn .8s ease-out .2s both}
+  .lead b{color:var(--ink)}
+  .hero-actions{
+    display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+    margin-top:28px; animation:fadeIn .8s ease-out .3s both;
+  }
+  @keyframes fadeIn{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+
+  /* ============ PLAN AKTIF ============ */
+  .current{
+    padding:26px; border-radius:var(--r-lg);
+    background:linear-gradient(160deg,rgba(94,231,255,.14),rgba(177,140,255,.08) 55%,rgba(28,30,38,.94));
+    border:1px solid rgba(94,231,255,.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 22px 50px rgba(94,231,255,.2);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);
+    backdrop-filter:blur(16px) saturate(150%);
+    margin-bottom:8px;
+    animation:fadeIn .8s ease-out .4s both;
+  }
+  .current-top{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:18px}
+  .current h2{font-size:1.4rem; letter-spacing:-.02em; margin-bottom:4px}
+  .current .pbadge{
+    display:inline-block; padding:3px 10px; border-radius:999px;
+    font-size:.72rem; font-weight:800;
+    background:linear-gradient(90deg,#5ee7ff,#b18cff); color:#06121a;
+    margin-left:8px; vertical-align:middle;
+  }
+  .current .pmeta{color:var(--mute); font-size:.9rem}
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+  @media(max-width:700px){.stats{grid-template-columns:1fr 1fr}}
+  .stat{background:rgba(0,0,0,.32); border:1px solid var(--line); border-radius:var(--r-md); padding:14px}
+  .stat span{display:block; color:var(--mute); font-size:.76rem; margin-bottom:4px}
+  .stat b{font-size:1.1rem; letter-spacing:-.01em; word-break:break-word}
+  .progress{height:8px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden; margin-top:16px}
+  .progress > i{display:block; height:100%; background:linear-gradient(90deg,#5ee7ff,#b18cff); border-radius:999px; transition:width .6s}
+
+  .pill{
+    font-size:.75rem; font-weight:700; padding:5px 11px; border-radius:999px;
+    white-space:nowrap; border:1px solid;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .pill.ok{color:var(--ok); border-color:rgba(143,209,158,.45); background:rgba(143,209,158,.1)}
+  .pill.soon{color:var(--warn); border-color:rgba(227,199,122,.45); background:rgba(227,199,122,.1)}
+  .pill.bad{color:var(--bad); border-color:rgba(255,143,143,.45); background:rgba(255,143,143,.1)}
+
+  /* ============ SEKSYON ============ */
+  section{padding:44px 0}
+  .sec-head{max-width:640px; margin-bottom:24px}
+  .sec-head h2{font-size:clamp(1.5rem,3.6vw,2.1rem); letter-spacing:-.02em; line-height:1.12}
+  .sec-head p{color:var(--mute); margin-top:8px}
+
+  /* ============ PLAN YO ============ */
+  .plans{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px}
+  .plan{
+    padding:22px; display:flex; flex-direction:column; gap:8px;
+    background:linear-gradient(160deg,rgba(28,30,38,.92),rgba(16,17,22,.96));
+    border:1px solid var(--line); border-radius:var(--r-lg);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 18px 40px rgba(0,0,0,.45);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);
+    backdrop-filter:blur(16px) saturate(150%);
+    transition:transform .25s, border-color .25s;
+  }
+  .plan:hover{transform:translateY(-5px); border-color:rgba(94,231,255,.35)}
+  .plan.pop{
+    background:linear-gradient(160deg,rgba(94,231,255,.14),rgba(177,140,255,.08) 55%,rgba(28,30,38,.94));
+    border-color:rgba(94,231,255,.5);
+  }
+  .tag{
+    align-self:flex-start; font-size:.72rem; padding:3px 10px; border-radius:999px;
+    background:linear-gradient(90deg,#5ee7ff,#b18cff); color:#06121a; font-weight:800;
+    letter-spacing:.03em;
+  }
+  .plan h3{font-size:.9rem; color:#c8c8cf; font-weight:600; margin-top:4px}
+  .plan .mb{font-size:1.9rem; font-weight:800; letter-spacing:-.03em; line-height:1.05}
+  .plan .mb small{font-size:.9rem; color:var(--mute); font-weight:600; margin-left:6px}
+  .plan .price{font-size:1.05rem; font-weight:700; color:var(--neon)}
+  .plan .dur{color:var(--mute); font-size:.82rem}
+  .plan .choose{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    width:100%; margin-top:auto; padding:10px; border-radius:10px;
+    background:rgba(255,255,255,.06); border:1px solid var(--line);
+    color:var(--ink); font-weight:700; font-size:.86rem; text-decoration:none;
+    transition:.15s;
+  }
+  .plan .choose:hover{background:rgba(94,231,255,.15); border-color:var(--neon); color:var(--neon)}
+
+  /* ============ KOUVÈTI ============ */
+  .cov-tools{display:grid; grid-template-columns:1fr auto; gap:14px; align-items:center; margin-bottom:20px}
+  @media(max-width:560px){.cov-tools{grid-template-columns:1fr}}
+  .search{position:relative}
+  .search svg{position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--mute)}
+  .search input{
+    width:100%; padding:14px 16px 14px 46px; border-radius:14px;
+    background:#0c0c10; border:1px solid var(--line); color:var(--ink);
+    font:inherit; font-size:16px;
+  }
+  .search input:focus{outline:0; border-color:var(--neon); box-shadow:0 0 0 3px rgba(94,231,255,.15)}
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chips button{
+    border:1px solid var(--line); background:rgba(255,255,255,.05);
+    color:var(--mute); font:inherit; font-size:.86rem; font-weight:600;
+    padding:10px 16px; border-radius:999px; transition:.18s;
+  }
+  .chips button[aria-pressed="true"]{background:linear-gradient(180deg,#fff,#d6dae2); color:#111; border-color:transparent}
+  .zones{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px}
+  .zone{
+    padding:16px; border-radius:var(--r-md);
+    background:linear-gradient(160deg,rgba(28,30,38,.9),rgba(16,17,22,.95));
+    border:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+  }
+  .zone b{display:block; font-size:.96rem}
+  .zone .d{color:var(--mute); font-size:.82rem}
+  .empty{padding:28px; text-align:center; color:var(--mute); grid-column:1/-1}
+  .cov-foot{margin-top:18px; display:flex; gap:14px; align-items:center; flex-wrap:wrap; color:var(--mute); font-size:.9rem}
+
+  /* ============ EKIPMAN ============ */
+  .equips{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+  @media(max-width:760px){.equips{grid-template-columns:1fr}}
+  .equip{
+    padding:24px; border-radius:var(--r-lg);
+    background:linear-gradient(160deg,rgba(28,30,38,.92),rgba(16,17,22,.96));
+    border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 20px 44px rgba(0,0,0,.45);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);
+    backdrop-filter:blur(16px) saturate(150%);
+    display:flex; flex-direction:column; gap:12px;
+    transition:border-color .25s;
+  }
+  .equip:hover{border-color:rgba(94,231,255,.35)}
+  .equip-visual{
+    width:100%; aspect-ratio:16/10; border-radius:var(--r-md);
+    background:radial-gradient(circle at 50% 45%, rgba(94,231,255,.18), transparent 65%), #0c0c10;
+    border:1px solid var(--line);
+    display:grid; place-items:center; color:var(--neon);
+  }
+  .equip-visual svg{width:100px; height:100px; filter:drop-shadow(0 0 20px rgba(94,231,255,.4))}
+  .equip h3{font-size:1.1rem}
+  .equip .sub{color:var(--mute); font-size:.88rem}
+  .equip-price{display:flex; align-items:baseline; gap:10px; margin-top:4px}
+  .equip-price b{font-size:1.6rem; color:var(--neon); letter-spacing:-.02em}
+  .equip-price .old{color:var(--mute); text-decoration:line-through; font-weight:600; font-size:.95rem}
+  .equip .buy{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    width:100%; margin-top:auto; padding:10px; border-radius:10px;
+    background:rgba(255,255,255,.06); border:1px solid var(--line);
+    color:var(--ink); font-weight:700; font-size:.86rem; text-decoration:none;
+    transition:.15s;
+  }
+  .equip .buy:hover{background:rgba(94,231,255,.15); border-color:var(--neon); color:var(--neon)}
+
+  /* ============ SIPÒ ============ */
+  .support{
+    padding:26px; border-radius:var(--r-lg);
+    background:linear-gradient(160deg,rgba(94,231,255,.10),rgba(177,140,255,.06) 60%,rgba(16,17,22,.96));
+    border:1px solid rgba(94,231,255,.35);
+    display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:center;
+  }
+  @media(max-width:700px){.support{grid-template-columns:1fr}}
+  .support h2{font-size:1.3rem; margin-bottom:8px}
+  .support p{color:var(--mute); font-size:.9rem}
+  .support-list{display:grid; gap:10px; list-style:none}
+  .support-list li{display:flex; align-items:center; gap:10px; font-size:.9rem}
+  .support-list svg{color:var(--neon); flex:none}
+  .support-list a{color:var(--ink); text-decoration:none; word-break:break-word}
+  .support-list a:hover{color:var(--neon)}
+
+  /* ============ FOOTER ============ */
+  footer{
+    padding:32px 0 40px; text-align:center; color:var(--mute);
+    font-size:.86rem; border-top:1px solid var(--line); margin-top:40px;
+    overflow-wrap:anywhere;
+  }
+  footer .fbrand{
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:10px;
+    color:var(--neon); text-decoration:none;
+  }
+  footer .fbrand b{color:var(--ink); font-size:.95rem}
+  footer a{color:var(--neon); text-decoration:none}
+  footer a:hover{text-decoration:underline}
+
+  /* Bar mobil */
+  .mbar{display:none}
+  @media(max-width:900px){
+    .menu{display:none}
+    .mbar{
+      display:flex; position:fixed; left:12px; right:12px;
+      bottom:calc(12px + env(safe-area-inset-bottom));
+      z-index:40; justify-content:space-around; padding:6px;
+      border-radius:999px; background:rgba(20,20,26,.92);
+      border:1px solid var(--line);
+      -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
+      box-shadow:0 -4px 24px rgba(0,0,0,.4);
+    }
+    .mbar a{
+      flex:1; text-align:center; text-decoration:none;
+      color:var(--mute); font-size:.78rem; font-weight:600;
+      padding:10px 4px; border-radius:999px;
+      display:flex; flex-direction:column; align-items:center; gap:3px;
+      transition:.15s;
+    }
+    .mbar a:hover, .mbar a.active{color:var(--ink); background:rgba(255,255,255,.08)}
+    .mbar svg{width:18px; height:18px}
+    body{padding-bottom:84px}
+  }
+
+  /* ============ MODAL ============ */
+  .overlay{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(0,0,0,.68);
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+    display:grid; place-items:center; padding:16px;
+    animation:ovIn .25s ease-out;
+  }
+  @keyframes ovIn{from{opacity:0}to{opacity:1}}
+  .modal{
+    width:min(420px,100%); padding:30px 24px; border-radius:20px;
+    background:linear-gradient(160deg,rgba(38,42,54,.96),rgba(16,18,24,.98));
+    border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 30px 80px rgba(0,0,0,.6);
+    -webkit-backdrop-filter:blur(26px) saturate(160%);
+    backdrop-filter:blur(26px) saturate(160%);
+    position:relative;
+    animation:mIn .35s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes mIn{from{opacity:0; transform:translateY(16px) scale(.98)}to{opacity:1; transform:none}}
+  .modal h2{font-size:1.2rem; margin-bottom:6px}
+  .modal p{color:var(--mute); font-size:.9rem; margin-bottom:18px}
+  .modal .x{
+    position:absolute; top:10px; right:10px; width:38px; height:38px;
+    border-radius:50%; border:1px solid var(--line); background:rgba(255,255,255,.06);
+    color:var(--ink); display:grid; place-items:center;
+    transition:.15s;
+  }
+  .modal .x:hover{background:rgba(255,255,255,.14)}
+  .modal .x svg{width:16px; height:16px}
+
+  .spinner{
+    width:44px; height:44px; border-radius:50%;
+    border:3px solid rgba(94,231,255,.2);
+    border-top-color:var(--neon);
+    animation:spin .8s linear infinite;
+    margin:0 auto 16px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{text-align:center; color:var(--mute); font-size:.92rem}
+
+  .skip{
+    position:absolute; left:12px; top:-64px; z-index:100;
+    background:#fff; color:#111; padding:10px 18px; border-radius:999px;
+    font-weight:700; text-decoration:none; transition:top .15s;
+  }
+  .skip:focus{top:12px}
+
+  /* Modal welcome */
+  .welcome-modal{
+    width:min(440px,100%); padding:32px 26px 26px; border-radius:24px;
+    background:linear-gradient(160deg,rgba(38,42,54,.98),rgba(16,18,24,.99));
+    border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 30px 90px rgba(0,0,0,.75);
+    -webkit-backdrop-filter:blur(26px) saturate(160%);
+    backdrop-filter:blur(26px) saturate(160%);
+    position:relative;
+    animation:mIn .4s cubic-bezier(.2,.8,.2,1);
+    text-align:center;
+  }
+  .welcome-modal .mark{
+    width:72px; height:72px; margin:0 auto 18px;
+    border-radius:50%; display:grid; place-items:center;
+    background:linear-gradient(135deg, rgba(94,231,255,.22), rgba(177,140,255,.16));
+    border:1px solid rgba(94,231,255,.45);
+    color:var(--neon);
+    box-shadow:0 0 32px rgba(94,231,255,.35);
+    animation:pulseMark 2.4s infinite;
+  }
+  @keyframes pulseMark{0%,100%{transform:scale(1); box-shadow:0 0 32px rgba(94,231,255,.35)}50%{transform:scale(1.05); box-shadow:0 0 48px rgba(94,231,255,.55)}}
+  .welcome-modal .mark svg{width:34px; height:34px}
+  .welcome-modal h2{
+    font-size:1.4rem; letter-spacing:-.02em; margin-bottom:8px;
+    background:linear-gradient(180deg,#fff 30%,#9bdcec 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .welcome-modal p{color:var(--mute); font-size:.92rem; line-height:1.55; margin-bottom:16px}
+  .welcome-modal p b{color:var(--neon)}
+  .promo-box{
+    background:rgba(94,231,255,.1); border:1px solid rgba(94,231,255,.35);
+    border-radius:12px; padding:14px; margin-bottom:16px; font-size:.88rem;
+    text-align:left;
+  }
+  .promo-box b{color:var(--ink); display:block; margin-bottom:4px}
+  .promo-box span{color:var(--mute)}
+  .welcome-modal .btn{width:100%; margin-top:8px}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#current">Ale nan plan ou</a>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="hub.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+          <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/>
+        </svg>
+        <b>NET PLUS <small>5G LTE</small></b>
+      </a>
+      <ul class="menu">
+        <li><a href="#current">Plan ou</a></li>
+        <li><a href="#plans">Plan</a></li>
+        <li><a href="#coverage">Kouvèti</a></li>
+        <li><a href="#equipment">Ekipman</a></li>
+        <li><a href="#support">Sipò</a></li>
+      </ul>
+      <div class="tools">
+        <button class="btn ghost sm" onclick="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="16" height="16">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+          </svg>
+          Dekonekte
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="top" class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <span class="badge"><i></i>Byenveni sou NET PLUS</span>
+    <h1 class="hero-title" id="greeting">Bonjou, Kliyan!</h1>
+    <p class="lead"><b>NET PLUS</b> se pi bon rezo WiFi an Ayiti — <b>vit</b>, <b>abòdab</b>, epi <b>disponib toupatou</b>. Jere plan ou, verifye kouvèti, epi dekouvri ekipman nou yo.</p>
+    <div class="hero-actions">
+      <a class="btn lg" href="#equipment">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+        View NetPlus
+      </a>
+      <a class="btn ghost lg" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>
+        Paj akèy
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ PLAN AKTIF ============ -->
+  <section id="current" style="padding:8px 0 40px">
+    <div class="current">
+      <div class="current-top">
+        <div>
+          <h2 id="planName">—</h2>
+          <div class="pmeta" id="planMeta">—</div>
+        </div>
+        <span class="pill" id="statusPill">—</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><span>Jou rete</span><b id="daysLeft">—</b></div>
+        <div class="stat"><span>Ekspirasyon</span><b id="expDate">—</b></div>
+        <div class="stat"><span>Done</span><b id="planData">—</b></div>
+        <div class="stat"><span>Zòn</span><b id="userZone">—</b></div>
+      </div>
+      <div class="progress"><i id="progressBar" style="width:0%"></i></div>
+    </div>
+  </section>
+
+  <!-- ============ PLAN YO ============ -->
+  <section id="plans">
+    <div class="sec-head">
+      <h2>Chwazi plan ou</h2>
+      <p>Achte yon plan, resevwa kòd ou sou WhatsApp, epi konekte.</p>
+    </div>
+    <div class="plans" id="planGrid"></div>
+  </section>
+
+  <!-- ============ KOUVÈTI ============ -->
+  <section id="coverage">
+    <div class="sec-head">
+      <h2>Kouvèti: kote nou disponib</h2>
+      <p>Chèche zòn ou. Pou zòn "Byento", klike "Notifye m" epi n ap ekri w.</p>
+    </div>
+    <div class="cov-tools">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+        </svg>
+        <input id="covSearch" type="search" placeholder="Chèche yon zòn…">
+      </div>
+      <div class="chips">
+        <button data-f="all" aria-pressed="true">Tout</button>
+        <button data-f="ok" aria-pressed="false">Disponib</button>
+        <button data-f="soon" aria-pressed="false">Byento</button>
+      </div>
+    </div>
+    <div class="zones" id="zones"></div>
+    <div class="cov-foot">
+      <span>Zòn ou pa nan lis la?</span>
+      <a class="btn ghost sm" id="covReq" href="#" target="_blank" rel="noopener">Mande kouvèti</a>
+    </div>
+  </section>
+
+  <!-- ============ EKIPMAN ============ -->
+  <section id="equipment">
+    <div class="sec-head">
+      <h2>Ekipman NetPlus</h2>
+      <p>Antèn CPE NetPlus ak routeur NetPlus pou yon koneksyon estab.</p>
+    </div>
+    <div class="equips">
+
+      <article class="equip">
+        <div class="equip-visual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v6"/><path d="M9 6a3 3 0 0 1 6 0"/><path d="M12 9l-6 12h12L12 9z"/><circle cx="12" cy="18" r="1.2" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <span class="tag">Pwomosyon</span>
+        <h3>Antèn CPE NetPlus</h3>
+        <p class="sub">Resevwa siyal NetPlus lakay ou. Pafè pou zòn limit.</p>
+        <div class="equip-price"><b>60 USD</b><span class="old">65 USD</span></div>
+        <a class="buy" href="activation.html?plan=cpe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12l5 5L20 7"/></svg>
+          Achte antèn
+        </a>
+      </article>
+
+      <article class="equip">
+        <div class="equip-visual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 16.5h.01M11 16.5h.01"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/><path d="M18 6l2-2M6 6L4 4"/>
+          </svg>
+        </div>
+        <span class="tag">Pwomosyon</span>
+        <h3>Routeur NetPlus</h3>
+        <p class="sub">Routeur WiFi pou kay ou oswa biznis ou.</p>
+        <div class="equip-price"><b>60 USD</b><span class="old">65 USD</span></div>
+        <a class="buy" href="activation.html?plan=router">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12l5 5L20 7"/></svg>
+          Achte routeur
+        </a>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ SIPÒ ============ -->
+  <section id="support">
+    <div class="support">
+      <div>
+        <h2>Bezwen èd?</h2>
+        <p>Ekip NET PLUS la disponib pou w ede w ak plan, koneksyon, oswa enstalasyon.</p>
+      </div>
+      <ul class="support-list">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="20" height="20">
+            <path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/>
+          </svg>
+          <a href="mailto:info.netplus.ht@gmail.com">info.netplus.ht@gmail.com</a>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+            <path d="M6.5 10.5a14 14 0 0 0 7 7l2-2a1 1 0 0 1 1-.2 10 10 0 0 0 3.5.5 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A16 16 0 0 1 3 4a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.2.2 2.4.5 3.5a1 1 0 0 1-.2 1z"/>
+          </svg>
+          <a href="tel:+50941951159">509 4195-1159</a>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+            <path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/>
+          </svg>
+          <a href="https://wa.me/50941951159" target="_blank" rel="noopener">WhatsApp 509 4195-1159</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <a class="fbrand" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="22" height="22">
+        <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+        <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/>
+      </svg>
+      <b>NET PLUS 5G LTE</b>
+    </a>
+    <p>© <span id="yr"></span> NET PLUS · Tout dwa rezève · <a href="mailto:info.netplus.ht@gmail.com">info.netplus.ht@gmail.com</a></p>
+  </div>
+</footer>
+
+<!-- ============ BAR MOBIL ============ -->
+<nav class="mbar">
+  <a href="#current">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M11 10h2"/></svg>
+    Plan
+  </a>
+  <a href="#coverage">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+    Kouvèti
+  </a>
+  <a href="#equipment">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+    Ekipman
+  </a>
+  <a href="#support">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/></svg>
+    Sipò
+  </a>
+</nav>
+
+<!-- ============ MODAL WELCOME ============ -->
+<div class="overlay" id="welcomeOverlay" hidden>
+  <div class="welcome-modal" role="dialog" aria-modal="true">
+    <div class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+        <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <h2>Welcome to NetPlus</h2>
+    <p>The best WiFi network in Haiti. <b>Very fast</b>, <b>for a low price</b>. Enjoy.</p>
+    <div class="promo-box">
+      <b>Pwomosyon ekipman</b>
+      <span>Antèn CPE ak Routeur — 60 USD (65 USD nòmal)</span>
+    </div>
+    <button class="btn" id="welcomeBuy">Wè ekipman yo</button>
+    <button class="btn ghost" id="welcomeOk" style="margin-top:8px">Kontinye</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const API = window.NETPLUS_API || "";
+const $ = id => document.getElementById(id);
+$("yr").textContent = new Date().getFullYear();
+
+const tok = localStorage.getItem("tok");
+if (!tok) location.replace("login.html");
+
+function logout(){ localStorage.removeItem("tok"); location.href = "login.html"; }
+
+/* ============ PLAN AK ZÒN ============ */
+const PLANS = {
+  mini:{name:"Mini 3.5 GB",data:"3.5 GB",days:null,price:50,badge:null},
+  promo:{name:"Promo 8.5 GB",data:"8.5 GB",days:null,price:100,badge:"Promo"},
+  d1:{name:"Jou",data:null,days:1,price:100,badge:null},
+  d3:{name:"3 jou",data:null,days:3,price:250,badge:null},
+  d5:{name:"5 jou",data:null,days:5,price:450,badge:null},
+  d14:{name:"14 jou",data:null,days:14,price:1500,badge:"Popilè"},
+  d30:{name:"30 jou",data:null,days:30,price:2500,badge:null},
+  v1:{name:"VIP Jou",data:null,days:1,price:500,badge:"VIP"},
+  v7:{name:"VIP 7 jou",data:null,days:7,price:2500,badge:"VIP"},
+  v30:{name:"VIP 30 jou",data:null,days:30,price:6500,badge:"VIP"}
+};
+const ZONES = [
+  {n:"Asipha",d:"Gonaïves",s:"ok"},{n:"Morne Blanc",d:"Gonaïves",s:"ok"},
+  {n:"Bien Ac",d:"Gonaïves",s:"ok"},{n:"Seprenn",d:"Gonaïves",s:"ok"},
+  {n:"Gros Morne",d:"Gonaïves",s:"ok"},{n:"Parc Vincent",d:"Gonaïves",s:"ok"},
+  {n:"Bretagne",d:"Gonaïves",s:"ok"},{n:"Cap-Haïtien",d:"Okap",s:"soon"},
+  {n:"Lòt zòn",d:"Sou demann",s:"soon"}
+];
+
+/* ============ PLAN GRID ============ */
+$("planGrid").innerHTML = Object.entries(PLANS).map(([key, p])=>{
+  const dur = p.days ? `${p.days} jou` : (p.data || "Ilimite");
+  const badge = p.badge ? `<span class="tag">${p.badge}</span>` : "";
+  return `<article class="plan${p.badge === "Popilè" || p.badge === "VIP" ? " pop" : ""}">
+    ${badge}
+    <h3>${p.name}</h3>
+    <div class="mb">${p.data ? p.data.split(" ")[0] : (p.days ? p.days : "∞")}<small>${p.data ? p.data.split(" ")[1] : (p.days ? "jou" : "ilimite")}</small></div>
+    <div class="price">${p.price} HTG</div>
+    <div class="dur">${dur}</div>
+    <a class="choose" href="activation.html?plan=${key}">Chwizi</a>
+  </article>`;
+}).join("");
+
+/* ============ ZONES ============ */
+let covFilter = "all";
+const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+function renderZones(){
+  const q = norm($("covSearch").value.trim());
+  const list = ZONES.filter(z =>
+    (covFilter === "all" || z.s === covFilter) &&
+    (!q || norm(z.n + " " + z.d).includes(q))
+  );
+  $("zones").innerHTML = list.length
+    ? list.map(z => `<div class="zone">
+        <div><b>${z.n}</b><div class="d">${z.d}</div></div>
+        <span class="pill ${z.s}">${z.s === "ok" ? "Disponib" : "Byento"}</span>
+      </div>`).join("")
+    : `<div class="empty">Pa gen rezilta.</div>`;
+}
+$("covSearch").addEventListener("input", renderZones);
+document.querySelectorAll(".chips button").forEach(b => {
+  b.addEventListener("click", () => {
+    covFilter = b.dataset.f;
+    document.querySelectorAll(".chips button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    renderZones();
+  });
+});
+renderZones();
+$("covReq").href = "https://wa.me/50941951159?text=" + encodeURIComponent("Bonjou NET PLUS, mwen ta renmen konnen si sèvis la disponib nan zòn mwen.");
+
+/* ============ CHAJE DONE ============ */
+function fmtDate(iso){
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("fr-FR", {day:"2-digit", month:"short", year:"numeric"});
+}
+
+fetch(API + "/api/me", { headers:{ Authorization:"Bearer "+tok } })
+  .then(r => r.json())
+  .then(d => {
+    if (!d.ok){
+      if (d.error === "expired" || d.error === "missing" || d.error === "unauthorized"){
+        localStorage.removeItem("tok");
+        location.replace("login.html");
+      }
+      return;
+    }
+
+    const u = d.user || {};
+    const p = d.plan;
+    const displayName = u.email ? u.email.split("@")[0] : (u.phone || "Kliyan");
+
+    $("greeting").textContent = "Bonjou, " + displayName + "!";
+
+    if (p && p.active){
+      $("statusPill").className = "pill ok";
+      $("statusPill").textContent = "Aktif";
+    } else if (p){
+      $("statusPill").className = "pill bad";
+      $("statusPill").textContent = "Ekspire";
+    } else {
+      $("statusPill").className = "pill soon";
+      $("statusPill").textContent = "Pa gen plan";
+    }
+
+    if (p){
+      $("planName").innerHTML = p.name + (p.badge ? `<span class="pbadge">${p.badge}</span>` : "");
+      $("planMeta").textContent = p.unlimited
+        ? "Ilimite" + (p.days ? " · " + p.days + " jou" : "")
+        : (p.data || "—") + (p.days ? " · " + p.days + " jou" : "");
+      $("daysLeft").textContent = p.daysLeft != null ? p.daysLeft + " jou" : (p.unlimited ? "Ilimite" : "—");
+      $("expDate").textContent = fmtDate(p.end);
+      $("planData").textContent = p.unlimited ? "Ilimite" : (p.data || "—");
+
+      if (p.start && p.end){
+        const total = new Date(p.end) - new Date(p.start);
+        const done = Math.max(0, Math.min(1, (Date.now() - new Date(p.start)) / total));
+        $("progressBar").style.width = Math.round(done * 100) + "%";
+      }
+    } else {
+      $("planName").textContent = "Pa gen plan aktif";
+      $("planMeta").textContent = "Achte yon plan pi ba a pou kòmanse.";
+    }
+
+    $("userZone").textContent = u.zone || "—";
+
+    /* Modal welcome — yon sèl fwa pa sesyon */
+    if (!sessionStorage.getItem("np_welcomed")){
+      $("welcomeOverlay").hidden = false;
+      sessionStorage.setItem("np_welcomed", "1");
+    }
+  })
+  .catch(() => {
+    $("greeting").textContent = "Bonjou!";
+  });
+
+/* ============ MODAL WELCOME ============ */
+function closeWelcome(){
+  $("welcomeOverlay").hidden = true;
+}
+$("welcomeOk").addEventListener("click", closeWelcome);
+$("welcomeOverlay").addEventListener("click", e => {
+  if (e.target === $("welcomeOverlay")) closeWelcome();
+});
+$("welcomeBuy").addEventListener("click", () => {
+  closeWelcome();
+  document.getElementById("equipment").scrollIntoView({ behavior:"smooth" });
+});
+</script>
+</body>
+</html>
