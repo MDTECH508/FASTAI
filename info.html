@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a0a0b">
+<title>NET PLUS — Enfòmasyon</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --ink:#f2f2f3; --mute:#9d9da4;
+    --line:rgba(255,255,255,.12); --neon:#5ee7ff; --neon2:#b18cff;
+    --ok:#8fd19e; --bad:#ff8f8f; --warn:#e3c77a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink);
+    line-height:1.6; min-height:100vh;
+  }
+  body::before{
+    content:""; position:fixed; inset:-20%; z-index:-2;
+    background:
+      radial-gradient(45% 40% at 20% 20%, rgba(94,231,255,.16), transparent 70%),
+      radial-gradient(40% 35% at 80% 25%, rgba(177,140,255,.14), transparent 70%);
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:24px 20px 60px}
+  header{padding:12px 0;margin-bottom:20px}
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:8px 8px 8px 18px;border-radius:999px;
+    background:rgba(20,20,26,.86);border:1px solid var(--line);
+    -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  }
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--neon)}
+  .logo .mark{
+    width:38px;height:38px;border-radius:11px;flex:none;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg, rgba(94,231,255,.4), rgba(177,140,255,.28));
+    border:1px solid rgba(94,231,255,.5);color:#fff;
+  }
+  .logo .mark svg{width:20px;height:20px}
+  .logo .text{display:flex;flex-direction:column;line-height:1}
+  .logo .text b{color:var(--ink);font-size:.95rem;font-weight:900;letter-spacing:.05em}
+  .logo .text small{color:var(--neon);font-size:.6rem;font-weight:700;letter-spacing:.2em;margin-top:3px}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;padding:9px 16px;
+    border-radius:999px;font-weight:700;font-size:.86rem;text-decoration:none;
+    color:var(--mute);background:transparent;border:1px solid var(--line);
+    transition:.18s;
+  }
+  .btn:hover{color:var(--ink);background:rgba(255,255,255,.06)}
+
+  h1{font-size:clamp(1.8rem,4.5vw,2.4rem);letter-spacing:-.03em;margin-bottom:8px;
+    background:linear-gradient(180deg,#fff 25%,#9bdcec 70%,#8c8c93);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .subtitle{color:var(--mute);font-size:1rem;margin-bottom:32px}
+
+  section{margin-bottom:40px}
+  .section-title{
+    font-size:1.15rem;font-weight:800;margin-bottom:16px;
+    display:flex;align-items:center;gap:10px;
+    padding-bottom:10px;border-bottom:1px solid var(--line);
+  }
+  .section-title svg{color:var(--neon);width:22px;height:22px}
+
+  .card{
+    background:linear-gradient(160deg,rgba(28,30,38,.92),rgba(16,17,22,.96));
+    border:1px solid var(--line);border-radius:16px;
+    padding:20px;margin-bottom:12px;
+    -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  }
+  .card h3{font-size:1.02rem;margin-bottom:8px}
+  .card p{color:var(--mute);font-size:.9rem}
+
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:500px}
+  thead{background:rgba(94,231,255,.08)}
+  th{text-align:left;padding:12px 14px;font-weight:700;color:var(--neon);font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line)}
+  td{padding:12px 14px;border-bottom:1px solid var(--line)}
+  tr:hover{background:rgba(255,255,255,.03)}
+  td b{color:var(--ink)}
+  td .tag-pill{
+    display:inline-block;padding:2px 8px;border-radius:999px;
+    font-size:.7rem;font-weight:800;
+    background:linear-gradient(90deg,#5ee7ff,#b18cff);color:#06121a;
+    margin-left:6px;
+  }
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:640px){.grid-2{grid-template-columns:1fr}}
+
+  .steps{list-style:none;counter-reset:s;display:grid;gap:12px}
+  .steps li{
+    counter-increment:s;display:grid;grid-template-columns:36px 1fr;
+    gap:14px;align-items:start;
+    padding:16px;border-radius:14px;
+    background:rgba(28,30,38,.7);border:1px solid var(--line);
+  }
+  .steps li::before{
+    content:counter(s);width:36px;height:36px;border-radius:50%;
+    display:grid;place-items:center;font-weight:800;font-size:.92rem;
+    background:linear-gradient(135deg,rgba(94,231,255,.22),rgba(177,140,255,.16));
+    border:1px solid rgba(94,231,255,.4);color:var(--neon);
+  }
+  .steps strong{display:block;margin-bottom:4px}
+  .steps span{color:var(--mute);font-size:.88rem}
+
+  .faq-item{border-bottom:1px solid var(--line)}
+  .faq-item:last-child{border-bottom:0}
+  .faq-item summary{
+    padding:14px 0;cursor:pointer;font-weight:700;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    list-style:none;font-size:.94rem;
+  }
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary::after{content:"+";color:var(--neon);font-size:1.4rem;font-weight:300;line-height:1}
+  .faq-item[open] summary::after{content:"−"}
+  .faq-item p{padding:0 0 16px;color:var(--mute);font-size:.9rem}
+
+  .kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+  .kpi .card{text-align:center;padding:16px}
+  .kpi .card b{display:block;font-size:1.5rem;color:var(--neon);font-weight:800;margin-bottom:4px}
+  .kpi .card span{font-size:.8rem;color:var(--mute)}
+
+  .pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:640px){.pay-methods{grid-template-columns:1fr}}
+  .pay-method{
+    background:rgba(94,231,255,.06);border:1px solid rgba(94,231,255,.35);
+    border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;
+  }
+  .pay-method .icon{
+    width:44px;height:44px;border-radius:11px;
+    display:grid;place-items:center;flex:none;
+    background:rgba(94,231,255,.15);color:var(--neon);
+  }
+  .pay-method .icon svg{width:22px;height:22px}
+  .pay-method .info{flex:1;min-width:0}
+  .pay-method .info b{display:block;font-size:.94rem;margin-bottom:2px}
+  .pay-method .info span{font-size:.84rem;color:var(--mute);font-family:ui-monospace,monospace;letter-spacing:.04em}
+
+  footer{padding:32px 0;text-align:center;color:var(--mute);font-size:.84rem;border-top:1px solid var(--line);margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <nav class="nav">
+      <a class="logo" href="index.html">
+        <span class="mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+            <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span class="text"><b>NET PLUS</b><small>5G LTE</small></span>
+      </a>
+      <a class="btn" href="index.html">← Akèy</a>
+    </nav>
+  </header>
+
+  <h1>Enfòmasyon konplè</h1>
+  <p class="subtitle">Tout sa w bezwen konnen sou NET PLUS — plan, peman, kouvèti, ekipman, ak sipò.</p>
+
+  <div class="kpi">
+    <div class="card"><b>5–15 Mbps</b><span>Hotspot</span></div>
+    <div class="card"><b>30/10 Mbps</b><span>Rezidansyèl</span></div>
+    <div class="card"><b>500 HTG</b><span>Plan minimum</span></div>
+    <div class="card"><b>7 zòn</b><span>Disponib</span></div>
+  </div>
+
+  <!-- PLAN MOBIL -->
+  <section>
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/><path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/></svg>
+      Plan WiFi mobil
+    </div>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>Plan</th><th>Pri</th><th>Dire</th><th>Vitès</th></tr></thead>
+        <tbody>
+          <tr><td><b>14 jou</b> <span class="tag-pill">Popilè</span></td><td><b>1,500 HTG</b></td><td>14 jou</td><td>5–15 Mbps</td></tr>
+          <tr><td><b>30 jou</b></td><td><b>2,500 HTG</b></td><td>30 jou</td><td>5–15 Mbps</td></tr>
+          <tr><td><b>VIP Jou</b> <span class="tag-pill">VIP</span></td><td><b>500 HTG</b></td><td>1 jou</td><td>30 Mbps</td></tr>
+          <tr><td><b>VIP 7 jou</b> <span class="tag-pill">VIP</span></td><td><b>2,500 HTG</b></td><td>7 jou</td><td>30 Mbps</td></tr>
+          <tr><td><b>VIP 30 jou</b> <span class="tag-pill">VIP</span></td><td><b>6,500 HTG</b></td><td>30 jou</td><td>30 Mbps</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PLAN REZIDANSYÈL -->
+  <section>
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+      Plan rezidansyèl
+    </div>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>Plan</th><th>Pri</th><th>Vitès</th><th>Enstalasyon</th></tr></thead>
+        <tbody>
+          <tr><td><b>Basic</b></td><td>35 USD/mwa</td><td>30/10 Mbps</td><td>50 USD</td></tr>
+          <tr><td><b>Pro</b></td><td>45 USD/mwa</td><td>Vitès siperyè</td><td>50 USD</td></tr>
+          <tr><td><b>Premium</b></td><td>55 USD/mwa</td><td>Vitès maksimòm</td><td>50 USD</td></tr>
+          <tr><td><b>VIP 14 jou</b></td><td>25 USD</td><td>55 Mbps</td><td>50 USD</td></tr>
+          <tr><td><b>VIP 30 jou</b></td><td>75 USD</td><td>100 Mbps</td><td>50 USD</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PEMAN -->
+  <section>
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      Metòd peman
+    </div>
+    <div class="pay-methods">
+      <div class="pay-method">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        </div>
+        <div class="info">
+          <b>NatCash</b>
+          <span>509 5511 2990 — Enelson Pierre</span>
+        </div>
+      </div>
+      <div class="pay-method">
+        <div class="icon" style="background:rgba(255,80,80,.15);color:#ff8f8f">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        </div>
+        <div class="info">
+          <b>MonCash</b>
+          <span>509 4195 1159 — NET PLUS</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Kijan pou peye</h3>
+      <ol style="color:var(--mute);font-size:.9rem;margin-top:10px;padding-left:20px;line-height:1.9">
+        <li>Chwazi plan ou sou paj akèy la</li>
+        <li>Ranpli fòm aktivasyon an</li>
+        <li>Chwazi NatCash oswa MonCash</li>
+        <li>Voye montan an sou nimewo ki make a</li>
+        <li>Kopye ID tranzaksyon an (nan SMS la)</li>
+        <li>Antre ID a sou paj peman an epi valide</li>
+        <li>Kòd ou ap parèt — kopye l epi konekte</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- EKIPMAN -->
+  <section>
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+      Ekipman
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Antèn CPE NetPlus</h3>
+        <p style="margin-bottom:12px">Antèn Starlink-style pou resevwa siyal nan zòn limit.</p>
+        <p style="font-size:1.4rem;font-weight:800;color:var(--neon)">60 USD <span style="font-size:.85rem;color:var(--mute);text-decoration:line-through;font-weight:600">65 USD</span></p>
+        <ul style="color:var(--mute);font-size:.86rem;margin-top:10px;padding-left:18px">
+          <li>Antèn pwofesyonèl</li>
+          <li>Enstalasyon senp</li>
+          <li>Garanti 6 mwa</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Routeur NetPlus</h3>
+        <p style="margin-bottom:12px">Routeur WiFi doub band pou kay ou oswa biznis ou.</p>
+        <p style="font-size:1.4rem;font-weight:800;color:var(--neon)">60 USD <span style="font-size:.85rem;color:var(--mute);text-decoration:line-through;font-weight:600">65 USD</span></p>
+        <ul style="color:var(--mute);font-size:.86rem;margin-top:10px;padding-left:18px">
+          <li>WiFi doub band</li>
+          <li>Jiska 30 aparèy</li>
+          <li>Konfigirasyon enkli</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- KOUVÈTI -->
+  <section>
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      Kouvèti
+    </div>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>Zòn</th><th>Vil</th><th>Estati</th></tr></thead>
+        <tbody>
+          <tr><td>Asipha</td><td>Gonaïves</td><td style="color:var(--ok)">Disponib</td></tr>
+          <tr><td>Morne Blanc</td><td>Gonaïves</td><td style="color:var(--ok)">Disponib</td></tr>
+          <tr><td>Bien Ac</td><td>Gonaïves</td><td style="color:var(--ok)">Disponib</td></tr>
+          <tr><td>Seprenn</td><td>Gonaïves</td><td style="color:var(--ok)">Disponib</td></tr>
+          <tr><td>Gros Morne</td><td>Gonaïves</td><td style="color:var(--ok)">Disponib</td></tr>
+          <tr><td>Parc Vincent</td><td>Gonaïves</td><td style="color:var(--ok)">Disponib</td></tr>
+          <tr><td>Bretagne</td><td>Gonaïves</td><td style="color:var(--ok)">Disponib</td></tr>
+          <tr><td>Cap-Haïtien</td><td>Okap</td><td style="color:var(--warn)">Byento</td></tr>
+          <tr><td>Lòt zòn</td><td>—</td><td style="color:var(--warn)">Sou demann</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- KIJAN SA MACHE -->
+  <section>
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>
+      Kijan sa mache
+    </div>
+    <ol class="steps">
+      <li><div><strong>Chwazi plan ou</strong><span>Sou paj akèy la, klike yon plan epi ranpli fòm nan.</span></div></li>
+      <li><div><strong>Peye</strong><span>Voye lajan sou NatCash (509 5511 2990) oswa MonCash (509 4195 1159).</span></div></li>
+      <li><div><strong>Resevwa kòd</strong><span>Apre validasyon ID tranzaksyon an, kòd ou ap parèt.</span></div></li>
+      <li><div><strong>Kopye kòd la</strong><span>Kopye kòd la pou w pa pèdi l.</span></div></li>
+      <li><div><strong>Konekte</strong><span>Ale nan paj koneksyon an epi antre kòd ou.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.7"/><circle cx="12" cy="16.5" r=".6" fill="currentColor"/></svg>
+      Kesyon yo poze souvan
+    </div>
+    <div class="card" style="padding:0 20px">
+      <details class="faq-item">
+        <summary>Kijan pou m peye?</summary>
+        <p>Ou ka peye ak NatCash oswa MonCash. Apre w fin voye lajan an, antre ID tranzaksyon an sou paj peman an.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Konbyen tan kòd la pran pou rive?</summary>
+        <p>Kòd la parèt otomatikman apre w fin valide ID tranzaksyon an. Si li pa parèt nan 2 minit, kontakte nou sou WhatsApp.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Kisa m fè si kòd mwen pa mache?</summary>
+        <p>Verifye si w antre l kòrèkteman. Si li toujou pa mache, kontakte nou sou WhatsApp 509 4195-1159.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Èske w gen ranbousman?</summary>
+        <p>Wi, nan ka kòd pa mache oswa pann ki dire plis pase 48 èdtan. Kontakte nou nan 7 jou apre acha a.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Konbyen aparèy ka konekte?</summary>
+        <p>Plan mobil yo pa limite kantite aparèy, men vitès la pataje. Pou plizyè aparèy, nou rekòmande routeur NetPlus.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Èske m ka transfere kòd mwen?</summary>
+        <p>Non, chak kòd sèvi yon sèl fwa epi li pa transfere.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- SIPÒ -->
+  <section>
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/></svg>
+      Kontakte nou
+    </div>
+    <div class="card">
+      <p style="margin-bottom:14px">Ekip NET PLUS la disponib 7/7.</p>
+      <div style="display:grid;gap:10px">
+        <a href="mailto:info.netplus.ht@gmail.com" style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:rgba(94,231,255,.06);border:1px solid rgba(94,231,255,.25);color:var(--ink);text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="20" height="20" style="color:var(--neon)"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>
+          <b>info.netplus.ht@gmail.com</b>
+        </a>
+        <a href="tel:+50941951159" style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:rgba(94,231,255,.06);border:1px solid rgba(94,231,255,.25);color:var(--ink);text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" style="color:var(--neon)"><path d="M6.5 10.5a14 14 0 0 0 7 7l2-2a1 1 0 0 1 1-.2 10 10 0 0 0 3.5.5 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A16 16 0 0 1 3 4a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.2.2 2.4.5 3.5a1 1 0 0 1-.2 1z"/></svg>
+          <b>509 4195-1159</b>
+        </a>
+        <a href="https://wa.me/50941951159" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.3);color:var(--ink);text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" style="color:#25d366"><path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/></svg>
+          <b>WhatsApp 509 4195-1159</b>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>© <span id="yr"></span> NET PLUS · The best network in Haiti</footer>
+
+</div>
+<script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+</body>
+        </html>
