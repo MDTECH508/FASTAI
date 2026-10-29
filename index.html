@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<title>NET PLUS — The best network in Haiti</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235ee7ff' stroke-width='2' stroke-linecap='round'><path d='M2 8.5a16 16 0 0 1 20 0'/><path d='M5 12a11 11 0 0 1 14 0'/><path d='M8.5 15.5a6 6 0 0 1 7 0'/><circle cx='12' cy='19' r='1.2' fill='%235ee7ff' stroke='none'/></svg>">
+<script src="splash.js"></script>
+<style>
+  :root{
+    --bg:#0a0a0b; --ink:#f5f5f7; --mute:#8e8e96;
+    --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.14);
+    --neon:#5ee7ff; --neon2:#b18cff;
+    --ok:#8fd19e; --bad:#ff8f8f; --warn:#e3c77a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:88px;-webkit-text-size-adjust:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",system-ui,sans-serif;
+    background:var(--bg); color:var(--ink);
+    line-height:1.5; min-height:100vh; overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-.011em;
+  }
+  body::before{
+    content:""; position:fixed; inset:-30%; z-index:-2;
+    background:
+      radial-gradient(50% 40% at 15% 15%, rgba(94,231,255,.12), transparent 70%),
+      radial-gradient(45% 40% at 85% 20%, rgba(177,140,255,.1), transparent 70%),
+      radial-gradient(50% 45% at 50% 95%, rgba(94,231,255,.06), transparent 70%);
+  }
+  .wrap{width:100%; max-width:1180px; margin:0 auto; padding:0 20px}
+  a{color:inherit; text-decoration:none}
+  button{font:inherit; cursor:pointer}
+  [hidden]{display:none!important}
+
+  /* HEADER */
+  header{
+    position:sticky; top:0; z-index:50; padding:16px 0;
+    background:rgba(10,10,11,.72);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    backdrop-filter:blur(20px) saturate(180%);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; gap:16px}
+  .logo{display:flex; align-items:center; gap:12px; font-weight:800; white-space:nowrap; cursor:pointer; transition:transform .2s}
+  .logo:hover{transform:scale(1.02)}
+  .logo .mark{
+    width:40px; height:40px; border-radius:11px; flex:none;
+    display:grid; place-items:center;
+    background:linear-gradient(135deg, rgba(94,231,255,.2), rgba(177,140,255,.15));
+    border:1px solid rgba(94,231,255,.4); color:var(--neon);
+    box-shadow:0 0 16px rgba(94,231,255,.2), inset 0 1px 0 rgba(255,255,255,.15);
+  }
+  .logo .mark svg{width:22px; height:22px}
+  .logo .text{display:flex; flex-direction:column; line-height:1}
+  .logo .text b{font-size:1rem; letter-spacing:.02em; font-weight:900; color:var(--ink)}
+  .logo .text small{color:var(--neon); font-size:.6rem; font-weight:700; letter-spacing:.22em; margin-top:3px}
+  .menu{display:flex; gap:2px; list-style:none}
+  .menu a{display:block; padding:9px 14px; border-radius:10px; color:var(--mute); font-size:.88rem; font-weight:500; transition:.18s}
+  .menu a:hover{color:var(--ink); background:rgba(255,255,255,.06)}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:11px 20px; min-height:44px; border:0; border-radius:11px;
+    font:inherit; font-weight:600; font-size:.9rem; text-decoration:none;
+    color:#0a0a0b; cursor:pointer; background:var(--ink);
+    transition:transform .14s, filter .18s;
+  }
+  .btn:hover{filter:brightness(.95)}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:transparent; color:var(--ink); border:1px solid var(--line-strong)}
+  .btn.ghost:hover{background:rgba(255,255,255,.06)}
+  .btn.sm{min-height:36px; padding:8px 14px; font-size:.82rem}
+  .btn-primary{
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
+    color:#0a0a0b;
+    box-shadow:0 4px 16px rgba(94,231,255,.25);
+  }
+  .btn-primary:hover{filter:brightness(1.08); box-shadow:0 6px 24px rgba(94,231,255,.4)}
+
+  /* HERO */
+  .hero{padding:80px 0 60px; text-align:center}
+  .hero-logo{
+    display:inline-flex; flex-direction:column; align-items:center; gap:20px;
+    margin-bottom:40px; cursor:pointer;
+    transition:transform .3s cubic-bezier(.2,.8,.2,1);
+  }
+  .hero-logo:hover{transform:scale(1.03)}
+  .hero-logo .big-mark{
+    width:120px; height:120px; border-radius:30px;
+    display:grid; place-items:center;
+    background:linear-gradient(135deg, rgba(94,231,255,.18), rgba(177,140,255,.12));
+    border:1.5px solid rgba(94,231,255,.35);
+    color:var(--neon); position:relative;
+    box-shadow:0 0 50px rgba(94,231,255,.3), inset 0 2px 0 rgba(255,255,255,.25);
+    transition:box-shadow .4s;
+  }
+  .hero-logo:hover .big-mark{box-shadow:0 0 70px rgba(94,231,255,.45), inset 0 2px 0 rgba(255,255,255,.3)}
+  .hero-logo .big-mark svg{width:64px; height:64px}
+  .hero-logo .brand-name{text-align:center}
+  .hero-logo .brand-name h1{
+    font-size:clamp(2rem, 5vw, 3rem); font-weight:900;
+    letter-spacing:.04em; line-height:1; color:var(--ink); margin-bottom:6px;
+  }
+  .hero-logo .brand-name span{font-size:.78rem; font-weight:700; letter-spacing:.4em; color:var(--neon)}
+
+  .hero-msg{max-width:640px; margin:0 auto}
+  .hero-msg .tag{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 16px; border-radius:999px;
+    font-size:.82rem; font-weight:600;
+    background:rgba(94,231,255,.06); border:1px solid rgba(94,231,255,.25);
+    color:var(--neon); margin-bottom:20px;
+  }
+  .hero-msg .tag i{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--neon); box-shadow:0 0 10px var(--neon);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1; transform:scale(1)}50%{opacity:.6; transform:scale(.9)}}
+  .hero-msg h2{
+    font-size:clamp(1.6rem, 4.2vw, 2.6rem); font-weight:800;
+    line-height:1.1; letter-spacing:-.03em; color:var(--ink); margin-bottom:16px;
+  }
+  .hero-msg h2 em{
+    font-style:normal;
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero-msg .lead{color:var(--mute); font-size:1.05rem; line-height:1.6; max-width:56ch; margin:0 auto}
+  .hero-msg .lead b{color:var(--ink); font-weight:600}
+
+  section{padding:60px 0}
+  .sec-head{max-width:640px; margin-bottom:32px}
+  .sec-head h2{font-size:clamp(1.6rem, 3.8vw, 2.2rem); font-weight:800; letter-spacing:-.02em; color:var(--ink); margin-bottom:10px}
+  .sec-head p{color:var(--mute); font-size:1rem}
+
+  /* PLANS */
+  .plans{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px}
+  .plan{
+    padding:28px 24px; border-radius:18px;
+    display:flex; flex-direction:column; gap:10px;
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    transition:transform .25s, border-color .25s, background .25s;
+    cursor:pointer; text-align:left; color:var(--ink);
+  }
+  .plan:hover{transform:translateY(-4px); border-color:rgba(94,231,255,.3); background:rgba(255,255,255,.05)}
+  .plan.pop{background:linear-gradient(160deg,rgba(94,231,255,.08),rgba(177,140,255,.04) 55%,rgba(255,255,255,.02)); border-color:rgba(94,231,255,.35)}
+  .plan.home{background:linear-gradient(160deg,rgba(143,209,158,.06),rgba(94,231,255,.03) 55%,rgba(255,255,255,.02)); border-color:rgba(143,209,158,.25)}
+  .tag{align-self:flex-start; font-size:.7rem; padding:4px 10px; border-radius:999px; background:rgba(94,231,255,.15); color:var(--neon); font-weight:800; letter-spacing:.04em; border:1px solid rgba(94,231,255,.3)}
+  .tag.home-tag{background:rgba(143,209,158,.15); color:var(--ok); border-color:rgba(143,209,158,.3)}
+  .plan h3{font-size:.9rem; color:var(--mute); font-weight:600; margin-top:6px}
+  .plan .mb{font-size:2.4rem; font-weight:800; letter-spacing:-.04em; line-height:1; color:var(--ink)}
+  .plan .mb small{font-size:.92rem; color:var(--mute); font-weight:600; margin-left:6px}
+  .plan .price{font-size:1.08rem; font-weight:700; color:var(--neon); margin-top:4px}
+  .plan.home .price{color:var(--ok)}
+  .plan .speed{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 10px; border-radius:8px;
+    background:rgba(94,231,255,.1);
+    border:1px solid rgba(94,231,255,.25);
+    color:var(--neon); font-size:.82rem; font-weight:700;
+    margin:6px 0;
+    align-self:flex-start;
+  }
+  .plan.home .speed{background:rgba(143,209,158,.1); border-color:rgba(143,209,158,.25); color:var(--ok)}
+  .plan .speed svg{width:12px; height:12px}
+  .plan ul{list-style:none; color:var(--mute); font-size:.85rem; margin:10px 0 16px; flex:1}
+  .plan li{padding:6px 0; border-top:1px solid var(--line); display:flex; align-items:center; gap:8px}
+  .plan li:first-child{border-top:0}
+  .plan li svg{color:var(--ok); flex:none}
+  .plan .choose{width:100%; margin-top:auto; padding:11px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid var(--line-strong); color:var(--ink); font-weight:700; font-size:.88rem; display:flex; align-items:center; justify-content:center; gap:6px; transition:.15s}
+  .plan:hover .choose{background:rgba(94,231,255,.12); border-color:var(--neon); color:var(--neon)}
+  .plan.home:hover .choose{background:rgba(143,209,158,.12); border-color:var(--ok); color:var(--ok)}
+
+  .home-section{margin-top:64px; padding-top:44px; border-top:1px solid var(--line)}
+
+  /* EKIPMAN */
+  .equips{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+  @media(max-width:760px){.equips{grid-template-columns:1fr}}
+  .equip{
+    padding:28px; border-radius:20px;
+    background:rgba(255,255,255,.03); border:1px solid var(--line);
+    display:flex; flex-direction:column; gap:16px;
+    transition:border-color .25s, transform .3s; cursor:pointer;
+  }
+  .equip:hover{border-color:rgba(94,231,255,.3); transform:translateY(-3px)}
+  .equip-visual{
+    width:100%; aspect-ratio:16/11; border-radius:14px;
+    background:radial-gradient(circle at 50% 30%, rgba(94,231,255,.2), transparent 60%), radial-gradient(circle at 50% 90%, rgba(177,140,255,.15), transparent 50%), linear-gradient(180deg, #0d0d12, #08080b);
+    border:1px solid var(--line); display:grid; place-items:center; color:var(--neon);
+    position:relative; overflow:hidden; perspective:800px;
+  }
+  .equip-visual::before{
+    content:""; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(94,231,255,.08) 1px, transparent 1px),linear-gradient(90deg, rgba(94,231,255,.08) 1px, transparent 1px);
+    background-size:36px 36px;
+    mask-image:radial-gradient(circle at 50% 50%, #000 30%, transparent 75%);
+    -webkit-mask-image:radial-gradient(circle at 50% 50%, #000 30%, transparent 75%);
+    z-index:1;
+  }
+  .equip-visual::after{content:""; position:absolute; bottom:0; left:10%; right:10%; height:40%; background:radial-gradient(ellipse at 50% 100%, rgba(94,231,255,.3), transparent 70%); filter:blur(18px); opacity:.6; z-index:0}
+  .equip-visual .obj3d{
+    width:70%; max-width:200px; position:relative; z-index:2;
+    transform:rotateX(8deg) rotateY(-12deg);
+    transition:transform .5s cubic-bezier(.2,.7,.2,1);
+    filter:drop-shadow(0 20px 30px rgba(94,231,255,.35)) drop-shadow(0 4px 8px rgba(0,0,0,.5));
+  }
+  .equip:hover .equip-visual .obj3d{transform:rotateX(4deg) rotateY(-6deg) translateY(-4px) scale(1.03)}
+  .equip h3{font-size:1.1rem; font-weight:700; color:var(--ink)}
+  .equip .sub{color:var(--mute); font-size:.86rem; line-height:1.5}
+  .equip-price{display:flex; align-items:baseline; gap:10px}
+  .equip-price b{font-size:1.55rem; color:var(--neon); font-weight:800}
+  .equip-price .old{color:var(--mute); text-decoration:line-through; font-weight:600; font-size:.92rem}
+  .equip .buy{display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-top:auto; padding:11px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid var(--line-strong); color:var(--ink); font-weight:700; font-size:.86rem; transition:.15s}
+  .equip:hover .buy{background:rgba(94,231,255,.12); border-color:var(--neon); color:var(--neon)}
+
+  /* KOUVÈTI */
+  .search{position:relative; margin-bottom:20px}
+  .search svg{position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--mute)}
+  .search input{width:100%; padding:13px 16px 13px 46px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid var(--line); color:var(--ink); font:inherit; font-size:15px; transition:.18s}
+  .search input:focus{outline:0; border-color:rgba(94,231,255,.4); box-shadow:0 0 0 3px rgba(94,231,255,.1)}
+  .zones{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px}
+  .zone{padding:16px 18px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:12px; transition:.18s}
+  .zone:hover{border-color:rgba(255,255,255,.15)}
+  .zone b{display:block; font-size:.94rem; font-weight:700; color:var(--ink)}
+  .zone .d{color:var(--mute); font-size:.8rem; margin-top:2px}
+  .pill{font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:999px; white-space:nowrap; border:1px solid; display:inline-flex; align-items:center; gap:5px}
+  .pill.ok{color:var(--ok); border-color:rgba(143,209,158,.35); background:rgba(143,209,158,.08)}
+  .pill.soon{color:var(--warn); border-color:rgba(227,199,122,.35); background:rgba(227,199,122,.08)}
+  .empty{padding:28px; text-align:center; color:var(--mute); grid-column:1/-1}
+
+  /* FOOTER */
+  footer{padding:40px 0 48px; text-align:center; color:var(--mute); font-size:.84rem; border-top:1px solid var(--line); margin-top:60px}
+  footer .flogo{display:inline-flex; align-items:center; gap:10px; margin-bottom:14px; cursor:pointer}
+  footer .flogo .mark{width:34px; height:34px; border-radius:9px; display:grid; place-items:center; background:linear-gradient(135deg, rgba(94,231,255,.2), rgba(177,140,255,.15)); border:1px solid rgba(94,231,255,.35); color:var(--neon)}
+  footer .flogo .mark svg{width:18px; height:18px}
+  footer .flogo b{color:var(--ink); font-size:.88rem; font-weight:800; letter-spacing:.03em}
+  footer a{color:var(--neon)}
+  footer a:hover{text-decoration:underline}
+  footer .admin-link{
+    display:inline-flex; align-items:center; gap:6px;
+    color:var(--mute); font-size:.76rem;
+    padding:6px 12px; border-radius:8px;
+    margin-top:14px; opacity:.4; transition:.2s;
+  }
+  footer .admin-link:hover{opacity:1; background:rgba(255,255,255,.04); color:var(--ink)}
+  footer .admin-link svg{width:12px; height:12px}
+
+  /* BAR MOBIL */
+  .mbar{display:none}
+  @media(max-width:900px){
+    .menu{display:none}
+    .mbar{
+      display:flex; position:fixed; left:12px; right:12px;
+      bottom:calc(12px + env(safe-area-inset-bottom));
+      z-index:40; justify-content:space-around; padding:6px;
+      border-radius:999px; background:rgba(20,20,26,.92);
+      border:1px solid var(--line-strong);
+      -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
+      box-shadow:0 -4px 24px rgba(0,0,0,.5);
+    }
+    .mbar a{
+      flex:1; text-align:center; color:var(--mute);
+      font-size:.74rem; font-weight:600; padding:10px 4px;
+      border-radius:999px; display:flex; flex-direction:column;
+      align-items:center; gap:3px; transition:.15s;
+    }
+    .mbar a:hover{color:var(--ink); background:rgba(255,255,255,.08)}
+    .mbar svg{width:18px; height:18px}
+    body{padding-bottom:84px}
+  }
+
+  /* WELCOME ANIMATION */
+  .welcome-overlay{
+    position:fixed; inset:0; z-index:9000;
+    display:none; place-items:center;
+    background:rgba(10,10,11,.97);
+    animation:wlIn .3s ease-out;
+  }
+  .welcome-overlay.show{display:grid}
+  @keyframes wlIn{from{opacity:0}to{opacity:1}}
+  .welcome-overlay.closing{animation:wlOut .4s ease-in forwards}
+  @keyframes wlOut{to{opacity:0}}
+  .welcome-stage{display:flex; flex-direction:column; align-items:center; gap:22px; padding:40px 32px; text-align:center; max-width:460px}
+  .welcome-logo{
+    width:110px; height:110px; border-radius:28px;
+    display:grid; place-items:center;
+    background:linear-gradient(135deg, rgba(94,231,255,.22), rgba(177,140,255,.16));
+    border:1.5px solid rgba(94,231,255,.45);
+    color:var(--neon);
+    box-shadow:0 0 60px rgba(94,231,255,.45), inset 0 2px 0 rgba(255,255,255,.25);
+    animation:logoBounce 1.4s cubic-bezier(.2,.8,.2,1) infinite;
+  }
+  @keyframes logoBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-12px) scale(1.04)}}
+  .welcome-logo svg{width:56px; height:56px}
+  .welcome-text{font-size:1.5rem; font-weight:800; letter-spacing:-.02em; line-height:1.2; color:var(--ink)}
+  .welcome-text span{display:block; font-size:1.05rem; margin-top:8px; background:linear-gradient(135deg, var(--neon), var(--neon2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .welcome-sub{font-size:.9rem; color:var(--mute); line-height:1.5}
+  .welcome-sub b{color:var(--neon); font-weight:600}
+  .welcome-progress{width:100%; height:4px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden; margin-top:8px}
+  .welcome-progress > i{display:block; height:100%; background:linear-gradient(90deg, var(--neon), var(--neon2)); border-radius:999px; box-shadow:0 0 8px rgba(94,231,255,.6); animation:progressFill 2.5s cubic-bezier(.2,.6,.4,1) forwards}
+  @keyframes progressFill{from{width:0%}to{width:100%}}
+  .welcome-percent{font-size:.8rem; color:var(--neon); font-weight:700; font-variant-numeric:tabular-nums}
+
+  /* CHATBOT FLOAT */
+  .chatbot-float{
+    position:fixed; right:20px; bottom:calc(20px + env(safe-area-inset-bottom));
+    z-index:45; width:60px; height:60px; border-radius:50%;
+    display:grid; place-items:center;
+    background:linear-gradient(135deg,#25d366,#128c7e);
+    color:#fff; text-decoration:none;
+    box-shadow:0 8px 24px rgba(37,211,102,.4), 0 2px 8px rgba(0,0,0,.4);
+    transition:transform .2s;
+    animation:chatPulse 3s infinite;
+  }
+  .chatbot-float:hover{transform:scale(1.08)}
+  .chatbot-float svg{width:28px; height:28px}
+  .chatbot-float .badge{
+    position:absolute; top:-4px; right:-4px;
+    width:20px; height:20px; border-radius:50%;
+    background:var(--bad); color:#fff;
+    font-size:.7rem; font-weight:800;
+    display:grid; place-items:center;
+    border:2px solid var(--bg);
+  }
+  @keyframes chatPulse{
+    0%,100%{box-shadow:0 8px 24px rgba(37,211,102,.4), 0 2px 8px rgba(0,0,0,.4)}
+    50%{box-shadow:0 8px 32px rgba(37,211,102,.6), 0 2px 8px rgba(0,0,0,.4)}
+  }
+  @media(max-width:900px){
+    .chatbot-float{bottom:calc(96px + env(safe-area-inset-bottom))}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important; transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- WELCOME ANIMATION -->
+<div class="welcome-overlay" id="welcomeOverlay">
+  <div class="welcome-stage">
+    <div class="welcome-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+        <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="welcome-text">Welcome to NET PLUS<span>The best network in Haiti</span></div>
+    <div class="welcome-sub"><b>Fast</b> · <b>Affordable</b> · <b>Reliable</b></div>
+    <div class="welcome-progress"><i></i></div>
+    <div class="welcome-percent" id="welcomePercent">0%</div>
+  </div>
+</div>
+
+<!-- CHATBOT FLOAT -->
+<a href="chatbot.html" class="chatbot-float" title="Pale ak yon ajan">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+  </svg>
+  <span class="badge">1</span>
+</a>
+
+<!-- HEADER -->
+<header>
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="portal.html" onclick="event.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});">
+        <span class="mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+            <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span class="text"><b>NET PLUS</b><small>5G LTE</small></span>
+      </a>
+      <ul class="menu">
+        <li><a href="#plans">Plan</a></li>
+        <li><a href="#home">Rezidansyèl</a></li>
+        <li><a href="#equipment">Ekipman</a></li>
+        <li><a href="#coverage">Kouvèti</a></li>
+        <li><a href="info.html">Info</a></li>
+        <li><a href="chatbot.html">Chat</a></li>
+      </ul>
+      <div style="display:flex;gap:8px">
+        <a class="btn ghost sm" href="chatbot.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="16" height="16">
+            <path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/>
+          </svg>
+          Chat
+        </a>
+        <a class="btn ghost sm" href="login.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="16" height="16">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>
+          </svg>
+          Konekte
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-logo">
+      <div class="big-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+          <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
+      <div class="brand-name">
+        <h1>NET PLUS</h1>
+        <span>5G LTE</span>
+      </div>
+    </div>
+    <div class="hero-msg">
+      <div class="tag"><i></i>The best network in Haiti</div>
+      <h2>Welcome to NetPlus — <em>The best network in Haiti</em></h2>
+      <p class="lead"><b>NET PLUS</b> se pi bon rezo WiFi an Ayiti. <b>Vit</b>, <b>abòdab</b>, epi <b>disponib toupatou</b>.</p>
+    </div>
+  </section>
+
+  <!-- PLAN WIFI MOBIL -->
+  <section id="plans">
+    <div class="sec-head">
+      <h2>Plan WiFi mobil</h2>
+      <p>10 Mbps pou Basic · 20 Mbps pou VIP. Klike yon plan pou w achte l.</p>
+    </div>
+    <div class="plans" id="planGrid"></div>
+
+    <div class="home-section" id="home">
+      <div class="sec-head">
+        <h2>Plan rezidansyèl</h2>
+        <p>30/10 Mbps pou Basic · enstalasyon 50 USD.</p>
+      </div>
+      <div class="plans" id="homeGrid"></div>
+    </div>
+  </section>
+
+  <!-- EKIPMAN -->
+  <section id="equipment">
+    <div class="sec-head">
+      <h2>Ekipman NetPlus</h2>
+      <p>Antèn CPE (Starlink-style) ak routeur WiFi pou yon koneksyon estab. Enstalasyon nan 7 jou maksimòm.</p>
+    </div>
+    <div class="equips">
+
+      <a class="equip" href="chatbot.html">
+        <div class="equip-visual">
+          <svg class="obj3d" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cpeBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+                <stop offset="45%" stop-color="#b8bcc4" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#5a5e66" stop-opacity="0.95"/>
+              </linearGradient>
+              <linearGradient id="cpeTop" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                <stop offset="100%" stop-color="#e0e4ea" stop-opacity="0.95"/>
+              </linearGradient>
+              <radialGradient id="signalGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#5ee7ff" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#5ee7ff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <ellipse cx="100" cy="180" rx="55" ry="8" fill="#000" opacity="0.5"/>
+            <g opacity="0.85">
+              <path d="M60 70 Q100 40 140 70" stroke="#5ee7ff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M68 80 Q100 55 132 80" stroke="#5ee7ff" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+              <path d="M76 90 Q100 70 124 90" stroke="#5ee7ff" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+              <circle cx="100" cy="72" r="30" fill="url(#signalGlow)" opacity="0.35"/>
+            </g>
+            <path d="M55 105 L145 105 L135 145 L65 145 Z" fill="url(#cpeBody)" stroke="#3a3e46" stroke-width="1"/>
+            <path d="M55 105 L145 105 L140 112 L60 112 Z" fill="url(#cpeTop)"/>
+            <path d="M65 108 L100 108 L95 140 L70 140 Z" fill="#fff" opacity="0.15"/>
+            <rect x="95" y="145" width="10" height="20" fill="#6a6e76" stroke="#3a3e46" stroke-width="0.5" rx="2"/>
+            <ellipse cx="100" cy="168" rx="30" ry="7" fill="url(#cpeTop)" stroke="#3a3e46" stroke-width="0.5"/>
+            <circle cx="90" cy="155" r="1.5" fill="#5ee7ff">
+              <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="110" cy="155" r="1.5" fill="#5ee7ff">
+              <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+        <span class="tag">Pwomosyon</span>
+        <h3>Antèn CPE NetPlus</h3>
+        <p class="sub">Resevwa siyal NetPlus lakay ou. Teknoloji Starlink-style.</p>
+        <div class="equip-price"><b>60 USD</b><span class="old">65 USD</span></div>
+        <div class="buy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          Mande enstalasyon
+        </div>
+      </a>
+
+      <a class="equip" href="chatbot.html">
+        <div class="equip-visual">
+          <svg class="obj3d" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="routerTop" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+                <stop offset="50%" stop-color="#c8ccd4" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#6a6e76" stop-opacity="0.95"/>
+              </linearGradient>
+              <linearGradient id="routerFront" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#4a4e56"/>
+                <stop offset="100%" stop-color="#2a2e36"/>
+              </linearGradient>
+              <linearGradient id="antennaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#e0e4ea"/>
+                <stop offset="100%" stop-color="#4a4e56"/>
+              </linearGradient>
+              <radialGradient id="routerGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#5ee7ff" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#5ee7ff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <ellipse cx="100" cy="175" rx="70" ry="8" fill="#000" opacity="0.5"/>
+            <rect x="52" y="55" width="5" height="60" rx="2" fill="url(#antennaGrad)" stroke="#2a2e36" stroke-width="0.5"/>
+            <rect x="143" y="55" width="5" height="60" rx="2" fill="url(#antennaGrad)" stroke="#2a2e36" stroke-width="0.5"/>
+            <circle cx="54.5" cy="55" r="3" fill="#c8ccd4" stroke="#2a2e36" stroke-width="0.5"/>
+            <circle cx="145.5" cy="55" r="3" fill="#c8ccd4" stroke="#2a2e36" stroke-width="0.5"/>
+            <path d="M40 115 L160 115 L150 135 L50 135 Z" fill="url(#routerTop)" stroke="#2a2e36" stroke-width="1"/>
+            <path d="M50 135 L150 135 L150 160 L50 160 Z" fill="url(#routerFront)" stroke="#2a2e36" stroke-width="1"/>
+            <path d="M40 115 L50 135 L50 160 L40 140 Z" fill="#6a6e76" stroke="#2a2e36" stroke-width="0.5"/>
+            <path d="M160 115 L150 135 L150 160 L160 140 Z" fill="#4a4e56" stroke="#2a2e36" stroke-width="0.5"/>
+            <path d="M55 118 L120 118 L115 130 L60 130 Z" fill="#fff" opacity="0.25"/>
+            <circle cx="70" cy="147" r="2" fill="#5ee7ff">
+              <animate attributeName="opacity" values="0.3;1;0.3" dur="1.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="80" cy="147" r="2" fill="#5ee7ff" opacity="0.7"/>
+            <circle cx="90" cy="147" r="2" fill="#8fd19e" opacity="0.9"/>
+            <g opacity="0.6">
+              <path d="M70 50 Q100 30 130 50" stroke="#5ee7ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M78 40 Q100 25 122 40" stroke="#5ee7ff" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
+              <circle cx="100" cy="40" r="35" fill="url(#routerGlow)" opacity="0.4"/>
+            </g>
+          </svg>
+        </div>
+        <span class="tag">Pwomosyon</span>
+        <h3>Routeur NetPlus</h3>
+        <p class="sub">Routeur WiFi doub band pou kay ou oswa biznis. Jiska 30 aparèy.</p>
+        <div class="equip-price"><b>60 USD</b><span class="old">65 USD</span></div>
+        <div class="buy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          Mande enstalasyon
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- KOUVÈTI -->
+  <section id="coverage">
+    <div class="sec-head">
+      <h2>Kouvèti</h2>
+      <p>Chèche zòn ou nan lis la.</p>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+      </svg>
+      <input id="covSearch" type="search" placeholder="Chèche yon vil oswa zòn…">
+    </div>
+    <div class="zones" id="zones"></div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="flogo">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+          <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+      </span>
+      <span><b>NET PLUS</b> · 5G LTE</span>
+    </div>
+    <p>© <span id="yr"></span> NET PLUS · The best network in Haiti · <a href="mailto:info.netplus.ht@gmail.com">info.netplus.ht@gmail.com</a></p>
+    <a class="admin-link" href="admin.html" title="Admin">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="10" rx="2"/>
+        <circle cx="12" cy="16" r="1"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Admin
+    </a>
+  </div>
+</footer>
+
+<nav class="mbar">
+  <a href="#plans">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M11 10h2"/></svg>
+    Plan
+  </a>
+  <a href="#home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+    Rez.
+  </a>
+  <a href="#equipment">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+    Ekipman
+  </a>
+  <a href="chatbot.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/></svg>
+    Chat
+  </a>
+</nav>
+
+<script src="config.js"></script>
+<script src="status-banner.js"></script>
+<script>
+const API = window.NETPLUS_API || "";
+const $ = id => document.getElementById(id);
+$("yr").textContent = new Date().getFullYear();
+
+/* ============ PLAN WIFI MOBIL ============ */
+const PLANS = {
+  d14:  {name:"14 jou",     days:14, price:1500, mbps:10, badge:"Popilè"},
+  d30:  {name:"30 jou",     days:30, price:2500, mbps:10, badge:null},
+  v1:   {name:"VIP Jou",    days:1,  price:500,  mbps:20, badge:"VIP"},
+  v7:   {name:"VIP 7 jou",  days:7,  price:2500, mbps:20, badge:"VIP"},
+  v30:  {name:"VIP 30 jou", days:30, price:6500, mbps:20, badge:"VIP"}
+};
+
+/* ============ PLAN REZIDANSYÈL ============ */
+const HOME_PLANS = {
+  hb:   {name:"Rezidansyèl Basic", desc:"30/10 Mbps", price:35, install:50, months:1},
+  hmp:  {name:"Pro (mwa)",        desc:"40/15 Mbps", price:45, months:1},
+  hmx:  {name:"Premium (mwa)",    desc:"50/20 Mbps", price:55, months:1},
+  hv14: {name:"VIP 14 jou",       desc:"65 Mbps · 14 jou", price:25, days:14},
+  hv30: {name:"VIP 30 jou",       desc:"110 Mbps · 30 jou", price:75, days:30}
+};
+
+/* ============ ZONES ============ */
+const ZONES = [
+  {n:"Asipha",d:"Gonaïves",s:"ok"},{n:"Morne Blanc",d:"Gonaïves",s:"ok"},
+  {n:"Bien Ac",d:"Gonaïves",s:"ok"},{n:"Seprenn",d:"Gonaïves",s:"ok"},
+  {n:"Gros Morne",d:"Gonaïves",s:"ok"},{n:"Parc Vincent",d:"Gonaïves",s:"ok"},
+  {n:"Bretagne",d:"Gonaïves",s:"ok"},{n:"Cap-Haïtien",d:"Okap",s:"soon"},
+  {n:"Lòt zòn",d:"Sou demann",s:"soon"}
+];
+
+/* ============ RENDER PLAN MOBIL ============ */
+$("planGrid").innerHTML = Object.entries(PLANS).map(([key, p])=>{
+  const badge = p.badge ? `<span class="tag">${p.badge}</span>` : "";
+  const isPop = p.badge === "Popilè" || p.badge === "VIP";
+  return `<div class="plan${isPop ? " pop" : ""}" onclick="location.href='activation.html?plan=${key}'">
+    ${badge}
+    <h3>${p.name}</h3>
+    <div class="mb">${p.days}<small>jou</small></div>
+    <div class="price">${p.price.toLocaleString("fr-FR")} HTG</div>
+    <div class="speed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+      ${p.mbps} Mbps
+    </div>
+    <ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12l5 5L20 7"/></svg> ${p.days} jou ilimite</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12l5 5L20 7"/></svg> ${p.mbps} Mbps desann</li>
+    </ul>
+    <div class="choose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      Achte plan
+    </div>
+  </div>`;
+}).join("");
+
+/* ============ RENDER PLAN REZIDANSYÈL ============ */
+$("homeGrid").innerHTML = Object.entries(HOME_PLANS).map(([key, p])=>{
+  const installLine = p.install
+    ? `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M12 8v8M8 12h8"/></svg> + ${p.install} USD enstalasyon</li>`
+    : "";
+  return `<div class="plan home" onclick="location.href='activation.html?plan=${key}'">
+    <span class="tag home-tag">Rezidansyèl</span>
+    <h3>${p.name}</h3>
+    <div class="mb">${p.price}<small>USD</small></div>
+    <div class="price">${p.days ? p.days + " jou" : "1 mwa"}</div>
+    <div class="speed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+      ${p.desc}
+    </div>
+    <ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12l5 5L20 7"/></svg> ${p.desc}</li>
+      ${installLine}
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12l5 5L20 7"/></svg> Antèn CPE obligatwa</li>
+    </ul>
+    <div class="choose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      Achte plan
+    </div>
+  </div>`;
+}).join("");
+
+/* ============ KOUVÈTI ============ */
+function renderZones(){
+  const q = $("covSearch").value.trim().toLowerCase();
+  const list = ZONES.filter(z => !q || (z.n + " " + z.d).toLowerCase().includes(q));
+  $("zones").innerHTML = list.length
+    ? list.map(z => `<div class="zone">
+        <div><b>${z.n}</b><span class="d">${z.d}</span></div>
+        <span class="pill ${z.s}">${z.s === "ok" ? "Disponib" : "Byento"}</span>
+      </div>`).join("")
+    : `<div class="empty">Pa gen rezilta.</div>`;
+}
+$("covSearch").addEventListener("input", renderZones);
+renderZones();
+
+/* ============ WELCOME ANIMATION ============ */
+(function showWelcomeOnce(){
+  if (sessionStorage.getItem("np_welcome_shown") === "1") return;
+  sessionStorage.setItem("np_welcome_shown", "1");
+
+  const overlay = $("welcomeOverlay");
+  const percentEl = $("welcomePercent");
+  const progressBar = overlay.querySelector(".welcome-progress > i");
+
+  overlay.classList.remove("closing");
+  overlay.classList.add("show");
+  document.body.style.overflow = "hidden";
+  progressBar.style.animation = "none";
+  void progressBar.offsetWidth;
+  progressBar.style.animation = "progressFill 2.5s cubic-bezier(.2,.6,.4,1) forwards";
+
+  let p = 0;
+  const interval = setInterval(() => {
+    p += Math.floor(Math.random() * 8) + 2;
+    if (p >= 100){
+      p = 100;
+      clearInterval(interval);
+      setTimeout(() => {
+        overlay.classList.add("closing");
+        setTimeout(() => {
+          overlay.classList.remove("show", "closing");
+          document.body.style.overflow = "";
+        }, 400);
+      }, 400);
+    }
+    percentEl.textContent = p + "%";
+  }, 60);
+
+  if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
+})();
+</script>
+</body>
+</html>
