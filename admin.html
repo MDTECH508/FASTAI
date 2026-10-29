@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NET PLUS — Admin</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --ink:#f5f5f7; --mute:#8e8e96;
+    --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.14);
+    --neon:#5ee7ff; --neon2:#b18cff; --ok:#8fd19e; --bad:#ff8f8f; --warn:#e3c77a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    background:var(--bg); color:var(--ink);
+    min-height:100vh; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-.011em;
+  }
+  body::before{
+    content:""; position:fixed; inset:-30%; z-index:-2;
+    background:
+      radial-gradient(50% 40% at 15% 15%, rgba(94,231,255,.08), transparent 70%),
+      radial-gradient(45% 40% at 85% 20%, rgba(177,140,255,.06), transparent 70%);
+  }
+  .wrap{max-width:1400px;margin:0 auto;padding:24px 20px}
+
+  .card{
+    background:rgba(20,20,26,.98);
+    border:1px solid var(--line-strong);
+    border-radius:18px; padding:24px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 20px 60px rgba(0,0,0,.5);
+    margin-bottom:16px;
+  }
+
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .brand .mark{
+    width:38px;height:38px;border-radius:11px;flex:none;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg, rgba(94,231,255,.2), rgba(177,140,255,.15));
+    border:1px solid rgba(94,231,255,.4); color:var(--neon);
+  }
+  .brand .mark svg{width:20px;height:20px}
+  .brand b{color:var(--ink);font-size:1rem;font-weight:900;letter-spacing:.03em}
+
+  h1{font-size:1.4rem;margin-bottom:16px;font-weight:800;letter-spacing:-.02em}
+  h2{font-size:1.1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;font-weight:700}
+  h2 svg{color:var(--neon)}
+
+  label{display:block;font-size:.8rem;color:#c8c8cf;margin:12px 0 6px;font-weight:600}
+  .field{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:0 14px}
+  .field:focus-within{border-color:rgba(94,231,255,.5);box-shadow:0 0 0 3px rgba(94,231,255,.1)}
+  .field input,.field select,.field textarea{flex:1;background:transparent;border:0;outline:0;color:var(--ink);font:inherit;font-size:15px;padding:12px 0}
+  .field textarea{resize:vertical;min-height:60px}
+  .field select option{background:#1a1a1d}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 20px;border:0;border-radius:10px;cursor:pointer;
+    font:inherit;font-weight:700;font-size:.9rem;color:#0a0a0b;
+    background:var(--ink);transition:.15s;
+  }
+  .btn:hover{filter:brightness(.95)}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-strong)}
+  .btn.ghost:hover{background:rgba(255,255,255,.06)}
+  .btn.sm{padding:8px 14px;font-size:.82rem;min-height:36px}
+  .btn.green{background:linear-gradient(135deg,#8fd19e,#5ee7ff);color:#0a0a0b}
+  .btn.warn{background:linear-gradient(135deg,#e3c77a,#ffd98a);color:#0a0a0b}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
+  .spinner{width:16px;height:16px;border:2px solid rgba(10,10,11,.3);border-top-color:#0a0a0b;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .msg{margin-top:14px;padding:11px 14px;border-radius:10px;font-size:.86rem;display:none;align-items:center;gap:8px}
+  .msg.err{display:flex;background:rgba(255,120,120,.1);border:1px solid rgba(255,120,120,.3);color:#ffb0b0}
+  .msg.ok{display:flex;background:rgba(143,209,158,.1);border:1px solid rgba(143,209,158,.3);color:var(--ok)}
+
+  .tabs{
+    display:flex;gap:4px;padding:4px;border-radius:12px;
+    background:rgba(0,0,0,.3);border:1px solid var(--line);
+    margin-bottom:20px;overflow-x:auto;
+  }
+  .tabs button{
+    flex:1;min-width:130px;border:0;background:transparent;color:var(--mute);
+    font:inherit;font-size:.82rem;font-weight:700;
+    padding:10px 14px;border-radius:9px;cursor:pointer;white-space:nowrap;
+    transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .tabs button[aria-selected="true"]{background:var(--ink);color:#0a0a0b}
+  .tabs button .badge-count{
+    display:inline-block;min-width:18px;height:18px;padding:0 5px;
+    border-radius:9px;background:var(--warn);color:#0a0a0b;
+    font-size:.68rem;font-weight:800;line-height:18px;text-align:center;
+  }
+  .tabs button[aria-selected="true"] .badge-count{background:#0a0a0b;color:var(--warn)}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+  .stat{padding:16px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--line)}
+  .stat span{display:block;font-size:.76rem;color:var(--mute);margin-bottom:4px}
+  .stat b{font-size:1.4rem;font-weight:800;color:var(--neon)}
+  .stat.ok b{color:var(--ok)}
+  .stat.warn b{color:var(--warn)}
+  .stat.bad b{color:var(--bad)}
+
+  .table-wrap{overflow-x:auto;background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:14px}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;min-width:800px}
+  thead{background:rgba(94,231,255,.08)}
+  th{text-align:left;padding:12px 14px;font-weight:700;color:var(--neon);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+  td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:middle}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  td.mono{font-family:ui-monospace,monospace;font-size:.78rem;color:var(--neon)}
+
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid;white-space:nowrap}
+  .badge.pending{color:var(--warn);border-color:rgba(227,199,122,.45);background:rgba(227,199,122,.1)}
+  .badge.pending_verification{color:var(--warn);border-color:rgba(227,199,122,.45);background:rgba(227,199,122,.15)}
+  .badge.delivered{color:var(--ok);border-color:rgba(143,209,158,.45);background:rgba(143,209,158,.1)}
+  .badge.installed{color:var(--neon);border-color:rgba(94,231,255,.45);background:rgba(94,231,255,.1)}
+  .badge.failed{color:var(--bad);border-color:rgba(255,143,143,.45);background:rgba(255,143,143,.1)}
+  .badge.urgent{color:var(--bad);border-color:rgba(255,143,143,.5);background:rgba(255,143,143,.1)}
+  .badge.soon{color:var(--warn);border-color:rgba(227,199,122,.5);background:rgba(227,199,122,.1)}
+
+  .empty{padding:40px;text-align:center;color:var(--mute)}
+
+  .refresh-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+  .refresh-bar .updated{font-size:.8rem;color:var(--mute)}
+
+  .alert-banner{
+    padding:14px 16px;border-radius:12px;margin-bottom:16px;
+    background:rgba(227,199,122,.1);
+    border:1px solid rgba(227,199,122,.4);
+    color:var(--warn);font-size:.88rem;
+    display:flex;align-items:center;gap:10px;
+  }
+  .alert-banner svg{flex:none}
+  .alert-banner.danger{background:rgba(255,120,120,.1);border-color:rgba(255,120,120,.4);color:var(--bad)}
+
+  /* Plan editor */
+  .plan-row{
+    display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;
+    gap:10px;align-items:end;padding:14px;border-radius:12px;
+    background:rgba(0,0,0,.25);border:1px solid var(--line);margin-bottom:10px;
+  }
+  @media(max-width:768px){.plan-row{grid-template-columns:1fr 1fr}}
+  .plan-row label{font-size:.72rem;margin:0 0 4px}
+  .plan-row input{
+    width:100%;background:transparent;border:1px solid var(--line);
+    border-radius:8px;padding:8px 10px;color:var(--ink);
+    font-family:inherit;font-size:.88rem;
+  }
+  .plan-row input[type="number"]{color:var(--neon);font-weight:700}
+
+  /* Ekipman card */
+  .equip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .equip-card{
+    padding:20px;border-radius:14px;
+    background:linear-gradient(160deg,rgba(28,30,38,.9),rgba(16,17,22,.95));
+    border:1px solid var(--line);
+  }
+  .equip-card h3{font-size:1rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .equip-card h3 svg{color:var(--neon);width:18px;height:18px}
+  .equip-card .price{font-size:1.5rem;font-weight:800;color:var(--neon);margin:10px 0}
+  .equip-card .price small{font-size:.82rem;color:var(--mute);font-weight:600}
+  .equip-card .desc{font-size:.84rem;color:var(--mute);line-height:1.5;margin-bottom:10px}
+  .equip-card .stat-line{
+    display:flex;justify-content:space-between;padding:6px 0;
+    border-top:1px solid var(--line);font-size:.82rem;
+  }
+  .equip-card .stat-line span{color:var(--mute)}
+  .equip-card .stat-line b{color:var(--ink)}
+
+  /* Mesaj template */
+  .msg-template{
+    padding:16px;border-radius:12px;background:rgba(0,0,0,.25);
+    border:1px solid var(--line);margin-bottom:12px;
+  }
+  .msg-template h4{font-size:.9rem;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .msg-template h4 svg{color:var(--neon);width:16px;height:16px}
+  .msg-template pre{
+    white-space:pre-wrap;font-family:ui-monospace,monospace;
+    font-size:.78rem;color:var(--mute);background:rgba(0,0,0,.3);
+    padding:12px;border-radius:8px;line-height:1.6;
+    max-height:200px;overflow-y:auto;
+  }
+  .msg-template .copy-tpl{
+    float:right;font-size:.72rem;padding:4px 10px;
+    background:rgba(94,231,255,.1);border:1px solid rgba(94,231,255,.3);
+    color:var(--neon);border-radius:6px;cursor:pointer;font-weight:700;
+  }
+  .msg-template .copy-tpl:hover{background:rgba(94,231,255,.2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div id="loginBox" class="card" style="max-width:420px;margin:60px auto">
+    <div class="brand">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+          <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+      </span>
+      <b>NET PLUS Admin</b>
+    </div>
+    <h1>Koneksyon</h1>
+    <label for="u">Itilizatè</label>
+    <div class="field"><input id="u" value="admin" autocomplete="username"></div>
+    <label for="p">Modpas</label>
+    <div class="field"><input id="p" type="password" autocomplete="current-password"></div>
+    <button class="btn" id="loginBtn" style="width:100%;margin-top:20px">Konekte</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <!-- PANEL -->
+  <div id="panel" hidden>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div class="brand" style="margin:0">
+        <span class="mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+            <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <b>NET PLUS Admin</b>
+      </div>
+      <div style="display:flex;gap:8px">
+        <a class="btn ghost sm" href="portal.html" target="_blank" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14">
+            <path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/>
+          </svg>
+          Sit
+        </a>
+        <button class="btn ghost sm" onclick="logout()">Dekonekte</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="dashboard" onclick="switchTab('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button role="tab" aria-selected="false" data-tab="pending" onclick="switchTab('pending')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Peman <span class="badge-count" id="pendingCount">0</span>
+      </button>
+      <button role="tab" aria-selected="false" data-tab="installations" onclick="switchTab('installations')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+        Enstalasyon <span class="badge-count" id="installCount">0</span>
+      </button>
+      <button role="tab" aria-selected="false" data-tab="plans" onclick="switchTab('plans')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M11 10h2"/></svg>
+        Pri plan
+      </button>
+      <button role="tab" aria-selected="false" data-tab="equipment" onclick="switchTab('equipment')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+        Ekipman
+      </button>
+      <button role="tab" aria-selected="false" data-tab="transactions" onclick="switchTab('transactions')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        Tout
+      </button>
+      <button role="tab" aria-selected="false" data-tab="messages" onclick="switchTab('messages')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/></svg>
+        Mesaj
+      </button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard">
+      <div class="card">
+        <div class="refresh-bar">
+          <h2 style="margin:0">Statistik</h2>
+          <button class="btn ghost sm" onclick="loadDashboard()">Rafrechi</button>
+        </div>
+        <div class="stats" id="statsGrid">
+          <div class="stat"><span>Total revni</span><b id="statRevenue">—</b></div>
+          <div class="stat"><span>Tout kòmand</span><b id="statTotal">—</b></div>
+          <div class="stat ok"><span>Peman konfime</span><b id="statPaid">—</b></div>
+          <div class="stat warn"><span>Peman pending</span><b id="statPending">—</b></div>
+          <div class="stat warn"><span>Enstalasyon pending</span><b id="statInstall">—</b></div>
+          <div class="stat"><span>Kòd kreye</span><b id="statCodes">—</b></div>
+          <div class="stat"><span>Kliyan inik</span><b id="statClients">—</b></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+          Revni 7 dènye jou
+        </h2>
+        <div id="chartRevenue" style="display:grid;gap:8px"></div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M11 10h2"/></svg>
+          Top 5 plan
+        </h2>
+        <div id="topPlans" style="display:grid;gap:8px"></div>
+      </div>
+    </div>
+
+    <!-- PEMAN PENDING -->
+    <div id="tab-pending" hidden>
+      <div id="pendingAlert"></div>
+      <div class="card">
+        <div class="refresh-bar">
+          <h2 style="margin:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Peman k ap tann verifikasyon
+          </h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="updated" id="pendingUpdated">—</span>
+            <button class="btn ghost sm" onclick="loadPending()">Rafrechi</button>
+          </div>
+        </div>
+        <p style="color:var(--mute);font-size:.86rem;margin-bottom:16px">
+          Verifye ID tranzaksyon an nan SMS NatCash ou, epi klike "Verifye" pou w jenere kòd la.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Kòmand</th><th>Dat</th><th>Plan</th><th>Montan</th>
+                <th>Kliyan</th><th>Telefòn</th><th>ID tranzaksyon</th><th>Aksyon</th>
+              </tr>
+            </thead>
+            <tbody id="pendingBody">
+              <tr><td colspan="8" class="empty">Ap chaje…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENSTALASYON PENDING -->
+    <div id="tab-installations" hidden>
+      <div id="installAlert"></div>
+      <div class="card">
+        <div class="refresh-bar">
+          <h2 style="margin:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+            Enstalasyon k ap tann (7 jou maksimòm)
+          </h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="updated" id="installUpdated">—</span>
+            <button class="btn ghost sm" onclick="loadInstallations()">Rafrechi</button>
+          </div>
+        </div>
+        <p style="color:var(--mute);font-size:.86rem;margin-bottom:16px">
+          Tout enstalasyon dwe fèt nan 7 jou. Dat limit la parèt an wouj si li prè oswa an reta.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Kòmand</th><th>Dat</th><th>Ekipman</th><th>Montan</th>
+                <th>Kliyan</th><th>Telefòn</th><th>Zòn</th><th>Adrès</th>
+                <th>Dat limit</th><th>Aksyon</th>
+              </tr>
+            </thead>
+            <tbody id="installBody">
+              <tr><td colspan="10" class="empty">Ap chaje…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRI PLAN -->
+    <div id="tab-plans" hidden>
+      <div class="card">
+        <div class="refresh-bar">
+          <h2 style="margin:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+            Modifye pri plan yo
+          </h2>
+          <button class="btn ghost sm" onclick="loadPlanEditor()">Rafrechi</button>
+        </div>
+        <p style="color:var(--mute);font-size:.86rem;margin-bottom:16px">Chanjman ap parèt imedyatman sou sit la.</p>
+        <div id="planEditor"></div>
+        <button class="btn green" onclick="savePlans()" style="margin-top:16px;width:100%">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M5 12l5 5L20 7"/></svg>
+          Sove tout chanjman
+        </button>
+        <div class="msg" id="planMsg"></div>
+      </div>
+    </div>
+
+    <!-- EKIPMAN -->
+    <div id="tab-equipment" hidden>
+      <div class="card">
+        <div class="refresh-bar">
+          <h2 style="margin:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+            Ekipman ak enstalasyon
+          </h2>
+          <button class="btn ghost sm" onclick="loadEquipmentStats()">Rafrechi</button>
+        </div>
+        <div class="equip-grid" id="equipGrid"></div>
+      </div>
+
+      <div class="card">
+        <h2>Istwa enstalasyon</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Kòmand</th><th>Dat</th><th>Ekipman</th><th>Kliyan</th><th>Zòn</th><th>Estati</th></tr>
+            </thead>
+            <tbody id="equipHistoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOUT TRANZAKSYON -->
+    <div id="tab-transactions" hidden>
+      <div class="card">
+        <div class="refresh-bar">
+          <h2 style="margin:0">Tout tranzaksyon</h2>
+          <button class="btn ghost sm" onclick="loadTransactions()">Rafrechi</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Dat</th><th>Plan</th><th>Montan</th>
+                <th>Kliyan</th><th>Telefòn</th><th>Metòd</th><th>Estati</th><th>Kòd</th>
+              </tr>
+            </thead>
+            <tbody id="txBody">
+              <tr><td colspan="9" class="empty">Ap chaje…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESAJ -->
+    <div id="tab-messages" hidden>
+      <div class="card">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/></svg>
+          Mesaj WhatsApp (templates)
+        </h2>
+        <p style="color:var(--mute);font-size:.86rem;margin-bottom:16px">Kopye mesaj sa yo pou w voye bay kliyan yo.</p>
+
+        <div class="msg-template">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Peman ap tann
+            <button class="copy-tpl" onclick="copyTemplate(this)">Kopye</button>
+          </h4>
+          <pre>Bonjou [NON],
+
+Nou resevwa demann peman w pou kòmand [ID].
+Plan: [PLAN]
+Montan: [MONTAN] HTG
+
+⏱ Peman w ap valide nan 5 a 10 minit.
+Nou pral voye kòd ou sou WhatsApp.
+
+Mèsi paske w chwazi NET PLUS!</pre>
+        </div>
+
+        <div class="msg-template">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>
+            Peman konfime
+            <button class="copy-tpl" onclick="copyTemplate(this)">Kopye</button>
+          </h4>
+          <pre>✅ NET PLUS — Peman konfime!
+
+Kòmand: [ID]
+Plan: [PLAN]
+
+🔑 KÒD OU: [KÒD]
+
+Antre l sou paj koneksyon an pou w konekte.
+
+📞 509 4195-1159</pre>
+        </div>
+
+        <div class="msg-template">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+            Enstalasyon konfime
+            <button class="copy-tpl" onclick="copyTemplate(this)">Kopye</button>
+          </h4>
+          <pre>✅ NET PLUS — Enstalasyon konfime!
+
+Kòmand: [ID]
+Ekipman: [EKIPMAN]
+
+📅 Dat enstalasyon: [DAT]
+⏰ Lè: [LÈ]
+
+Teknisyen nou an ap pase lakay ou nan dat sa a.
+
+📞 509 4195-1159</pre>
+        </div>
+
+        <div class="msg-template">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>
+            Enstalasyon fini
+            <button class="copy-tpl" onclick="copyTemplate(this)">Kopye</button>
+          </h4>
+          <pre>✅ NET PLUS — Enstalasyon fini!
+
+Kòmand: [ID]
+Ekipman: [EKIPMAN]
+
+Ekip nou an enstale ekipman w. Ou ka konekte kounye a.
+
+📞 509 4195-1159</pre>
+        </div>
+
+        <div class="msg-template">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+            Pwoblèm peman
+            <button class="copy-tpl" onclick="copyTemplate(this)">Kopye</button>
+          </h4>
+          <pre>Bonjou [NON],
+
+Nou gen yon ti pwoblèm ak peman w pou kòmand [ID].
+
+Rezon: [REZON]
+
+Tanpri kontakte nou sou WhatsApp pou n ka rezoud li:
+📞 509 4195-1159
+
+Mèsi!</pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const API = window.NETPLUS_API || "";
+const $ = id => document.getElementById(id);
+let token = localStorage.getItem("adm");
+
+/* LOGIN */
+async function doLogin(){
+  const btn = $("loginBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Ap konekte…';
+  try {
+    const r = await fetch(API + "/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: $("u").value, password: $("p").value })
+    });
+    const d = await r.json();
+    if (!d.ok){
+      $("loginMsg").className = "msg err";
+      $("loginMsg").style.display = "flex";
+      $("loginMsg").textContent = "Itilizatè oswa modpas pa bon.";
+      return;
+    }
+    token = d.token;
+    localStorage.setItem("adm", token);
+    showPanel();
+  } catch(_) {
+    $("loginMsg").className = "msg err";
+    $("loginMsg").style.display = "flex";
+    $("loginMsg").textContent = "Erè rezo.";
+  } finally {
+    btn.disabled = false; btn.textContent = "Konekte";
+  }
+}
+$("loginBtn").addEventListener("click", doLogin);
+$("p").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+function logout(){ localStorage.removeItem("adm"); location.reload(); }
+
+function showPanel(){
+  $("loginBox").hidden = true;
+  $("panel").hidden = false;
+  loadDashboard();
+  loadPendingCounts();
+}
+
+/* TABS */
+function switchTab(name){
+  document.querySelectorAll(".tabs button").forEach(b =>
+    b.setAttribute("aria-selected", b.dataset.tab === name));
+  ["dashboard","pending","installations","plans","equipment","transactions","messages"].forEach(t =>
+    $("tab-" + t).hidden = t !== name);
+
+  if (name === "dashboard") loadDashboard();
+  if (name === "pending") loadPending();
+  if (name === "installations") loadInstallations();
+  if (name === "plans") loadPlanEditor();
+  if (name === "equipment") loadEquipmentStats();
+  if (name === "transactions") loadTransactions();
+}
+
+function authHeaders(){
+  return { "Content-Type": "application/json", Authorization: "Bearer " + token };
+}
+
+/* COUNTS */
+async function loadPendingCounts(){
+  try {
+    const [p, i] = await Promise.all([
+      fetch(API + "/api/admin/pending", { headers: authHeaders() }).then(r => r.json()),
+      fetch(API + "/api/admin/installations", { headers: authHeaders() }).then(r => r.json())
+    ]);
+    $("pendingCount").textContent = p.count || 0;
+    $("installCount").textContent = (i.rows || []).length;
+  } catch(_){}
+}
+
+/* DASHBOARD */
+async function loadDashboard(){
+  try {
+    const r = await fetch(API + "/api/admin/dashboard", { headers: authHeaders() });
+    const d = await r.json();
+    if (!d.ok) return;
+    $("statRevenue").textContent = (d.revenue || 0).toLocaleString("fr-FR") + " HTG";
+    $("statTotal").textContent = d.totalTx || 0;
+    $("statPaid").textContent = d.paidTx || 0;
+    $("statPending").textContent = d.pendingTx || 0;
+    $("statInstall").textContent = d.installPending || 0;
+    $("statCodes").textContent = d.totalCodes || 0;
+    $("statClients").textContent = d.clients || 0;
+
+    if (d.revenueByDay && d.revenueByDay.length){
+      const max = Math.max(...d.revenueByDay.map(x => x.total), 1);
+      $("chartRevenue").innerHTML = d.revenueByDay.map(x => `
+        <div style="display:flex;align-items:center;gap:10px;font-size:.84rem">
+          <span style="width:80px;color:var(--mute)">${x.day}</span>
+          <div style="flex:1;height:22px;background:rgba(255,255,255,.05);border-radius:6px;overflow:hidden">
+            <div style="height:100%;width:${(x.total/max*100).toFixed(0)}%;background:linear-gradient(90deg,#5ee7ff,#b18cff);border-radius:6px;transition:width .5s"></div>
+          </div>
+          <b style="color:var(--neon);width:90px;text-align:right">${x.total.toLocaleString("fr-FR")} HTG</b>
+        </div>
+      `).join("");
+    } else {
+      $("chartRevenue").innerHTML = '<div class="empty">Pa gen done.</div>';
+    }
+
+    if (d.topPlans && d.topPlans.length){
+      $("topPlans").innerHTML = d.topPlans.map(p => `
+        <div style="display:flex;justify-content:space-between;padding:10px;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;font-size:.88rem">
+          <span>${p.plan_name || p.plan_key}</span>
+          <b style="color:var(--neon)">${p.count}× · ${(p.total||0).toLocaleString("fr-FR")} HTG</b>
+        </div>
+      `).join("");
+    }
+  } catch(_){}
+}
+
+/* PEMAN PENDING */
+async function loadPending(){
+  try {
+    const r = await fetch(API + "/api/admin/pending", { headers: authHeaders() });
+    const d = await r.json();
+    if (!d.ok) return;
+    $("pendingCount").textContent = d.count || 0;
+    $("pendingUpdated").textContent = "Mete ajou: " + new Date().toLocaleTimeString("fr-FR");
+
+    if (d.count > 0){
+      $("pendingAlert").innerHTML = `
+        <div class="alert-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+          </svg>
+          Ou gen <b style="color:var(--warn)">${d.count}</b> peman k ap tann verifikasyon.
+        </div>
+      `;
+    } else {
+      $("pendingAlert").innerHTML = "";
+    }
+
+    if (!d.rows || d.rows.length === 0){
+      $("pendingBody").innerHTML = '<tr><td colspan="8" class="empty">✅ Pa gen peman k ap tann.</td></tr>';
+      return;
+    }
+
+    $("pendingBody").innerHTML = d.rows.map(o => `
+      <tr>
+        <td class="mono">${o.id}</td>
+        <td>${new Date(o.created_at).toLocaleString("fr-FR")}</td>
+        <td>${o.plan_name || o.plan_key}</td>
+        <td><b>${(o.amount_htg||0).toLocaleString("fr-FR")} HTG</b></td>
+        <td>${o.name || "—"}</td>
+        <td>${o.phone || "—"}</td>
+        <td class="mono" style="font-size:.7rem;max-width:180px;overflow-wrap:anywhere">${o.txn_id || "—"}</td>
+        <td>
+          <button class="btn green sm" onclick="confirmPay('${o.id}')">✓ Verifye</button>
+          ${o.phone ? `<a class="btn ghost sm" href="https://wa.me/${o.phone.replace(/\D/g,"")}?text=${encodeURIComponent(`Bonjou! Nou verifye peman w pou kòmand ${o.id}.`)}" target="_blank" style="margin-left:4px;text-decoration:none">💬</a>` : ""}
+        </td>
+      </tr>
+    `).join("");
+  } catch(_){}
+}
+
+async function confirmPay(orderId){
+  if (!confirm("Konfime peman pou kòmand " + orderId + "?\n\nKòd la ap jenere epi voye bay kliyan an otomatikman.")) return;
+  try {
+    const r = await fetch(API + "/api/admin/verify-payment", {
+      method: "POST", headers: authHeaders(),
+      body: JSON.stringify({ orderId })
+    });
+    const d = await r.json();
+    if (!d.ok){ alert("Erè: " + (d.error || "enkoni")); return; }
+    alert("✅ Peman verifye!\n\nKòd: " + d.code + "\n\nKòd la voye bay kliyan an.");
+    loadPending();
+    loadPendingCounts();
+    loadDashboard();
+  } catch(_) { alert("Erè rezo."); }
+}
+
+/* ENSTALASYON */
+async function loadInstallations(){
+  try {
+    const r = await fetch(API + "/api/admin/installations", { headers: authHeaders() });
+    const d = await r.json();
+    if (!d.ok) return;
+
+    $("installCount").textContent = (d.rows || []).length;
+    $("installUpdated").textContent = "Mete ajou: " + new Date().toLocaleTimeString("fr-FR");
+
+    // Alert pou enstalasyon ki gen mwens pase 2 jou oswa an reta
+    let urgent = 0, overdue = 0;
+    (d.rows || []).forEach(o => {
+      const created = new Date(o.created_at);
+      const limitDate = new Date(created.getTime() + 7 * 86400000);
+      const daysLeft = Math.ceil((limitDate - new Date()) / 86400000);
+      if (daysLeft < 0) overdue++;
+      else if (daysLeft <= 2) urgent++;
+    });
+
+    if (overdue > 0){
+      $("installAlert").innerHTML = `
+        <div class="alert-banner danger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <path d="M12 9v4"/><path d="M12 17h.01"/>
+          </svg>
+          ⚠️ <b>${overdue}</b> enstalasyon an reta (plis pase 7 jou)!
+        </div>
+      `;
+    } else if (urgent > 0){
+      $("installAlert").innerHTML = `
+        <div class="alert-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+          </svg>
+          ⏱ <b>${urgent}</b> enstalasyon gen mwens pase 2 jou pou fèt.
+        </div>
+      `;
+    } else {
+      $("installAlert").innerHTML = "";
+    }
+
+    if (!d.rows || d.rows.length === 0){
+      $("installBody").innerHTML = '<tr><td colspan="10" class="empty">✅ Pa gen enstalasyon k ap tann.</td></tr>';
+      return;
+    }
+
+    $("installBody").innerHTML = d.rows.map(o => {
+      const created = new Date(o.created_at);
+      const limitDate = new Date(created.getTime() + 7 * 86400000);
+      const daysLeft = Math.ceil((limitDate - new Date()) / 86400000);
+      const isUrgent = daysLeft <= 2;
+      const isOverdue = daysLeft < 0;
+
+      const limitColor = isOverdue ? "var(--bad)" : isUrgent ? "var(--warn)" : "var(--mute)";
+      const limitText = isOverdue
+        ? `⚠️ ${Math.abs(daysLeft)} jou an reta`
+        : isUrgent
+          ? `⏱ ${daysLeft} jou rete`
+          : `${daysLeft} jou`;
+
+      return `
+        <tr style="${isOverdue ? "background:rgba(255,120,120,.05)" : ""}">
+          <td class="mono">${o.id}</td>
+          <td>${created.toLocaleDateString("fr-FR")}</td>
+          <td>${o.plan_name || o.plan_key}</td>
+          <td><b>${(o.amount_htg||0).toLocaleString("fr-FR")} HTG</b></td>
+          <td>${o.name || "—"}</td>
+          <td>${o.phone || "—"}</td>
+          <td>${o.zone || "—"}</td>
+          <td style="max-width:150px;overflow-wrap:break-word;font-size:.82rem">${o.address || "—"}</td>
+          <td><b style="color:${limitColor}">${limitText}</b></td>
+          <td style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="btn green sm" onclick="markInstalled('${o.id}')">✓ Enstale</button>
+            ${o.phone ? `<a class="btn ghost sm" href="https://wa.me/${o.phone.replace(/\D/g,"")}?text=${encodeURIComponent(`Bonjou ${o.name}! Nou NET PLUS. Nou vle konfime dat enstalasyon w pou kòmand ${o.id}.`)}" target="_blank" style="text-decoration:none">💬</a>` : ""}
+            ${o.phone ? `<a class="btn ghost sm" href="tel:+${o.phone.replace(/\D/g,"")}" style="text-decoration:none">📞</a>` : ""}
+          </td>
+        </tr>
+      `;
+    }).join("");
+  } catch(_){}
+}
+
+async function markInstalled(orderId){
+  if (!confirm("Konfime enstalasyon fini pou kòmand " + orderId + "?")) return;
+  try {
+    const r = await fetch(API + "/api/admin/mark-installed", {
+      method: "POST", headers: authHeaders(),
+      body: JSON.stringify({ orderId })
+    });
+    const d = await r.json();
+    if (!d.ok){ alert("Erè: " + (d.error || "enkoni")); return; }
+    alert("✅ Enstalasyon make kòm fini!\n\nKliyan an ap resevwa yon mesaj WhatsApp.");
+    loadInstallations();
+    loadPendingCounts();
+  } catch(_) { alert("Erè rezo."); }
+}
+
+/* PRI PLAN */
+let currentPlans = {};
+async function loadPlanEditor(){
+  try {
+    const r = await fetch(API + "/api/admin/plans", { headers: authHeaders() });
+    const d = await r.json();
+    if (!d.ok) return;
+    currentPlans = d.plans || {};
+
+    $("planEditor").innerHTML = Object.entries(currentPlans).map(([key, p]) => `
+      <div class="plan-row">
+        <div>
+          <label>Kòd</label>
+          <input value="${key}" disabled style="color:var(--mute);font-family:ui-monospace,monospace;font-size:.8rem">
+        </div>
+        <div>
+          <label>Non</label>
+          <input id="plan-name-${key}" value="${p.name || ''}">
+        </div>
+        <div>
+          <label>Pri (HTG)</label>
+          <input id="plan-price-${key}" type="number" value="${p.price || 0}">
+        </div>
+        <div>
+          <label>Jou</label>
+          <input id="plan-days-${key}" type="number" value="${p.days || ''}">
+        </div>
+        <div>
+          <label>Aktif</label>
+          <label style="display:flex;align-items:center;padding:8px 0;margin:0">
+            <input type="checkbox" id="plan-active-${key}" ${p.active !== false ? "checked" : ""} style="width:18px;height:18px;accent-color:#8fd19e;margin-right:6px">
+          </label>
+        </div>
+      </div>
+    `).join("");
+  } catch(_){}
+}
+
+async function savePlans(){
+  const updates = {};
+  for (const key of Object.keys(currentPlans)){
+    updates[key] = {
+      name: $("plan-name-" + key).value.trim(),
+      price: parseInt($("plan-price-" + key).value) || 0,
+      days: parseInt($("plan-days-" + key).value) || null,
+      active: $("plan-active-" + key).checked
+    };
+  }
+  try {
+    const r = await fetch(API + "/api/admin/plans", {
+      method: "POST", headers: authHeaders(),
+      body: JSON.stringify({ plans: updates })
+    });
+    const d = await r.json();
+    const m = $("planMsg");
+    m.className = d.ok ? "msg ok" : "msg err";
+    m.style.display = "flex";
+    m.textContent = d.ok ? "✅ Pri plan yo sove!" : "❌ Erè.";
+    if (d.ok) loadPlanEditor();
+  } catch(_) {
+    $("planMsg").className = "msg err";
+    $("planMsg").style.display = "flex";
+    $("planMsg").textContent = "Erè rezo.";
+  }
+}
+
+/* EKIPMAN */
+async function loadEquipmentStats(){
+  try {
+    const r = await fetch(API + "/api/admin/equipment-stats", { headers: authHeaders() });
+    const d = await r.json();
+    if (!d.ok) return;
+
+    $("equipGrid").innerHTML = `
+      <div class="equip-card">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6"/><path d="M9 6a3 3 0 0 1 6 0"/><path d="M12 9l-6 12h12L12 9z"/></svg>
+          Antèn CPE NetPlus
+        </h3>
+        <p class="desc">Resevwa siyal lakay ou. Starlink-style.</p>
+        <div class="price">60 <small>USD</small> <span style="font-size:.85rem;color:var(--mute);text-decoration:line-through;font-weight:600">65 USD</span></div>
+        <div class="stat-line"><span>Vandu</span><b>${d.cpe?.sold || 0}</b></div>
+        <div class="stat-line"><span>Pending</span><b style="color:var(--warn)">${d.cpe?.pending || 0}</b></div>
+        <div class="stat-line"><span>Enstale</span><b style="color:var(--ok)">${d.cpe?.installed || 0}</b></div>
+        <div class="stat-line"><span>Revni</span><b style="color:var(--neon)">${(d.cpe?.revenue || 0).toLocaleString("fr-FR")} HTG</b></div>
+      </div>
+
+      <div class="equip-card">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M8 13V9a4 4 0 0 1 8 0v4"/></svg>
+          Routeur NetPlus
+        </h3>
+        <p class="desc">Routeur WiFi doub band. Jiska 30 aparèy.</p>
+        <div class="price">60 <small>USD</small> <span style="font-size:.85rem;color:var(--mute);text-decoration:line-through;font-weight:600">65 USD</span></div>
+        <div class="stat-line"><span>Vandu</span><b>${d.router?.sold || 0}</b></div>
+        <div class="stat-line"><span>Pending</span><b style="color:var(--warn)">${d.router?.pending || 0}</b></div>
+        <div class="stat-line"><span>Enstale</span><b style="color:var(--ok)">${d.router?.installed || 0}</b></div>
+        <div class="stat-line"><span>Revni</span><b style="color:var(--neon)">${(d.router?.revenue || 0).toLocaleString("fr-FR")} HTG</b></div>
+      </div>
+    `;
+
+    $("equipHistoryBody").innerHTML = (d.history || []).length
+      ? d.history.map(o => `
+          <tr>
+            <td class="mono">${o.id}</td>
+            <td>${new Date(o.created_at).toLocaleString("fr-FR")}</td>
+            <td>${o.plan_name || o.plan_key}</td>
+            <td>${o.name || "—"}</td>
+            <td>${o.zone || "—"}</td>
+            <td><span class="badge ${o.status}">${o.status}</span></td>
+          </tr>
+        `).join("")
+      : '<tr><td colspan="6" class="empty">Pa gen enstalasyon.</td></tr>';
+  } catch(_){}
+}
+
+/* TOUT TRANZAKSYON */
+async function loadTransactions(){
+  try {
+    const r = await fetch(API + "/api/admin/transactions", { headers: authHeaders() });
+    const d = await r.json();
+    if (!d.rows || d.rows.length === 0){
+      $("txBody").innerHTML = '<tr><td colspan="9" class="empty">Pa gen tranzaksyon.</td></tr>';
+      return;
+    }
+    $("txBody").innerHTML = d.rows.map(o => `
+      <tr>
+        <td class="mono">${o.id}</td>
+        <td>${new Date(o.created_at).toLocaleString("fr-FR")}</td>
+        <td>${o.plan_name || o.plan_key || "—"}</td>
+        <td><b>${(o.amount_htg||0).toLocaleString("fr-FR")} HTG</b></td>
+        <td>${o.name || "—"}</td>
+        <td>${o.phone || "—"}</td>
+        <td>${o.method || "—"}</td>
+        <td><span class="badge ${o.status}">${o.status}</span></td>
+        <td class="mono">${o.code || "—"}</td>
+      </tr>
+    `).join("");
+  } catch(_){}
+}
+
+/* COPY TEMPLATE */
+function copyTemplate(btn){
+  const pre = btn.closest(".msg-template").querySelector("pre");
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    btn.textContent = "✓ Kopye!";
+    setTimeout(() => { btn.textContent = "Kopye"; }, 1500);
+  });
+}
+
+/* INIT */
+if (token) showPanel();
+</script>
+</body>
+</html>
