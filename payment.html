@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<title>NET PLUS — Peman</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --ink:#f5f5f7; --mute:#8e8e96;
+    --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.14);
+    --neon:#5ee7ff; --neon2:#b18cff;
+    --ok:#8fd19e; --bad:#ff8f8f; --warn:#e3c77a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",system-ui,sans-serif;
+    background:var(--bg); color:var(--ink);
+    min-height:100vh; display:grid; place-items:center; padding:20px;
+    -webkit-font-smoothing:antialiased; letter-spacing:-.011em;
+  }
+  body::before{
+    content:""; position:fixed; inset:-30%; z-index:-2;
+    background:
+      radial-gradient(50% 40% at 15% 15%, rgba(94,231,255,.12), transparent 70%),
+      radial-gradient(45% 40% at 85% 20%, rgba(177,140,255,.1), transparent 70%),
+      radial-gradient(50% 45% at 50% 95%, rgba(94,231,255,.06), transparent 70%);
+  }
+
+  .card{
+    width:100%; max-width:500px;
+    background:rgba(20,20,26,.98);
+    border:1px solid var(--line-strong);
+    border-radius:24px; padding:0;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 30px 80px rgba(0,0,0,.7);
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* ============ HEADER ============ */
+  .header{
+    padding:24px 28px 20px;
+    background:linear-gradient(180deg, rgba(94,231,255,.06), transparent);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px;
+  }
+  .brand{display:flex; align-items:center; gap:10px}
+  .brand .mark{
+    width:40px; height:40px; border-radius:11px; flex:none;
+    display:grid; place-items:center;
+    background:linear-gradient(135deg, rgba(94,231,255,.2), rgba(177,140,255,.15));
+    border:1px solid rgba(94,231,255,.4); color:var(--neon);
+    box-shadow:0 0 16px rgba(94,231,255,.2), inset 0 1px 0 rgba(255,255,255,.15);
+  }
+  .brand .mark svg{width:22px; height:22px}
+  .brand .text{display:flex; flex-direction:column; line-height:1}
+  .brand .text b{font-size:1rem; font-weight:900; letter-spacing:.03em}
+  .brand .text small{color:var(--neon); font-size:.6rem; font-weight:700; letter-spacing:.22em; margin-top:3px}
+
+  .refresh-btn{
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,.06); border:1px solid var(--line);
+    display:grid; place-items:center;
+    color:var(--mute); cursor:pointer; transition:.18s; flex:none;
+  }
+  .refresh-btn:hover{background:rgba(94,231,255,.1); border-color:var(--neon); color:var(--neon); transform:rotate(45deg)}
+  .refresh-btn:active{transform:rotate(180deg) scale(.9)}
+  .refresh-btn svg{width:16px; height:16px}
+
+  /* ============ CONTENT ============ */
+  .content{padding:24px 28px 28px}
+
+  h1{font-size:1.35rem; letter-spacing:-.02em; margin-bottom:6px}
+  p.sub{color:var(--mute); font-size:.9rem; margin-bottom:20px; line-height:1.5}
+
+  .secure-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px;
+    background:rgba(143,209,158,.08); border:1px solid rgba(143,209,158,.25);
+    color:var(--ok); font-size:.74rem; font-weight:600; margin-bottom:16px;
+  }
+  .secure-badge svg{width:13px; height:13px}
+  .secure-badge b{color:var(--ok); font-weight:800}
+
+  /* ============ REZIME ============ */
+  .order-sum{
+    background:linear-gradient(160deg, rgba(94,231,255,.08), rgba(177,140,255,.04));
+    border:1px solid rgba(94,231,255,.25);
+    border-radius:16px; padding:18px; margin-bottom:20px;
+    position:relative; overflow:hidden;
+  }
+  .order-sum::before{
+    content:""; position:absolute; top:0; right:0;
+    width:120px; height:120px;
+    background:radial-gradient(circle, rgba(94,231,255,.15), transparent 70%);
+    pointer-events:none;
+  }
+  .order-sum .row{display:flex; justify-content:space-between; padding:6px 0; font-size:.9rem}
+  .order-sum .row span{color:var(--mute)}
+  .order-sum .row b{color:var(--ink); font-weight:600; font-family:ui-monospace,monospace; letter-spacing:.02em}
+  .order-sum .total{
+    margin-top:12px; padding-top:14px; border-top:1px solid rgba(94,231,255,.2);
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .order-sum .total span{color:var(--mute); font-size:.88rem}
+  .order-sum .total b{font-size:1.7rem; color:var(--neon); font-weight:800; letter-spacing:-.02em}
+
+  /* ============ TABS ============ */
+  .tabs{
+    display:flex; gap:4px; padding:4px; border-radius:14px;
+    background:rgba(0,0,0,.35); border:1px solid var(--line);
+    margin-bottom:20px;
+  }
+  .tabs button{
+    flex:1; border:0; background:transparent; color:var(--mute);
+    font:inherit; font-weight:700; font-size:.82rem;
+    padding:11px 8px; border-radius:10px; cursor:pointer; transition:.18s;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .tabs button svg{width:14px; height:14px}
+  .tabs button[aria-selected="true"]{background:var(--ink); color:#0a0a0b}
+  .tabs button[aria-selected="true"] svg{color:#0a0a0b}
+
+  /* ============ PANEL ============ */
+  .panel{padding:4px 0; animation:fadeIn .3s ease-out}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+
+  .pay-detail{
+    background:rgba(0,0,0,.25);
+    border:1px solid var(--line);
+    border-radius:14px; padding:20px; margin-bottom:16px;
+  }
+  .pay-detail h3{
+    font-size:.94rem; margin-bottom:14px;
+    display:flex; align-items:center; gap:8px; color:var(--neon);
+    font-weight:700;
+  }
+  .pay-detail h3 svg{width:18px; height:18px}
+  .pay-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--line); font-size:.9rem;
+  }
+  .pay-row:last-child{border-bottom:0}
+  .pay-row span{color:var(--mute); font-size:.86rem}
+  .pay-row b{color:var(--ink); font-weight:700; font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:8px}
+  .pay-row b.mono{font-family:ui-monospace,monospace; letter-spacing:.04em; font-size:.95rem}
+  .copy-btn{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:5px 10px; border-radius:7px;
+    background:rgba(94,231,255,.1); border:1px solid rgba(94,231,255,.3);
+    color:var(--neon); font-size:.74rem; font-weight:700; cursor:pointer;
+    transition:.15s; font-family:inherit;
+  }
+  .copy-btn:hover{background:rgba(94,231,255,.2); border-color:var(--neon)}
+  .copy-btn svg{width:11px; height:11px}
+
+  /* ============ STEPS ============ */
+  .steps{list-style:none; counter-reset:s; margin:16px 0 0}
+  .steps li{
+    counter-increment:s; display:grid; grid-template-columns:26px 1fr;
+    gap:12px; align-items:start; padding:8px 0;
+    font-size:.86rem; color:var(--mute); line-height:1.5;
+  }
+  .steps li::before{
+    content:counter(s); width:26px; height:26px; border-radius:50%;
+    display:grid; place-items:center; font-weight:800; font-size:.74rem;
+    background:rgba(94,231,255,.12); border:1px solid rgba(94,231,255,.35); color:var(--neon);
+    flex:none;
+  }
+
+  /* ============ FIELDS ============ */
+  label{display:block; font-size:.8rem; color:#c8c8cf; margin:16px 0 8px; font-weight:600}
+  .field{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(0,0,0,.35);
+    border:1px solid var(--line);
+    border-radius:12px; padding:0 14px; transition:.18s;
+  }
+  .field:focus-within{border-color:rgba(94,231,255,.5); box-shadow:0 0 0 3px rgba(94,231,255,.1); background:rgba(0,0,0,.5)}
+  .field svg{color:var(--mute); flex:none}
+  .field input{
+    flex:1; background:transparent; border:0; outline:0; color:var(--ink);
+    font:inherit; font-size:16px; padding:14px 0; min-width:0;
+  }
+  .field input.mono{font-family:ui-monospace,monospace; letter-spacing:.06em; font-size:.95rem}
+
+  .counter{
+    display:flex; justify-content:space-between;
+    font-size:.76rem; color:var(--mute);
+    margin-top:8px; padding:0 4px;
+  }
+  .counter b{color:var(--neon); font-variant-numeric:tabular-nums; font-weight:700}
+  .counter.valid b{color:var(--ok)}
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    width:100%; margin-top:20px; padding:15px;
+    border:0; border-radius:12px;
+    cursor:pointer; font:inherit; font-weight:800; font-size:.96rem;
+    color:#0a0a0b;
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 4px 16px rgba(94,231,255,.25);
+    transition:transform .14s, filter .18s, box-shadow .2s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn:hover{filter:brightness(1.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 6px 24px rgba(94,231,255,.4)}
+  .btn:active{transform:scale(.98)}
+  .btn[disabled]{opacity:.5; cursor:not-allowed; filter:none}
+  .btn.ghost{
+    background:rgba(255,255,255,.05); color:var(--ink);
+    box-shadow:none; border:1px solid var(--line-strong);
+  }
+  .btn.ghost:hover{background:rgba(255,255,255,.1)}
+  .btn.green{
+    background:linear-gradient(135deg,#25d366,#128c7e); color:#fff;
+    box-shadow:0 4px 16px rgba(37,211,102,.25);
+  }
+  .btn.green:hover{box-shadow:0 6px 24px rgba(37,211,102,.4)}
+
+  .spinner{
+    width:16px; height:16px; border:2px solid rgba(10,10,11,.3);
+    border-top-color:#0a0a0b; border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ============ MSG ============ */
+  .msg{
+    margin-top:14px; padding:12px 16px; border-radius:11px;
+    font-size:.86rem; display:none; align-items:center; gap:8px;
+    line-height:1.5;
+  }
+  .msg svg{flex:none; width:16px; height:16px}
+  .msg.err{display:flex; background:rgba(255,120,120,.1); border:1px solid rgba(255,120,120,.3); color:#ffb0b0}
+  .msg.ok{display:flex; background:rgba(143,209,158,.1); border:1px solid rgba(143,209,158,.3); color:var(--ok)}
+
+  /* ============ BACK ============ */
+  .back{margin-top:22px; text-align:center}
+  .back a{
+    color:var(--mute); font-size:.85rem; text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:.15s;
+  }
+  .back a:hover{color:var(--neon)}
+  .back a svg{width:14px; height:14px}
+
+  /* ============ PENDING SCREEN ============ */
+  .pending-screen{padding:32px 28px 28px; text-align:center}
+  .pending-icon{
+    width:96px; height:96px; border-radius:50%; margin:0 auto 24px;
+    display:grid; place-items:center;
+    background:radial-gradient(circle at 50% 40%, rgba(227,199,122,.3), rgba(227,199,122,.08));
+    border:2px solid rgba(227,199,122,.5);
+    color:var(--warn);
+    box-shadow:0 0 50px rgba(227,199,122,.3);
+    animation:pendingPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes pendingPulse{
+    0%,100%{transform:scale(1) rotate(-3deg); box-shadow:0 0 50px rgba(227,199,122,.3)}
+    50%{transform:scale(1.04) rotate(3deg); box-shadow:0 0 70px rgba(227,199,122,.5)}
+  }
+  .pending-icon svg{width:46px; height:46px}
+
+  .pending-screen h1{
+    font-size:1.5rem; margin-bottom:10px;
+    background:linear-gradient(180deg,#fff 30%,#e3c77a 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:-.02em;
+  }
+  .pending-screen .desc{
+    color:var(--mute); font-size:.94rem; line-height:1.6; margin-bottom:22px;
+  }
+  .pending-screen .desc b{color:var(--warn); font-weight:700}
+
+  .info-box{
+    background:rgba(0,0,0,.3); border:1px solid var(--line);
+    border-radius:14px; padding:18px; margin-bottom:18px; text-align:left;
+  }
+  .info-box .line{
+    display:flex; justify-content:space-between; padding:8px 0;
+    font-size:.88rem; border-top:1px solid var(--line);
+  }
+  .info-box .line:first-child{border-top:0}
+  .info-box .line span{color:var(--mute)}
+  .info-box .line b{color:var(--ink); font-weight:700}
+  .info-box .line b.mono{font-family:ui-monospace,monospace; font-size:.8rem; letter-spacing:.02em; max-width:60%; text-align:right; word-break:break-all}
+  .info-box .line b.hl{color:var(--neon)}
+
+  .help-box{
+    background:rgba(94,231,255,.06); border:1px solid rgba(94,231,255,.25);
+    border-radius:14px; padding:18px; margin-bottom:18px; text-align:left;
+  }
+  .help-box p{font-size:.88rem; color:var(--mute); margin-bottom:14px; line-height:1.5}
+  .help-box p b{color:var(--ink)}
+  .help-box .actions{display:grid; gap:8px}
+
+  .auto-check{
+    font-size:.78rem; color:var(--mute); text-align:center;
+    margin-top:18px; display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .auto-check .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--warn);
+    animation:blink 1.5s infinite;
+  }
+  @keyframes blink{0%,100%{opacity:1; transform:scale(1)}50%{opacity:.4; transform:scale(.8)}}
+
+  /* ============ CHAT AGENT ============ */
+  .chat-agent{
+    background:linear-gradient(160deg, rgba(37,211,102,.08), rgba(37,211,102,.03));
+    border:1px solid rgba(37,211,102,.3);
+    border-radius:16px; padding:24px; text-align:center;
+  }
+  .chat-agent .icon{
+    width:60px; height:60px; border-radius:50%; margin:0 auto 16px;
+    display:grid; place-items:center;
+    background:rgba(37,211,102,.15); color:#25d366;
+    border:1px solid rgba(37,211,102,.4);
+    box-shadow:0 0 24px rgba(37,211,102,.25);
+  }
+  .chat-agent .icon svg{width:30px; height:30px}
+  .chat-agent h3{font-size:1.05rem; margin-bottom:8px; color:#8fe7b0; font-weight:700}
+  .chat-agent p{font-size:.88rem; color:var(--mute); margin-bottom:18px; line-height:1.5}
+  .chat-agent .meta{
+    display:flex; justify-content:center; gap:16px; margin-bottom:18px;
+    font-size:.78rem; color:var(--mute);
+    flex-wrap:wrap;
+  }
+  .chat-agent .meta span{display:flex; align-items:center; gap:5px}
+  .chat-agent .meta .dot{width:6px; height:6px; border-radius:50%; background:var(--ok); box-shadow:0 0 6px var(--ok)}
+
+  /* ============ RESPONSIVE ============ */
+  @media(max-width:480px){
+    .card{border-radius:20px}
+    .header{padding:20px 20px 16px}
+    .content{padding:20px}
+    .pending-screen{padding:24px 20px 20px}
+    .brand .mark{width:36px; height:36px}
+    .brand .text b{font-size:.92rem}
+  }
+</style>
+</head>
+<body>
+<div class="card" id="mainCard">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/>
+          <path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+      </span>
+      <span class="text">
+        <b>NET PLUS</b>
+        <small>SECURE PAYMENT</small>
+      </span>
+    </div>
+    <button class="refresh-btn" onclick="refreshPayment()" title="Rekòmanse">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="mainContent">
+
+    <h1>Peman</h1>
+    <p class="sub">Chwazi metòd peman ou epi swiv enstriksyon yo.</p>
+
+    <div class="secure-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l8 3.5v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10v-6z"/>
+        <path d="M8.5 12l2.5 2.5 4.5-5"/>
+      </svg>
+      Secured by <b>NET PLUS Secure X</b>
+    </div>
+
+    <!-- REZIME -->
+    <div class="order-sum">
+      <div class="row"><span>Kòmand</span><b id="oidLabel">—</b></div>
+      <div class="row"><span>Plan</span><b id="planLabel">—</b></div>
+      <div class="total">
+        <span>Total pou peye</span>
+        <b id="amtLabel">—</b>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="auto" onclick="switchTab('auto')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Auto
+      </button>
+      <button role="tab" aria-selected="false" data-tab="manual" onclick="switchTab('manual')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        Manyèl
+      </button>
+      <button role="tab" aria-selected="false" data-tab="agent" onclick="switchTab('agent')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/></svg>
+        Ajan
+      </button>
+    </div>
+
+    <!-- PANEL AUTO -->
+    <div class="panel" id="panel-auto">
+      <div class="pay-detail">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          Peye ak NatCash
+        </h3>
+        <div class="pay-row">
+          <span>Nimewo</span>
+          <b class="mono">50955112990
+            <button class="copy-btn" data-copy="50955112990">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>
+              </svg>
+              Kopye
+            </button>
+          </b>
+        </div>
+        <div class="pay-row"><span>Non</span><b>Enelson Pierre</b></div>
+        <div class="pay-row"><span>Montan</span><b id="amtAuto" style="color:var(--neon)">—</b></div>
+
+        <ol class="steps">
+          <li>Louvri NatCash epi voye montan an</li>
+          <li>Kopye <b style="color:var(--ink)">ID tranzaksyon</b> nan SMS la (25 oswa 26 chif)</li>
+          <li>Antre ID a anba a</li>
+          <li>Klike "Soumèt peman"</li>
+          <li>Yon ajan ap verifye nan <b style="color:var(--warn)">5-20 minit</b></li>
+        </ol>
+
+        <label for="txnAuto">ID tranzaksyon NatCash</label>
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="20" height="20">
+            <rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M11 10h2M15 10h2M7 14h10"/>
+          </svg>
+          <input id="txnAuto" class="mono" placeholder="25 oswa 26 chif" maxlength="26" inputmode="numeric">
+        </div>
+        <div class="counter" id="counterAuto">
+          <span>Chif antre</span>
+          <b>0/26</b>
+        </div>
+
+        <button class="btn" id="autoBtn" onclick="submitPay('auto')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
+            <path d="M5 12l5 5L20 7"/>
+          </svg>
+          Soumèt peman
+        </button>
+        <div class="msg" id="msgAuto"></div>
+      </div>
+    </div>
+
+    <!-- PANEL MANYÈL -->
+    <div class="panel" id="panel-manual" hidden>
+      <div class="pay-detail">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          Peye manyèlman
+        </h3>
+        <div class="pay-row">
+          <span>NatCash</span>
+          <b class="mono">50955112990
+            <button class="copy-btn" data-copy="50955112990">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+              Kopye
+            </button>
+          </b>
+        </div>
+        <div class="pay-row">
+          <span>MonCash</span>
+          <b class="mono">50941951159
+            <button class="copy-btn" data-copy="50941951159">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+              Kopye
+            </button>
+          </b>
+        </div>
+        <div class="pay-row"><span>Montan</span><b id="amtManual" style="color:var(--neon)">—</b></div>
+
+        <ol class="steps">
+          <li>Voye lajan an sou youn nan nimewo yo</li>
+          <li>Kopye <b style="color:var(--ink)">ID tranzaksyon</b> nan SMS la</li>
+          <li>Antre ID a anba a</li>
+          <li>Klike "Soumèt peman"</li>
+          <li>Yon ajan ap verifye nan <b style="color:var(--warn)">5-20 minit</b></li>
+        </ol>
+
+        <label for="txnManual">ID tranzaksyon</label>
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="20" height="20">
+            <rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M11 10h2M15 10h2M7 14h10"/>
+          </svg>
+          <input id="txnManual" class="mono" placeholder="25 oswa 26 chif" maxlength="26" inputmode="numeric">
+        </div>
+        <div class="counter" id="counterManual">
+          <span>Chif antre</span>
+          <b>0/26</b>
+        </div>
+
+        <button class="btn" id="manualBtn" onclick="submitPay('manual')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
+            <path d="M5 12l5 5L20 7"/>
+          </svg>
+          Soumèt peman
+        </button>
+        <div class="msg" id="msgManual"></div>
+      </div>
+    </div>
+
+    <!-- PANEL AJAN -->
+    <div class="panel" id="panel-agent" hidden>
+      <div class="chat-agent">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/>
+          </svg>
+        </div>
+        <h3>Pale ak yon ajan</h3>
+        <p>Ekip nou an disponib pou w ede w ak peman w.</p>
+        <div class="meta">
+          <span><i class="dot"></i> WhatsApp 24/7</span>
+          <span><i class="dot"></i> Rele 8 AM – 8 PM</span>
+        </div>
+        <a class="btn green" style="text-decoration:none" href="https://wa.me/50941951159?text=Bonjou%20NET%20PLUS!%20Mwen%20bezwen%20%C3%A8d%20ak%20peman." target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/>
+          </svg>
+          Louvri WhatsApp
+        </a>
+        <a class="btn ghost" style="margin-top:10px;text-decoration:none" href="tel:+50941951159">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="16" height="16">
+            <path d="M6.5 10.5a14 14 0 0 0 7 7l2-2a1 1 0 0 1 1-.2 10 10 0 0 0 3.5.5 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A16 16 0 0 1 3 4a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.2.2 2.4.5 3.5a1 1 0 0 1-.2 1z"/>
+          </svg>
+          Rele 509 4195-1159
+        </a>
+      </div>
+    </div>
+
+    <div class="back">
+      <a href="portal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+        </svg>
+        Retounen nan portal
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const API = window.NETPLUS_API || "";
+const WHATSAPP = "50941951159";
+const $ = id => document.getElementById(id);
+
+const params = new URLSearchParams(location.search);
+const orderId = params.get("order") || "";
+const amount = parseInt(params.get("amount") || "0", 10);
+const planKey = params.get("plan") || "";
+
+$("oidLabel").textContent = orderId || "—";
+$("planLabel").textContent = planKey || "—";
+$("amtLabel").textContent = amount ? amount.toLocaleString("fr-FR") + " HTG" : "—";
+$("amtAuto").textContent = amount ? amount.toLocaleString("fr-FR") + " HTG" : "—";
+$("amtManual").textContent = amount ? amount.toLocaleString("fr-FR") + " HTG" : "—";
+
+/* ============ COPY ============ */
+document.querySelectorAll(".copy-btn").forEach(b => {
+  b.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(b.dataset.copy);
+      const old = b.innerHTML;
+      b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><path d="M5 12l5 5L20 7"/></svg> Kopye!`;
+      setTimeout(() => b.innerHTML = old, 1500);
+    } catch(_){}
+  });
+});
+
+/* ============ TABS ============ */
+function switchTab(name){
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
+  ["auto","manual","agent"].forEach(t => $("panel-" + t).hidden = t !== name);
+}
+
+/* ============ COUNTER ============ */
+["Auto", "Manual"].forEach(kind => {
+  const input = $("txn" + kind);
+  const counter = $("counter" + kind);
+  if (!input || !counter) return;
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, 26);
+    const n = input.value.length;
+    counter.querySelector("b").textContent = n + "/26";
+    const valid = n === 25 || n === 26;
+    counter.classList.toggle("valid", valid);
+    counter.querySelector("b").style.color = valid ? "var(--ok)" : "var(--neon)";
+  });
+});
+
+/* ============ MSG ============ */
+function setMsg(id, kind, text){
+  const el = $(id);
+  el.className = "msg" + (kind ? " " + kind : "");
+  el.innerHTML = "";
+  if (!text) return;
+  const icon = kind === "ok"
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><circle cx="12" cy="16" r=".6" fill="currentColor"/></svg>`;
+  el.innerHTML = icon + "<span>" + text + "</span>";
+}
+
+/* ============ REFRESH ============ */
+function refreshPayment(){
+  if (confirm("Rekòmanse peman an?\n\nID tranzaksyon w ap efase.")){
+    location.reload();
+  }
+}
+
+/* ============ SUBMIT ============ */
+async function submitPay(mode){
+  const txnInput = mode === "auto" ? $("txnAuto") : $("txnManual");
+  const btn = mode === "auto" ? $("autoBtn") : $("manualBtn");
+  const msgId = mode === "auto" ? "msgAuto" : "msgManual";
+  const txn = txnInput.value.trim().replace(/\D/g, "");
+
+  if (!txn){ setMsg(msgId, "err", "Antre ID tranzaksyon an."); return; }
+  if (txn.length !== 25 && txn.length !== 26){
+    setMsg(msgId, "err", `ID NatCash dwe gen 25 oswa 26 chif. Ou antre ${txn.length} chif.`);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Ap soumèt…';
+  setMsg(msgId, null, "");
+
+  try {
+    const r = await fetch(API + "/api/pay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId,
+        txnId: txn,
+        amount,
+        method: mode === "auto" ? "natcash" : "manual",
+        planKey,
+        source: "payment"
+      })
+    });
+    const d = await r.json();
+
+    if (!d.ok){
+      setMsg(msgId, "err", "Erè: " + (d.error || "enkoni") + ". Eseye ankò oswa kontakte nou.");
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M5 12l5 5L20 7"/></svg> Soumèt peman';
+      return;
+    }
+
+    showPendingPage(txn);
+  } catch(_) {
+    setMsg(msgId, "err", "Erè rezo. Eseye ankò.");
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M5 12l5 5L20 7"/></svg> Soumèt peman';
+  }
+}
+
+/* ============ PENDING PAGE ============ */
+function showPendingPage(txn){
+  $("mainContent").innerHTML = `
+    <div class="pending-screen">
+      <div class="pending-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+
+      <h1>Peman ap valide</h1>
+      <p class="desc">
+        Nou resevwa peman w.<br>
+        <b>⏱ Ap valide nan 5 a 20 minit.</b><br>
+        Ou pral resevwa kòd ou sou WhatsApp.
+      </p>
+
+      <div class="info-box">
+        <div class="line"><span>Kòmand</span><b class="mono hl">${orderId}</b></div>
+        <div class="line"><span>Plan</span><b>${planKey}</b></div>
+        <div class="line"><span>Montan</span><b class="hl">${amount.toLocaleString("fr-FR")} HTG</b></div>
+        <div class="line"><span>ID tranzaksyon</span><b class="mono">${txn}</b></div>
+      </div>
+
+      <div class="help-box">
+        <p><b>Bezwen èd?</b><br>Ou ka ekri nou oswa rele nou dirèkteman.</p>
+        <div class="actions">
+          <a class="btn green" style="text-decoration:none" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Bonjou NET PLUS! Peman pou kòmand ${orderId} (${amount} HTG). ID tranzaksyon: ${txn}`)}" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
+              <path d="M21 12a8 8 0 0 1-11.6 7.2L4 21l1.8-5.4A8 8 0 1 1 21 12z"/>
+            </svg>
+            Ekri nou sou WhatsApp
+          </a>
+          <a class="btn ghost" style="text-decoration:none" href="tel:+50941951159">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="16" height="16">
+              <path d="M6.5 10.5a14 14 0 0 0 7 7l2-2a1 1 0 0 1 1-.2 10 10 0 0 0 3.5.5 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A16 16 0 0 1 3 4a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.2.2 2.4.5 3.5a1 1 0 0 1-.2 1z"/>
+            </svg>
+            Rele 509 4195-1159
+          </a>
+        </div>
+      </div>
+
+      <a class="btn ghost" style="text-decoration:none" href="portal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
+          <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+        </svg>
+        Retounen nan portal
+      </a>
+
+      <div class="auto-check">
+        <span class="dot"></span>
+        <span id="autoCheckText">Ap tcheke si kòd la pare…</span>
+      </div>
+    </div>
+  `;
+
+  let checks = 0;
+  const checkInterval = setInterval(async () => {
+    checks++;
+    const t = $("autoCheckText");
+    if (t) t.textContent = `Ap tcheke… (${checks}/120)`;
+
+    if (checks > 120){ clearInterval(checkInterval); if (t) t.textContent = "Tanpri tann mesaj WhatsApp nou."; return; }
+
+    try {
+      const r = await fetch(`${API}/api/order-status?order=${orderId}`);
+      const d = await r.json();
+      if (d.ok && d.status === "delivered" && d.code){
+        clearInterval(checkInterval);
+        sessionStorage.setItem("np_success_code", d.code);
+        sessionStorage.setItem("np_success_order", orderId);
+        sessionStorage.setItem("np_success_plan", planKey);
+        sessionStorage.setItem("np_success_amount", amount);
+        location.href = "pay-success.html";
+      }
+    } catch(_){}
+  }, 10000);
+}
+
+if (!orderId || !amount){
+  location.replace("portal.html");
+}
+</script>
+</body>
+</html>
