@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<title>NET PLUS — Ajan konvèsasyonèl</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --ink:#f5f5f7; --mute:#8e8e96;
+    --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.14);
+    --neon:#5ee7ff; --neon2:#b18cff;
+    --ok:#8fd19e; --bad:#ff8f8f; --warn:#e3c77a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",system-ui,sans-serif;
+    background:var(--bg); color:var(--ink);
+    line-height:1.5; overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-.011em;
+    display:flex; flex-direction:column;
+  }
+  body::before{
+    content:""; position:fixed; inset:-30%; z-index:-2;
+    background:
+      radial-gradient(50% 40% at 15% 15%, rgba(94,231,255,.12), transparent 70%),
+      radial-gradient(45% 40% at 85% 20%, rgba(177,140,255,.1), transparent 70%),
+      radial-gradient(50% 45% at 50% 95%, rgba(94,231,255,.06), transparent 70%);
+  }
+
+  .chat-header{
+    position:sticky; top:0; z-index:10;
+    padding:14px 18px;
+    background:rgba(10,10,11,.9);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    backdrop-filter:blur(20px) saturate(180%);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:12px;
+  }
+  .chat-header .back{
+    width:36px; height:36px; border-radius:50%;
+    background:rgba(255,255,255,.06); border:1px solid var(--line);
+    display:grid; place-items:center;
+    color:var(--ink); cursor:pointer; flex:none;
+    transition:.15s;
+  }
+  .chat-header .back:hover{background:rgba(255,255,255,.12)}
+  .chat-header .back svg{width:16px; height:16px}
+
+  .chat-header .refresh{
+    width:36px; height:36px; border-radius:50%;
+    background:rgba(94,231,255,.1); border:1px solid rgba(94,231,255,.35);
+    display:grid; place-items:center;
+    color:var(--neon); cursor:pointer; flex:none;
+    transition:.15s;
+  }
+  .chat-header .refresh:hover{background:rgba(94,231,255,.2); border-color:var(--neon); transform:rotate(45deg)}
+  .chat-header .refresh:active{transform:rotate(180deg) scale(.9)}
+  .chat-header .refresh svg{width:16px; height:16px}
+
+  .agent-avatar{
+    width:42px; height:42px; border-radius:50%;
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
+    display:grid; place-items:center; flex:none;
+    color:#0a0a0b; font-weight:900; font-size:1rem;
+    box-shadow:0 2px 12px rgba(94,231,255,.35);
+    position:relative;
+  }
+  .agent-avatar::after{
+    content:""; position:absolute; bottom:-1px; right:-1px;
+    width:12px; height:12px; border-radius:50%;
+    background:var(--ok); border:2px solid var(--bg);
+    box-shadow:0 0 6px var(--ok);
+  }
+  .chat-header .info{flex:1; min-width:0}
+  .chat-header .info b{display:block; font-size:.94rem; font-weight:700}
+  .chat-header .info span{
+    display:flex; align-items:center; gap:5px;
+    font-size:.76rem; color:var(--mute);
+  }
+  .chat-header .info span.online{color:var(--ok)}
+  .chat-header .info span.offline{color:var(--warn)}
+  .chat-header .info span::before{
+    content:""; width:6px; height:6px; border-radius:50%;
+    background:currentColor; box-shadow:0 0 6px currentColor;
+  }
+
+  .chat-messages{
+    flex:1; overflow-y:auto;
+    padding:20px 16px;
+    display:flex; flex-direction:column; gap:12px;
+    scroll-behavior:smooth;
+  }
+  .chat-messages::-webkit-scrollbar{width:6px}
+  .chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15); border-radius:3px}
+
+  .msg{
+    max-width:85%; padding:12px 16px;
+    border-radius:18px;
+    font-size:.9rem; line-height:1.55;
+    word-wrap:break-word;
+    animation:msgIn .3s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes msgIn{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .msg.bot{
+    background:rgba(30,30,38,.95);
+    border:1px solid var(--line);
+    border-bottom-left-radius:6px;
+    align-self:flex-start;
+    color:var(--ink);
+  }
+  .msg.user{
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
+    color:#0a0a0b;
+    border-bottom-right-radius:6px;
+    align-self:flex-end;
+    font-weight:500;
+  }
+  .msg.bot b{color:var(--neon); font-weight:700}
+  .msg.bot ul, .msg.bot ol{margin:8px 0 0 18px; padding:0}
+  .msg.bot li{margin:4px 0; font-size:.86rem}
+  .msg.bot .highlight{
+    display:block;
+    padding:10px 12px; border-radius:10px;
+    background:rgba(143,209,158,.1);
+    border:1px solid rgba(143,209,158,.3);
+    color:var(--ok); font-size:.82rem; line-height:1.6;
+    margin-top:8px;
+  }
+  .msg.bot .highlight b{color:var(--ok)}
+  .msg.bot .btn-inline{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 14px; border-radius:8px;
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
+    color:#0a0a0b; font-size:.8rem; font-weight:700;
+    text-decoration:none; margin-top:8px;
+    cursor:pointer;
+  }
+  .msg.bot .btn-inline:hover{filter:brightness(1.08)}
+
+  .msg .attach{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 12px; border-radius:8px;
+    background:rgba(94,231,255,.06);
+    border:1px dashed rgba(94,231,255,.35);
+    margin-top:6px; font-size:.82rem; color:var(--neon);
+  }
+  .msg .attach svg{flex:none; width:16px; height:16px}
+
+  .quick-replies{
+    display:flex; gap:8px; flex-wrap:wrap;
+    padding:8px 16px 12px;
+    background:rgba(10,10,11,.95);
+    border-top:1px solid var(--line);
+  }
+  .quick-reply{
+    padding:8px 14px; border-radius:999px;
+    background:rgba(94,231,255,.08);
+    border:1px solid rgba(94,231,255,.3);
+    color:var(--neon);
+    font:inherit; font-size:.78rem; font-weight:600;
+    cursor:pointer;
+    transition:.15s;
+    white-space:nowrap;
+  }
+  .quick-reply:hover{background:rgba(94,231,255,.15); border-color:var(--neon)}
+
+  .chat-input-bar{
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:rgba(10,10,11,.98);
+    border-top:1px solid var(--line);
+    display:flex; gap:8px; align-items:flex-end;
+  }
+  .chat-input-bar textarea{
+    flex:1;
+    padding:12px 16px;
+    border-radius:22px;
+    border:1px solid var(--line-strong);
+    background:rgba(30,30,38,.9);
+    color:var(--ink);
+    font:inherit; font-size:.94rem;
+    outline:0;
+    resize:none;
+    min-height:46px; max-height:120px;
+    transition:.18s;
+    font-family:inherit;
+    line-height:1.4;
+  }
+  .chat-input-bar textarea:focus{border-color:var(--neon); box-shadow:0 0 0 3px rgba(94,231,255,.1)}
+  .chat-input-bar textarea::placeholder{color:var(--mute)}
+
+  .chat-input-bar button{
+    width:46px; height:46px; border-radius:50%;
+    border:0; background:linear-gradient(135deg, var(--neon), var(--neon2));
+    color:#0a0a0b; cursor:pointer; flex:none;
+    display:grid; place-items:center;
+    transition:.15s;
+  }
+  .chat-input-bar button:hover{filter:brightness(1.1)}
+  .chat-input-bar button:active{transform:scale(.95)}
+  .chat-input-bar button:disabled{opacity:.4; cursor:not-allowed}
+  .chat-input-bar button svg{width:20px; height:20px}
+
+  .upload-btn{
+    width:46px; height:46px; border-radius:50%;
+    border:1px solid var(--line-strong);
+    background:rgba(30,30,38,.9);
+    color:var(--neon); cursor:pointer; flex:none;
+    display:grid; place-items:center;
+    transition:.15s;
+  }
+  .upload-btn:hover{background:rgba(94,231,255,.1); border-color:var(--neon)}
+  .upload-btn svg{width:20px; height:20px}
+  .upload-btn input{display:none}
+
+  .typing{
+    display:flex; gap:4px; padding:14px 16px;
+    background:rgba(30,30,38,.95);
+    border:1px solid var(--line);
+    border-radius:18px; border-bottom-left-radius:6px;
+    align-self:flex-start; max-width:100px;
+  }
+  .typing span{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--mute); animation:typing 1.4s infinite;
+  }
+  .typing span:nth-child(2){animation-delay:.2s}
+  .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes typing{0%,60%,100%{opacity:.4; transform:translateY(0)}30%{opacity:1; transform:translateY(-4px)}}
+
+  /* REFRESH NOTIFICATION */
+  .refresh-toast{
+    position:fixed; top:80px; left:50%;
+    transform:translateX(-50%) translateY(-100px);
+    background:rgba(20,20,26,.98);
+    border:1px solid rgba(94,231,255,.4);
+    color:var(--neon);
+    padding:12px 20px; border-radius:12px;
+    font-size:.86rem; font-weight:600;
+    display:flex; align-items:center; gap:8px;
+    box-shadow:0 8px 32px rgba(94,231,255,.25);
+    z-index:200;
+    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+  }
+  .refresh-toast.show{transform:translateX(-50%) translateY(0)}
+  .refresh-toast svg{width:16px; height:16px; animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .success-screen{
+    position:fixed; inset:0;
+    background:rgba(10,10,11,.98);
+    display:none; place-items:center;
+    padding:24px; text-align:center;
+    z-index:100;
+    animation:fadeIn .3s ease-out;
+  }
+  .success-screen.show{display:grid}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .success-content{max-width:420px}
+  .success-icon{
+    width:80px; height:80px; border-radius:50%; margin:0 auto 20px;
+    background:radial-gradient(circle at 50% 40%, rgba(143,209,158,.3), rgba(143,209,158,.1));
+    border:2px solid rgba(143,209,158,.55);
+    display:grid; place-items:center; color:var(--ok);
+    box-shadow:0 0 40px rgba(143,209,158,.4);
+    animation:popIn .6s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes popIn{from{transform:scale(.4); opacity:0}to{transform:scale(1); opacity:1}}
+  .success-icon svg{width:42px; height:42px}
+  .success-content h2{
+    font-size:1.4rem; margin-bottom:8px;
+    background:linear-gradient(180deg, #fff 30%, #8fd19e 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .success-content p{color:var(--mute); font-size:.92rem; line-height:1.6; margin-bottom:20px}
+  .success-content p b{color:var(--ok)}
+  .success-content .timer{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px;
+    background:rgba(227,199,122,.1);
+    border:1px solid rgba(227,199,122,.3);
+    color:var(--warn); font-size:.86rem; font-weight:700;
+    margin-bottom:20px;
+  }
+  .success-content .btn{
+    width:100%; padding:14px; border:0; border-radius:12px;
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
+    color:#0a0a0b; font:inherit; font-weight:800; font-size:.94rem;
+    cursor:pointer; text-decoration:none; display:inline-block;
+    transition:.15s;
+  }
+  .success-content .btn:hover{filter:brightness(1.08)}
+  .success-content .btn.secondary{
+    background:rgba(255,255,255,.05);
+    color:var(--ink);
+    border:1px solid var(--line-strong);
+    margin-top:10px;
+  }
+
+  @media(max-width:480px){
+    .chat-header{padding:12px 14px}
+    .chat-messages{padding:16px 12px}
+    .msg{max-width:88%}
+    .chat-input-bar{padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-header">
+  <button class="back" onclick="location.href='portal.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+  </button>
+  <div class="agent-avatar">NP</div>
+  <div class="info">
+    <b>NET PLUS Ajan</b>
+    <span id="agentStatus" class="offline">Ap tcheke...</span>
+  </div>
+  <button class="refresh" onclick="refreshChat()" title="Rekòmanse konvèsasyon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 4v6h-6"/>
+      <path d="M1 20v-6h6"/>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+    </svg>
+  </button>
+</div>
+
+<div class="chat-messages" id="chatMessages"></div>
+
+<div id="chatBottom">
+  <div class="quick-replies" id="quickReplies">
+    <button class="quick-reply" onclick="quickAsk('aktive')">⚡ Aktive plan</button>
+    <button class="quick-reply" onclick="quickAsk('plan')">💰 Pri plan</button>
+    <button class="quick-reply" onclick="quickAsk('kouvèti')">📍 Kouvèti</button>
+    <button class="quick-reply" onclick="quickAsk('peman')">💳 Peman</button>
+    <button class="quick-reply" onclick="quickAsk('enstalasyon')">🔧 Enstalasyon</button>
+    <button class="quick-reply" onclick="quickAsk('ajan')">👤 Ajan</button>
+  </div>
+
+  <div class="chat-input-bar">
+    <label class="upload-btn" title="Voye prèv peman (imaj)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <path d="M17 8l-5-5-5 5"/>
+        <path d="M12 3v12"/>
+      </svg>
+      <input type="file" id="proofUpload" accept="image/*" onchange="handleProofUpload(this)">
+    </label>
+    <textarea id="chatInput" placeholder="Ekri kesyon ou…" rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+    <button id="sendBtn" onclick="sendMessage()" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- TOAST REFRESH -->
+<div class="refresh-toast" id="refreshToast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+  </svg>
+  Konvèsasyon rekòmanse
+</div>
+
+<div class="success-screen" id="successScreen">
+  <div class="success-content">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+    </div>
+    <h2 id="successTitle">Demann resevwa!</h2>
+    <p id="successText">Yon ajan ap verifye peman w.</p>
+    <div class="timer" id="successTimer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Ap verifye nan <b>5-20</b> minit
+    </div>
+    <a class="btn" id="waSuccessBtn" href="https://wa.me/50941951159" target="_blank">
+      Kontinye sou WhatsApp
+    </a>
+    <a class="btn secondary" href="portal.html">
+      Retounen nan portal
+    </a>
+  </div>
+</div>
+
+<script>
+const WHATSAPP = "50941951159";
+const API = window.NETPLUS_API || "";
+const $ = id => document.getElementById(id);
+
+const PLANS = {
+  d14: {name:"14 jou", price:1500, mbps:10},
+  d30: {name:"30 jou", price:2500, mbps:10},
+  v1:  {name:"VIP Jou", price:500, mbps:20},
+  v7:  {name:"VIP 7 jou", price:2500, mbps:20},
+  v30: {name:"VIP 30 jou", price:6500, mbps:20}
+};
+
+/* ============================================================
+   SISTÈM ETA
+   ============================================================ */
+let state = {
+  step: "idle",
+  selectedPlan: null,
+  paymentMethod: null,
+  txnId: null
+};
+
+/* ============================================================
+   REFRESH KONVÈSASYON
+   ============================================================ */
+function refreshChat(){
+  // Reset state
+  state = {
+    step: "idle",
+    selectedPlan: null,
+    paymentMethod: null,
+    txnId: null
+  };
+
+  // Efase mesaj yo
+  $("chatMessages").innerHTML = "";
+
+  // Kache ekran siksè si l ouvè
+  $("successScreen").classList.remove("show");
+
+  // Reset quick replies
+  $("chatBottom").innerHTML = `
+    <div class="quick-replies" id="quickReplies">
+      <button class="quick-reply" onclick="quickAsk('aktive')">⚡ Aktive plan</button>
+      <button class="quick-reply" onclick="quickAsk('plan')">💰 Pri plan</button>
+      <button class="quick-reply" onclick="quickAsk('kouvèti')">📍 Kouvèti</button>
+      <button class="quick-reply" onclick="quickAsk('peman')">💳 Peman</button>
+      <button class="quick-reply" onclick="quickAsk('enstalasyon')">🔧 Enstalasyon</button>
+      <button class="quick-reply" onclick="quickAsk('ajan')">👤 Ajan</button>
+    </div>
+    <div class="chat-input-bar">
+      <label class="upload-btn" title="Voye prèv peman (imaj)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <path d="M17 8l-5-5-5 5"/>
+          <path d="M12 3v12"/>
+        </svg>
+        <input type="file" id="proofUpload" accept="image/*" onchange="handleProofUpload(this)">
+      </label>
+      <textarea id="chatInput" placeholder="Ekri kesyon ou…" rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+      <button id="sendBtn" onclick="sendMessage()" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+    </div>
+  `;
+
+  // Afiche toast
+  const toast = $("refreshToast");
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2500);
+
+  // Mesaj akèy
+  setTimeout(() => {
+    addMessage("Bonjou! 👋 Mwen se <b>ajan NET PLUS</b> — pi bon rezo an Ayiti!");
+    setTimeout(() => {
+      addMessage(`Kijan mwen ka ede w jodi a?<br><br>
+        Ou ka <b>ekri kesyon w</b> oswa klike yon bouton anba a:<br>
+        <ul>
+          <li>⚡ Aktive plan</li>
+          <li>💰 Pri plan</li>
+          <li>📍 Kouvèti</li>
+          <li>💳 Peman</li>
+        </ul>`);
+    }, 700);
+  }, 300);
+
+  if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+}
+
+/* ============================================================
+   ORÈ AJAN
+   ============================================================ */
+function getAgentStatus(){ const h = new Date().getHours(); return h >= 8 && h < 20; }
+function updateAgentStatus(){
+  const el = $("agentStatus");
+  if (!el) return;
+  if (getAgentStatus()){ el.className = "online"; el.textContent = "An liy · 8 AM – 8 PM"; }
+  else { el.className = "offline"; el.textContent = "Fèmen · WhatsApp 24/7"; }
+}
+updateAgentStatus();
+setInterval(updateAgentStatus, 60000);
+
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+function addMessage(text, who = "bot"){
+  const div = document.createElement("div");
+  div.className = "msg " + who;
+  div.innerHTML = text;
+  $("chatMessages").appendChild(div);
+  $("chatMessages").scrollTop = $("chatMessages").scrollHeight;
+}
+function showTyping(){
+  const div = document.createElement("div");
+  div.className = "typing";
+  div.id = "typingIndicator";
+  div.innerHTML = "<span></span><span></span><span></span>";
+  $("chatMessages").appendChild(div);
+  $("chatMessages").scrollTop = $("chatMessages").scrollHeight;
+}
+function hideTyping(){ const el = $("typingIndicator"); if (el) el.remove(); }
+function botReply(text, delay = 800){
+  showTyping();
+  setTimeout(() => { hideTyping(); addMessage(text, "bot"); }, delay);
+}
+
+/* ============================================================
+   INPUT
+   ============================================================ */
+function autoResize(textarea){
+  textarea.style.height = "46px";
+  textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
+  $("sendBtn").disabled = !textarea.value.trim();
+}
+function handleKeyDown(e){
+  if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+}
+function sendMessage(){
+  const input = $("chatInput");
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(escapeHtml(text), "user");
+  input.value = "";
+  autoResize(input);
+  $("sendBtn").disabled = true;
+  setTimeout(() => {
+    const response = getBotResponse(text);
+    if (response) botReply(response, 800);
+  }, 250);
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+/* ============================================================
+   QUICK ASK
+   ============================================================ */
+function quickAsk(topic){
+  const questions = {
+    plan: "Konbyen plan yo koute?",
+    aktive: "Mwen vle aktive yon plan",
+    kouvèti: "Nan ki zòn ou disponib?",
+    peman: "Kijan pou m peye?",
+    enstalasyon: "Kijan pou m mande enstalasyon?",
+    ajan: "Mwen bezwen pale ak yon moun"
+  };
+  const q = questions[topic] || topic;
+  addMessage(q, "user");
+  setTimeout(() => { botReply(getBotResponse(q), 700); }, 250);
+}
+
+/* ============================================================
+   DETEKSYON
+   ============================================================ */
+function detectPlan(q){
+  if (q.includes("vip") && (q.includes("30") || q.includes("trente"))) return "v30";
+  if (q.includes("vip") && (q.includes("7") || q.includes("set") || q.includes("sèt"))) return "v7";
+  if (q.includes("vip")) return "v1";
+  if (q.includes("30") || q.includes("trente")) return "d30";
+  if (q.includes("14") || q.includes("quatorze") || q.includes("katòz")) return "d14";
+  return null;
+}
+function detectPayment(q){
+  if (q.includes("natcash") || q.includes("nat cash") || q.includes("nat")) return "NatCash";
+  if (q.includes("moncash") || q.includes("mon cash") || q.includes("natcom") || q.includes("mon")) return "MonCash";
+  return null;
+}
+
+/* ============================================================
+   SEKANS
+   ============================================================ */
+function selectPlanForActivation(key){
+  const p = PLANS[key];
+  state.selectedPlan = key;
+  state.step = "ask_payment";
+  return `✅ Ou chwazi <b>${p.name}</b> (${p.mbps} Mbps — ${p.price.toLocaleString("fr-FR")} HTG).<br><br>
+    <b>Ki metòd peman ou te itilize?</b><br><br>
+    <ul>
+      <li><b>NatCash</b> — 509 5511 2990 (Enelson Pierre)</li>
+      <li><b>MonCash</b> — 509 4195 1159 (NET PLUS)</li>
+    </ul>
+    Ekri <b>"NatCash"</b> oswa <b>"MonCash"</b>.`;
+}
+
+function askForTxn(){
+  state.step = "ask_txn";
+  const p = PLANS[state.selectedPlan];
+  return `✅ <b>${p.name}</b> — ${p.price.toLocaleString("fr-FR")} HTG<br>
+    Metòd: <b>${state.paymentMethod}</b><br><br>
+    <b>Antre ID tranzaksyon an (25-26 chif).</b><br><br>
+    <span class="highlight">Egz: 1234567890123456789012345</span>
+    <br><br>
+    <span style="font-size:.82rem;color:var(--mute)">Ou ka voye yon <b>imaj prèv peman</b> tou ak bouton 📤.</span>`;
+}
+
+function processOrder(txn){
+  state.txnId = txn;
+  state.step = "done";
+  const p = PLANS[state.selectedPlan];
+  submitToBackend(txn, p);
+
+  return `✅ <b>Mèsi! Mwen resevwa:</b>
+    <br><br>
+    <b>Plan:</b> ${p.name} (${p.mbps} Mbps)<br>
+    <b>Pri:</b> ${p.price.toLocaleString("fr-FR")} HTG<br>
+    <b>Metòd:</b> ${state.paymentMethod}<br>
+    <b>ID tranzaksyon:</b> ${txn}<br><br>
+    <span class="highlight">
+      ⏱ <b>Yon ajan ap verifye peman w nan 5 a 20 minit.</b><br><br>
+      Ou pral resevwa yon mesaj WhatsApp ak kòd ou lè peman an konfime.
+    </span>`;
+}
+
+async function submitToBackend(txn, plan){
+  try {
+    if (API){
+      await fetch(API + "/api/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: "CHAT-" + Date.now(),
+          txnId: txn,
+          amount: plan.price,
+          method: state.paymentMethod,
+          planKey: state.selectedPlan,
+          source: "chatbot"
+        })
+      }).catch(()=>{});
+    }
+  } catch(_){}
+
+  const text = encodeURIComponent(
+    `🔔 AKTIVASYON PLAN (CHATBOT)\n\n` +
+    `📦 Plan: ${plan.name} (${plan.mbps} Mbps)\n` +
+    `💰 Pri: ${plan.price.toLocaleString("fr-FR")} HTG\n` +
+    `💳 Metòd: ${state.paymentMethod}\n` +
+    `🔑 ID tranzaksyon: ${txn}\n\n` +
+    `⏱ Verifye nan 5-20 minit.`
+  );
+
+  setTimeout(() => {
+    $("successTitle").textContent = "Demann aktive voye!";
+    $("successText").innerHTML = `Nou resevwa demann pou <b>${plan.name}</b>.<br><br>
+      <b>${state.paymentMethod}</b> — ${txn}<br><br>
+      Yon ajan ap verifye nan <b>5 a 20 minit</b>.`;
+    $("waSuccessBtn").href = `https://wa.me/${WHATSAPP}?text=${text}`;
+    $("successScreen").classList.add("show");
+  }, 800);
+}
+
+/* ============================================================
+   REPONS
+   ============================================================ */
+function getBotResponse(text){
+  const q = normalize(text);
+
+  if (state.step === "ask_plan"){
+    const planKey = detectPlan(q);
+    if (planKey) return selectPlanForActivation(planKey);
+    return `M pa rekonèt plan sa a. 😊<br><br>
+      <b>Chwazi yon plan:</b><br>
+      <ul>
+        <li><b>14 jou</b> — 1,500 HTG (10 Mbps)</li>
+        <li><b>30 jou</b> — 2,500 HTG (10 Mbps)</li>
+        <li><b>VIP Jou</b> — 500 HTG (20 Mbps)</li>
+        <li><b>VIP 7 jou</b> — 2,500 HTG (20 Mbps)</li>
+        <li><b>VIP 30 jou</b> — 6,500 HTG (20 Mbps)</li>
+      </ul>
+      Ekri non plan an.`;
+  }
+
+  if (state.step === "ask_payment"){
+    const method = detectPayment(q);
+    if (method){ state.paymentMethod = method; return askForTxn(); }
+    return `M pa rekonèt metòd sa a. 😊<br><br>
+      <b>Ki metòd ou te itilize?</b><br><br>
+      <ul>
+        <li><b>NatCash</b> — 509 5511 2990</li>
+        <li><b>MonCash</b> — 509 4195 1159</li>
+      </ul>
+      Ekri <b>"NatCash"</b> oswa <b>"MonCash"</b>.`;
+  }
+
+  if (state.step === "ask_txn"){
+    const txn = q.replace(/\D/g, "");
+    if (txn.length === 25 || txn.length === 26) return processOrder(txn);
+    if (txn.length > 0 && txn.length < 25){
+      return `ID tranzaksyon dwe gen <b>25 oswa 26 chif</b>. Ou antre <b>${txn.length} chif</b>.<br><br>
+        Tanpri verifye epi antre l ankò.`;
+    }
+    return `Tanpri antre <b>ID tranzaksyon (25-26 chif)</b>.<br><br>
+      Ou ka jwenn li nan SMS konfimasyon <b>${state.paymentMethod}</b> la.`;
+  }
+
+  if (state.step === "done"){
+    if (matches(q, ["mèsi", "mesi", "merci", "thank"])){
+      return `Pa gen pwoblèm! 😊<br><br>
+        <span class="highlight"><b>WhatsApp:</b> 509 4195-1159 (24/7)</span>`;
+    }
+    if (matches(q, ["nouvo plan", "rekòmanse", "lòt plan"])){
+      refreshChat();
+      return null;
+    }
+    return `✅ Peman w deja soumèt!<br><br>
+      Yon ajan ap verifye nan <b>5 a 20 minit</b>.<br><br>
+      Pou yon lòt plan, ekri <b>"nouvo plan"</b> oswa klike <b>bouton refresh</b> anlè a.`;
+  }
+
+  if (matches(q, ["aktive", "activate", "achte plan", "kijan pou aktive", "vle aktive", "kòmanse"])){
+    state.step = "ask_plan";
+    return `Bèl bagay! M ap ede w aktive yon plan.<br><br>
+      <b>Ki plan ou vle?</b><br><br>
+      <ul>
+        <li><b>14 jou</b> — 1,500 HTG (10 Mbps)</li>
+        <li><b>30 jou</b> — 2,500 HTG (10 Mbps)</li>
+        <li><b>VIP Jou</b> — 500 HTG (20 Mbps)</li>
+        <li><b>VIP 7 jou</b> — 2,500 HTG (20 Mbps)</li>
+        <li><b>VIP 30 jou</b> — 6,500 HTG (20 Mbps)</li>
+      </ul>
+      Ekri non plan an.`;
+  }
+
+  if (matches(q, ["plan", "pri", "tarif", "konbyen", "combien", "price", "cost"])){
+    return `Men plan nou yo — <b>NET PLUS pi bon rezo an Ayiti</b>:<br><br>
+      <ul>
+        <li><b>14 jou</b> — 1,500 HTG · <b>10 Mbps</b></li>
+        <li><b>30 jou</b> — 2,500 HTG · <b>10 Mbps</b></li>
+        <li><b>VIP Jou</b> — 500 HTG · <b>20 Mbps</b></li>
+        <li><b>VIP 7 jou</b> — 2,500 HTG · <b>20 Mbps</b></li>
+        <li><b>VIP 30 jou</b> — 6,500 HTG · <b>20 Mbps</b></li>
+      </ul>
+      Pou aktive, ekri <b>"aktive plan"</b>.`;
+  }
+
+  if (matches(q, ["kouvèti", "kote", "zon", "zòn", "disponib"])){
+    return `Nou disponib nan <b>Gonaïves</b>:<br>
+      <ul>
+        <li>✅ Asipha, Morne Blanc, Bien Ac</li>
+        <li>✅ Seprenn, Gros Morne, Parc Vincent, Bretagne</li>
+      </ul>
+      <b>Byento:</b> Cap-Haïtien<br>
+      <span class="highlight">Ekri nou: <b>509 4195-1159</b></span>`;
+  }
+
+  if (matches(q, ["peye", "peman", "payer", "payment"])){
+    return `Ou ka peye ak:<br><br>
+      <b>💰 NatCash:</b> 509 5511 2990 (Enelson Pierre)<br>
+      <b>💰 MonCash:</b> 509 4195 1159 (NET PLUS)<br><br>
+      Apre w fin voye, ekri <b>"aktive plan"</b> pou w soumèt ID a.`;
+  }
+
+  if (matches(q, ["enstalasyon", "install", "antèn", "cpe", "routeur", "router", "ekipman"])){
+    return `Antèn CPE ak Routeur NetPlus — 60 USD (nòmal 65 USD).<br><br>
+      <b>Kijan pou mande:</b>
+      <ol>
+        <li>Klike ekipman sou paj akèy la</li>
+        <li>Ranpli non + adrès + nimewo telefòn</li>
+        <li>Nou kontakte w nan 24 èdtan</li>
+        <li>Enstalasyon nan <b>7 jou maksimòm</b></li>
+      </ol>
+      <a class="btn-inline" href="portal.html#equipment">→ Mande enstalasyon</a>`;
+  }
+
+  if (matches(q, ["kontak", "contact", "whatsapp", "rele", "telefòn", "phone", "email", "pale ak yon moun", "ajan"])){
+    return `<b>Kijan pou w kontakte nou:</b><br><br>
+      <span class="highlight">
+        <b>📱 WhatsApp:</b> 509 4195-1159 (24/7)<br>
+        <b>📞 Rele:</b> 509 4195-1159 (8 AM – 8 PM)<br>
+        <b>📧 Imèl:</b> info.netplus.ht@gmail.com
+      </span>
+      <a class="btn-inline" href="https://wa.me/${WHATSAPP}" target="_blank">→ Louvri WhatsApp</a>`;
+  }
+
+  if (matches(q, ["mèsi", "mesi", "merci", "thank"])){
+    return `Pa gen pwoblèm! 😊<br><br>
+      <span class="highlight"><b>WhatsApp:</b> 509 4195-1159 (24/7)</span>`;
+  }
+
+  if (matches(q, ["bonjou", "bonsoir", "hello", "hi", "sali", "sak pase", "alo"])){
+    return `Bonjou! 👋 Byenveni sou <b>NET PLUS</b> — pi bon rezo an Ayiti!<br><br>
+      Mwen ka ede w ak:<br>
+      <ul>
+        <li>⚡ <b>Aktive yon plan</b></li>
+        <li>💰 <b>Pri plan yo</b></li>
+        <li>📍 <b>Kouvèti zòn ou</b></li>
+        <li>💳 <b>Kijan pou peye</b></li>
+      </ul>
+      Ekri <b>"aktive plan"</b> pou w kòmanse.`;
+  }
+
+  return `M pa fin konprann. 😊<br><br>
+    Ou ka eseye:<br>
+    <ul>
+      <li>Ekri <b>"aktive plan"</b></li>
+      <li>Ekri <b>"pri"</b></li>
+      <li>Ekri <b>"kouvèti"</b></li>
+      <li>Ekri <b>"peman"</b></li>
+    </ul>
+    <span class="highlight">WhatsApp: <b>509 4195-1159</b></span>`;
+}
+
+function handleProofUpload(input){
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const size = (file.size / 1024).toFixed(0);
+
+  addMessage(`<b>Prèv peman</b>: ${file.name} (${size} KB)
+    <div class="attach">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+      ${file.name}
+    </div>`, "user");
+
+  setTimeout(() => {
+    if (state.step === "ask_txn" && state.selectedPlan && state.paymentMethod){
+      processOrder(`IMG-${Date.now()}`);
+    } else {
+      botReply(`✅ Mèsi! Mwen resevwa prèv peman w.<br><br>
+        Pou w fini, klike <b>⚡ Aktive plan</b> oswa ekri <b>"aktive plan"</b> pou w kòmanse.`, 800);
+    }
+  }, 400);
+
+  input.value = "";
+}
+
+function normalize(s){
+  return String(s).toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function matches(q, keywords){ return keywords.some(k => q.includes(normalize(k))); }
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    addMessage("Bonjou! 👋 Mwen se <b>ajan NET PLUS</b> — pi bon rezo an Ayiti!");
+    setTimeout(() => {
+      addMessage(`Kijan mwen ka ede w jodi a?<br><br>
+        Ou ka <b>ekri kesyon w</b> oswa klike yon bouton anba a:<br>
+        <ul>
+          <li>⚡ Aktive plan</li>
+          <li>💰 Pri plan</li>
+          <li>📍 Kouvèti</li>
+          <li>💳 Peman</li>
+        </ul>`);
+    }, 700);
+  }, 400);
+});
+</script>
+</body>
+</html>
