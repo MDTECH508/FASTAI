@@ -1,640 +1,377 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Lecture - BLAST FLIX</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-  
-  <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
-html { scroll-behavior: smooth; }
-:root {
-  --neo-black: #000000;
-  --neo-ink: #0a0a0c;
-  --neo-charcoal: #121214;
-  --neo-slate: #1c1c1f;
-  --neo-graphite: #26262a;
-  --neo-steel: #34343a;
-  --neo-silver: #8a8a92;
-  --neo-light: #c8c8d0;
-  --neo-white: #f5f5f7;
-  --neo-blue: #0a84ff;
-  --neo-cyan: #64d2ff;
-  --neo-purple: #bf5af2;
-  --glass-1: rgba(255, 255, 255, 0.03);
-  --glass-2: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-bright: rgba(255, 255, 255, 0.18);
-  --text: #f5f5f7;
-  --text-dim: rgba(245, 245, 247, 0.55);
-  --text-mute: rgba(245, 245, 247, 0.35);
-  --r-sm: 14px;
-  --r-md: 20px;
-  --r-lg: 28px;
-  --r-xl: 34px;
-  --r-2xl: 42px;
-  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-3: 0 20px 60px rgba(0, 0, 0, 0.7);
-  --shadow-inset-strong: inset 0 2px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-  --spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
-  background: var(--neo-black);
-  color: var(--text);
-  min-height: 100vh;
-  padding-bottom: 40px;
-  letter-spacing: -0.01em;
-}
-.bg-neo {
-  position: fixed; inset: 0; z-index: -2;
-  background: var(--neo-black);
-  overflow: hidden;
-}
-.bg-neo::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100, 210, 255, 0.15), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(191, 90, 242, 0.1), transparent);
-  filter: blur(60px);
-}
-.noise {
-  position: fixed; inset: 0; z-index: -1;
-  opacity: 0.04; pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
-}
-
-/* HEADER */
-.header {
-  position: sticky; top: 0; z-index: 100;
-  padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-bottom: 1px solid var(--glass-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: 0 0 var(--r-xl) var(--r-xl);
-  padding-top: calc(16px + env(safe-area-inset-top, 0px));
-}
-.back {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--glass-2);
-  border: 1px solid var(--glass-border);
-  color: var(--text);
-  padding: 10px 18px;
-  border-radius: 50px;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all var(--spring);
-  backdrop-filter: blur(20px);
-}
-.back:hover {
-  border-color: var(--neo-cyan);
-  background: rgba(100, 210, 255, 0.15);
-  box-shadow: 0 0 20px rgba(100, 210, 255, 0.4);
-}
-.back i { font-size: 16px; }
-.header-title {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  background: linear-gradient(90deg, var(--neo-white), var(--neo-silver));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* CONTAINER */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* VIDEO */
-.video-wrap {
-  width: 100%;
-  aspect-ratio: 16/9;
-  background: black;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  border: 1px solid var(--glass-border-bright);
-  box-shadow: 
-    0 0 60px rgba(100, 210, 255, 0.2),
-    var(--shadow-3),
-    var(--shadow-inset-strong);
-  position: relative;
-  margin-bottom: 28px;
-}
-.video-wrap video { width: 100%; height: 100%; display: block; }
-.video-wrap:fullscreen { border-radius: 0; border: none; margin: 0; width: 100vw; height: 100vh; }
-
-/* LOADING */
-.loading-overlay {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(20px);
-  z-index: 8;
-  gap: 24px;
-  transition: opacity 0.4s, visibility 0.4s;
-}
-.loading-overlay.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-.spinner {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.08);
-  border-top-color: var(--neo-cyan);
-  border-right-color: var(--neo-purple);
-  animation: spin 1s linear infinite;
-  box-shadow: 
-    0 0 30px rgba(100, 210, 255, 0.5),
-    inset 0 0 10px rgba(191, 90, 242, 0.2);
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-/* ERROR */
-.error-overlay {
-  position: absolute; inset: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(20px);
-  z-index: 10;
-  gap: 16px;
-  padding: 20px;
-  text-align: center;
-}
-.error-overlay.show { display: flex; }
-.error-overlay i {
-  font-size: 60px;
-  color: #ff4444;
-  filter: drop-shadow(0 0 20px rgba(255, 68, 68, 0.5));
-}
-.error-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--neo-white);
-}
-.error-msg {
-  font-size: 13px;
-  color: var(--text-dim);
-  max-width: 400px;
-  line-height: 1.6;
-}
-.error-btn {
-  margin-top: 10px;
-  padding: 13px 26px;
-  background: linear-gradient(135deg, var(--neo-cyan), var(--neo-blue));
-  color: var(--neo-black);
-  border: none;
-  border-radius: 50px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  box-shadow: 0 8px 24px rgba(100, 210, 255, 0.4);
-  transition: all var(--spring);
-}
-.error-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(100, 210, 255, 0.6);
-}
-
-/* BIG PLAY */
-.big-play {
-  position: absolute; inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-  z-index: 7;
-  cursor: pointer;
-  transition: opacity 0.3s;
-}
-.big-play.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-.play-circle {
-  width: 104px;
-  height: 104px;
-  border-radius: 50%;
-  background: rgba(100, 210, 255, 0.25);
-  backdrop-filter: blur(20px);
-  border: 2px solid var(--neo-cyan);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: playPulse 2.5s ease-in-out infinite;
-  position: relative;
-}
-.play-circle::before {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-  border: 1px solid rgba(100, 210, 255, 0.4);
-  animation: playRing 2.5s ease-out infinite;
-}
-@keyframes playPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(100, 210, 255, 0.6); }
-  50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(100, 210, 255, 0.9); }
-}
-@keyframes playRing {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.4); opacity: 0; }
-}
-.play-circle i {
-  font-size: 46px;
-  color: white;
-  margin-left: 6px;
-  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9));
-}
-
-/* INFO CARD */
-.info-card {
-  background: var(--glass-1);
-  backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--r-lg);
-  padding: 30px;
-  margin-bottom: 28px;
-  box-shadow: var(--shadow-2), var(--shadow-inset-strong);
-}
-.info-head {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  margin-bottom: 26px;
-}
-.poster {
-  width: 140px;
-  aspect-ratio: 2/3;
-  border-radius: var(--r-sm);
-  object-fit: cover;
-  flex-shrink: 0;
-  border: 1px solid var(--glass-border-bright);
-  box-shadow: var(--shadow-2);
-}
-.info-content {
-  flex: 1;
-  min-width: 240px;
-}
-.info-title {
-  font-size: clamp(24px, 4vw, 34px);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  margin-bottom: 16px;
-  line-height: 1.15;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6);
-}
-.info-meta {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-}
-.info-meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 7px 14px;
-  background: var(--glass-2);
-  border: 1px solid var(--glass-border);
-  border-radius: 50px;
-  font-size: 12px;
-  font-weight: 600;
-  backdrop-filter: blur(20px);
-}
-.info-meta i { font-size: 10px; color: var(--neo-cyan); }
-.info-meta .rating i { color: var(--neo-cyan); }
-.info-desc {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text-dim);
-  margin-bottom: 20px;
-}
-
-/* CREATOR BADGE */
-.creator {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 20px;
-  margin-bottom: 22px;
-  background: linear-gradient(135deg, rgba(100, 210, 255, 0.12), rgba(191, 90, 242, 0.08));
-  border: 1px solid rgba(100, 210, 255, 0.35);
-  border-radius: 50px;
-  font-size: 12px;
-  font-weight: 600;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 0 20px rgba(100, 210, 255, 0.15);
-}
-.creator i {
-  color: var(--neo-cyan);
-  font-size: 14px;
-  filter: drop-shadow(0 0 6px rgba(100, 210, 255, 0.6));
-}
-.creator .label { color: var(--text-dim); }
-.creator .id {
-  font-family: 'SF Mono', 'Monaco', monospace;
-  font-weight: 800;
-  background: linear-gradient(90deg, var(--neo-cyan), var(--neo-purple));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-size: 13px;
-  letter-spacing: 0.5px;
-}
-
-/* ACTIONS */
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.act-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 24px;
-  border-radius: 50px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  transition: all var(--spring);
-  font-family: inherit;
-  text-decoration: none;
-  position: relative;
-  overflow: hidden;
-}
-.act-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.2), transparent 50%);
-  pointer-events: none;
-}
-.act-btn.primary {
-  background: linear-gradient(135deg, var(--neo-cyan), var(--neo-blue));
-  color: var(--neo-black);
-  box-shadow: 0 8px 24px rgba(100, 210, 255, 0.4);
-}
-.act-btn.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(100, 210, 255, 0.6);
-}
-.act-btn.glass {
-  background: var(--glass-2);
-  border: 1px solid var(--glass-border-bright);
-  color: var(--text);
-  backdrop-filter: blur(20px);
-}
-.act-btn.glass:hover {
-  border-color: var(--neo-cyan);
-  box-shadow: 0 0 20px rgba(100, 210, 255, 0.3);
-}
-
-/* RELATED */
-.related {
-  margin-top: 40px;
-}
-.related-title {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.related-title i {
-  color: var(--neo-cyan);
-  filter: drop-shadow(0 0 8px rgba(100, 210, 255, 0.6));
-}
-.related-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.related-card {
-  border-radius: var(--r-md);
-  overflow: hidden;
-  background: var(--glass-1);
-  border: 1px solid var(--glass-border);
-  text-decoration: none;
-  color: inherit;
-  transition: all var(--spring);
-  display: block;
-  box-shadow: var(--shadow-1, 0 2px 8px rgba(0,0,0,0.4));
-  position: relative;
-}
-.related-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent 40%);
-  pointer-events: none;
-  z-index: 2;
-  border-radius: var(--r-md);
-}
-.related-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  border-color: var(--glass-border-bright);
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.6),
-    0 0 30px rgba(100, 210, 255, 0.15);
-}
-.related-poster {
-  width: 100%;
-  aspect-ratio: 2/3;
-  object-fit: cover;
-  display: block;
-}
-.related-info {
-  padding: 12px 14px;
-}
-.related-title-text {
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 5px;
-}
-.related-meta {
-  font-size: 11px;
-  color: var(--text-dim);
-  font-weight: 500;
-}
-
-/* TOAST */
-.toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: rgba(20, 20, 22, 0.95);
-  backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid var(--glass-border-bright);
-  color: var(--text);
-  padding: 14px 24px;
-  border-radius: 50px;
-  font-size: 14px;
-  font-weight: 600;
-  z-index: 10000;
-  opacity: 0;
-  transition: all 0.4s var(--spring);
-  box-shadow: var(--shadow-3), var(--shadow-inset-strong);
-  pointer-events: none;
-}
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* PLYR OVERRIDES */
-.plyr--video .plyr__controls {
-  background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-}
-.plyr__control--overlaid {
-  background: rgba(100, 210, 255, 0.3) !important;
-  border: 2px solid var(--neo-cyan) !important;
-  backdrop-filter: blur(20px);
-}
-.plyr--video .plyr__progress__buffer {
-  background: rgba(255, 255, 255, 0.15) !important;
-}
-
-@media (max-width: 768px) {
-  .container { padding: 14px; }
-  .info-card { padding: 22px; }
-  .poster { width: 100px; }
-  .info-title { font-size: 22px; }
-  .info-desc { font-size: 13px; }
-  .related-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .play-circle { width: 76px; height: 76px; }
-  .play-circle i { font-size: 32px; }
-  .back { padding: 8px 14px; font-size: 13px; }
-}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <title>Lecture - BLAST FLIX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
+        :root {
+            --black:#000; --charcoal:#121214; --slate:#1c1c1f;
+            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2;
+            --glass-1:rgba(255,255,255,0.035);
+            --glass-2:rgba(255,255,255,0.07);
+            --glass-border:rgba(255,255,255,0.09);
+            --glass-border-bright:rgba(255,255,255,0.22);
+            --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.2);
+            --text:#f5f5f7;
+            --text-dim:rgba(245,245,247,0.55);
+            --text-mute:rgba(245,245,247,0.35);
+            --r-sm:12px; --r-md:18px; --r-lg:24px; --r-xl:30px;
+            --shadow-1:0 2px 8px rgba(0,0,0,0.4);
+            --shadow-2:0 8px 24px rgba(0,0,0,0.5);
+            --shadow-3:0 20px 60px rgba(0,0,0,0.7);
+            --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
+            --blur-glass:blur(40px) saturate(180%);
+        }
+        html, body {
+            font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;
+            background:var(--black); color:var(--text); min-height:100vh;
+            letter-spacing:-0.01em; overflow-x:hidden;
+        }
+        
+        .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); overflow:hidden; }
+        .bg-neo::before {
+            content:''; position:absolute; inset:0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.18), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.12), transparent);
+            filter:blur(80px);
+        }
+        
+        /* ===== HEADER ===== */
+        .header {
+            position:sticky; top:0; z-index:100; padding:12px 16px;
+            background:rgba(10,10,12,0.55);
+            backdrop-filter:var(--blur-glass); -webkit-backdrop-filter:var(--blur-glass);
+            border-bottom:1px solid var(--glass-border);
+            display:flex; align-items:center; gap:12px;
+            padding-top:calc(12px + env(safe-area-inset-top,0px));
+            box-shadow:var(--glass-highlight);
+        }
+        .back-btn {
+            width:38px; height:38px; border-radius:50%; background:var(--glass-2);
+            border:1px solid var(--glass-border); color:var(--text);
+            display:flex; align-items:center; justify-content:center;
+            text-decoration:none; font-size:14px; transition:all var(--spring);
+            box-shadow:var(--glass-highlight); flex-shrink:0;
+        }
+        .back-btn:hover { border-color:var(--cyan); background:rgba(100,210,255,0.15); }
+        .header-title { font-size:15px; font-weight:700; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        
+        /* ===== VIDEO ===== */
+        .container { max-width:1000px; margin:0 auto; padding:16px; }
+        .video-container {
+            position:relative; width:100%; aspect-ratio:16/9; background:#000;
+            border-radius:var(--r-lg); overflow:hidden;
+            border:1px solid var(--glass-border-bright);
+            box-shadow:0 0 40px rgba(100,210,255,0.15), var(--shadow-3), var(--glass-highlight);
+            margin-bottom:18px;
+        }
+        .video-container video { width:100%; height:100%; display:block; }
+        
+        .plyr-loading-overlay {
+            position:absolute; inset:0; display:none; flex-direction:column;
+            align-items:center; justify-content:center; background:rgba(0,0,0,0.85);
+            backdrop-filter:blur(20px); z-index:10; gap:16px;
+        }
+        .plyr-loading-overlay.active { display:flex; }
+        .spinner-circle {
+            width:50px; height:50px; border-radius:50%;
+            border:3px solid rgba(255,255,255,0.08);
+            border-top-color:var(--cyan); border-right-color:var(--purple);
+            animation:spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .loading-text { font-size:12px; font-weight:600; color:var(--text-dim); letter-spacing:2px; text-transform:uppercase; }
+        
+        /* ===== INFO CARD ===== */
+        .info-card {
+            background:var(--glass-1); backdrop-filter:var(--blur-glass);
+            border:1px solid var(--glass-border); border-radius:var(--r-lg);
+            padding:20px; margin-bottom:16px;
+            box-shadow:var(--glass-highlight), var(--shadow-2);
+        }
+        .info-header { display:flex; gap:16px; align-items:flex-start; margin-bottom:18px; }
+        .info-poster {
+            width:80px; aspect-ratio:2/3; object-fit:cover;
+            border-radius:var(--r-sm); border:1px solid var(--glass-border-bright);
+            box-shadow:var(--shadow-2); flex-shrink:0;
+        }
+        .info-content { flex:1; min-width:0; }
+        .info-title { font-size:20px; font-weight:800; line-height:1.2; margin-bottom:8px; }
+        .info-meta {
+            display:flex; flex-wrap:wrap; gap:10px;
+            font-size:11px; color:var(--text-dim); font-weight:600; margin-bottom:8px;
+        }
+        .info-meta span { display:inline-flex; align-items:center; gap:4px; }
+        .info-meta i { color:var(--cyan); font-size:10px; }
+        .info-genres { font-size:11px; color:var(--text-mute); text-transform:uppercase; letter-spacing:0.5px; }
+        
+        /* ===== PLAY BUTTON (SMALL) ===== */
+        .play-btn-small {
+            width:100%; padding:13px 18px;
+            background:#fff; color:var(--black);
+            border:none; border-radius:50px; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; gap:10px;
+            font-size:14px; font-weight:800; font-family:inherit;
+            transition:all var(--spring);
+            box-shadow:0 8px 24px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.5);
+            margin-bottom:12px;
+        }
+        .play-btn-small:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5); }
+        .play-btn-small i { font-size:13px; }
+        
+        /* ===== ACTION ROW (SMALL) ===== */
+        .action-row {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+        }
+        .action-btn-mini {
+            padding:10px 8px; background:var(--glass-2);
+            border:1px solid var(--glass-border); border-radius:var(--r-md);
+            color:var(--text); cursor:pointer; font-family:inherit;
+            display:flex; flex-direction:column; align-items:center; gap:4px;
+            transition:all var(--spring); box-shadow:var(--glass-highlight);
+        }
+        .action-btn-mini:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
+        .action-btn-mini i { font-size:14px; color:var(--cyan); }
+        .action-btn-mini span { font-size:10px; font-weight:600; }
+        
+        /* ===== GLASS CARD SMALL ===== */
+        .glass-card {
+            background:var(--glass-1); backdrop-filter:var(--blur-glass);
+            border:1px solid var(--glass-border); border-radius:var(--r-lg);
+            padding:16px; margin-bottom:14px;
+            box-shadow:var(--glass-highlight), var(--shadow-1);
+        }
+        .glass-card-title {
+            font-size:14px; font-weight:800; margin-bottom:12px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .glass-card-title i { color:var(--cyan); font-size:13px; }
+        
+        /* ===== STORY ===== */
+        .story-text { font-size:13px; line-height:1.6; color:var(--text-dim); }
+        
+        /* ===== LANGUAGE (COMPACT) ===== */
+        .lang-row { display:flex; gap:8px; flex-wrap:wrap; }
+        .lang-pill {
+            padding:8px 14px; background:var(--glass-2);
+            border:1px solid var(--glass-border); border-radius:50px;
+            color:var(--text); cursor:pointer; font-family:inherit;
+            font-size:12px; font-weight:600; transition:all var(--spring);
+            display:inline-flex; align-items:center; gap:6px;
+        }
+        .lang-pill:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
+        .lang-pill.active { border-color:var(--cyan); background:rgba(100,210,255,0.15); color:var(--cyan); }
+        .lang-pill i { font-size:11px; }
+        
+        /* ===== CAST (COMPACT) ===== */
+        .cast-scroll {
+            display:flex; gap:12px; overflow-x:auto; padding-bottom:6px;
+            scrollbar-width:none;
+        }
+        .cast-scroll::-webkit-scrollbar { display:none; }
+        .cast-item { flex-shrink:0; text-align:center; width:70px; }
+        .cast-avatar {
+            width:56px; height:56px; border-radius:50%; object-fit:cover;
+            border:2px solid var(--glass-border-bright);
+            margin-bottom:6px; box-shadow:0 4px 12px rgba(0,0,0,0.5);
+        }
+        .cast-name { font-size:10px; font-weight:700; line-height:1.2; margin-bottom:2px; }
+        .cast-char { font-size:9px; color:var(--text-mute); }
+        
+        /* ===== EPISODES ===== */
+        .episode-item {
+            display:flex; align-items:center; gap:10px;
+            padding:10px 12px; background:var(--glass-2);
+            border:1px solid var(--glass-border); border-radius:var(--r-md);
+            margin-bottom:8px; cursor:pointer; font-family:inherit;
+            color:var(--text); transition:all var(--spring);
+            box-shadow:var(--glass-highlight); text-align:left; width:100%;
+        }
+        .episode-item:hover { border-color:var(--cyan); background:rgba(100,210,255,0.08); }
+        .episode-item.active { border-color:var(--cyan); background:rgba(100,210,255,0.12); }
+        .episode-num {
+            width:36px; height:36px; border-radius:10px;
+            background:linear-gradient(135deg, var(--cyan), var(--blue));
+            display:flex; align-items:center; justify-content:center;
+            color:var(--black); font-size:14px; font-weight:900; flex-shrink:0;
+        }
+        .episode-title { font-size:12px; font-weight:700; flex:1; }
+        .episode-sub { font-size:10px; color:var(--text-dim); }
+        
+        /* ===== RELATED ===== */
+        .related-grid {
+            display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));
+            gap:10px;
+        }
+        .related-card {
+            background:var(--glass-1); border:1px solid var(--glass-border);
+            border-radius:var(--r-md); overflow:hidden; text-decoration:none; color:inherit;
+            transition:all var(--spring); box-shadow:var(--glass-highlight), var(--shadow-1);
+        }
+        .related-card:hover { transform:translateY(-3px); border-color:var(--glass-border-bright); }
+        .related-poster { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; background:var(--charcoal); }
+        .related-info { padding:8px; }
+        .related-title-text { font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+        .related-meta { font-size:9px; color:var(--text-dim); }
+        
+        /* ===== WHATSAPP ===== */
+        .whatsapp-ads {
+            background:var(--glass-1); backdrop-filter:var(--blur-glass);
+            border:1px solid var(--glass-border); border-radius:var(--r-lg);
+            padding:14px; margin-bottom:16px;
+            box-shadow:var(--glass-highlight), var(--shadow-1);
+            display:flex; align-items:center; gap:12px;
+        }
+        .whatsapp-icon {
+            width:42px; height:42px; border-radius:12px;
+            background:linear-gradient(135deg, #25D366, #128C7E);
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:20px; flex-shrink:0;
+            box-shadow:0 4px 12px rgba(37,211,102,0.4);
+        }
+        .whatsapp-content { flex:1; min-width:0; }
+        .whatsapp-title { font-size:12px; font-weight:800; margin-bottom:2px; }
+        .whatsapp-desc { font-size:10px; color:var(--text-dim); line-height:1.3; }
+        .whatsapp-btn {
+            padding:8px 14px; background:linear-gradient(135deg, #25D366, #128C7E);
+            color:#fff; border:none; border-radius:50px; font-size:11px; font-weight:700;
+            cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+            transition:all var(--spring); white-space:nowrap;
+        }
+        
+        /* ===== TOAST ===== */
+        .toast {
+            position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+            background:rgba(20,20,22,0.95); backdrop-filter:var(--blur-glass);
+            border:1px solid var(--glass-border-bright); color:var(--text);
+            padding:10px 20px; border-radius:50px; font-size:12px; font-weight:600;
+            z-index:10000; opacity:0; transition:all 0.3s var(--spring); pointer-events:none;
+            box-shadow:var(--glass-highlight), var(--shadow-2);
+        }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        
+        @media (max-width:768px) {
+            .container { padding:12px; }
+            .info-card { padding:16px; }
+            .info-poster { width:70px; }
+            .info-title { font-size:18px; }
+        }
+    </style>
 </head>
 <body>
 
 <div class="bg-neo"></div>
-<div class="noise"></div>
 
 <!-- HEADER -->
-<header class="header">
-  <a href="javascript:history.back()" class="back">
-    <i class="fas fa-arrow-left"></i>
-    Retour
-  </a>
-  <div class="header-title">BLAST FLIX</div>
-  <div style="width: 80px;"></div>
-</header>
+<div class="header">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <div class="header-title" id="headerTitle">Chargement...</div>
+</div>
 
 <div class="container">
-  <!-- VIDEO -->
-  <div class="video-wrap" id="videoWrap">
-    <video id="playerVideo" playsinline webkit-playsinline crossorigin controls></video>
-    
-    <!-- BIG PLAY -->
-    <div class="big-play" id="bigPlay">
-      <div class="play-circle">
-        <i class="fas fa-play"></i>
-      </div>
-    </div>
-    
-    <!-- LOADING -->
-    <div class="loading-overlay" id="loading">
-      <div class="spinner"></div>
-      <div class="loading-text">Chargement</div>
-    </div>
-    
-    <!-- ERROR -->
-    <div class="error-overlay" id="error">
-      <i class="fas fa-exclamation-triangle"></i>
-      <div class="error-title">Vidéo indisponible</div>
-      <div class="error-msg" id="errorMsg">Impossible de charger.</div>
-      <button class="error-btn" onclick="retryVideo()">
-        <i class="fas fa-redo"></i>
-        Réessayer
-      </button>
-    </div>
-  </div>
 
-  <!-- INFO CARD -->
-  <div class="info-card">
-    <div class="info-head">
-      <img id="infoPoster" class="poster" src="" alt="">
-      <div class="info-content">
-        <h1 id="infoTitle" class="info-title">Chargement...</h1>
-        <div id="infoMeta" class="info-meta"></div>
-        <p id="infoDesc" class="info-desc"></p>
-        
-        <div class="creator">
-          <i class="fas fa-star"></i>
-          <span class="label">Créé par</span>
-          <span class="id">Engine 50934946793</span>
+    <!-- VIDEO PLAYER -->
+    <div class="video-container">
+        <video id="player-video" playsinline webkit-playsinline crossorigin controls></video>
+        <div class="plyr-loading-overlay" id="plyr-loading-overlay">
+            <div class="spinner-circle"></div>
+            <div class="loading-text">Chargement...</div>
+        </div>
+    </div>
+
+    <!-- INFO CARD -->
+    <div class="info-card">
+        <div class="info-header">
+            <img id="infoPoster" class="info-poster" src="" alt="Poster">
+            <div class="info-content">
+                <h1 id="infoTitle" class="info-title">Chargement...</h1>
+                <div class="info-meta" id="infoMeta"></div>
+                <div class="info-genres" id="infoGenres"></div>
+            </div>
         </div>
         
-        <div class="actions">
-          <button class="act-btn primary" id="playBtn">
+        <!-- PLAY BUTTON (SMALL) -->
+        <button class="play-btn-small" id="playMainBtn">
             <i class="fas fa-play"></i>
-            Regarder
-          </button>
-          <button class="act-btn glass" id="shareBtn">
-            <i class="fas fa-share-alt"></i>
-            Partager
-          </button>
+            <span id="playBtnText">Play</span>
+        </button>
+        
+        <!-- ACTION ROW -->
+        <div class="action-row">
+            <button class="action-btn-mini" id="saveBtn">
+                <i class="fas fa-download"></i>
+                <span>Save</span>
+            </button>
+            <button class="action-btn-mini" id="listBtn">
+                <i class="fas fa-plus"></i>
+                <span>List</span>
+            </button>
+            <button class="action-btn-mini" id="shareBtn">
+                <i class="fas fa-share-nodes"></i>
+                <span>Partager</span>
+            </button>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- RELATED -->
-  <div class="related">
-    <h3 class="related-title">
-      <i class="fas fa-film"></i>
-      Vous pourriez aimer
-    </h3>
-    <div class="related-grid" id="relatedGrid"></div>
-  </div>
+    <!-- LANGUAGE (COMPACT) -->
+    <div class="glass-card">
+        <div class="glass-card-title"><i class="fas fa-language"></i> Language</div>
+        <div class="lang-row">
+            <button class="lang-pill active" onclick="changeLanguage('French', this)">
+                <i class="fas fa-check"></i> French (Dubbed)
+            </button>
+            <button class="lang-pill" onclick="changeLanguage('Original', this)">
+                <i class="fas fa-globe"></i> Original Audio
+            </button>
+            <button class="lang-pill" onclick="changeLanguage('Arabic', this)">
+                <i class="fas fa-globe"></i> Arabic dub
+            </button>
+        </div>
+    </div>
+
+    <!-- STORY -->
+    <div class="glass-card">
+        <div class="glass-card-title"><i class="fas fa-book-open"></i> The story</div>
+        <p class="story-text" id="storyText">Chargement...</p>
+    </div>
+
+    <!-- CAST (COMPACT) -->
+    <div class="glass-card">
+        <div class="glass-card-title"><i class="fas fa-users"></i> Acteurs</div>
+        <div class="cast-scroll" id="castGrid"></div>
+    </div>
+
+    <!-- EPISODES (ONLY IF SERIES) -->
+    <div class="glass-card" id="episodesCard" style="display:none;">
+        <div class="glass-card-title"><i class="fas fa-list-ol"></i> Episodes</div>
+        <div id="episodesList"></div>
+    </div>
+
+    <!-- WHATSAPP ADS -->
+    <div class="whatsapp-ads">
+        <div class="whatsapp-icon"><i class="fab fa-whatsapp"></i></div>
+        <div class="whatsapp-content">
+            <div class="whatsapp-title">Rejoignez notre chaîne</div>
+            <div class="whatsapp-desc">Nouveautés + liens directs</div>
+        </div>
+        <a href="https://whatsapp.com/channel/0029Vb6tw1G42Dcja42wiY3R" target="_blank" class="whatsapp-btn">
+            <i class="fab fa-whatsapp"></i> Suivre
+        </a>
+    </div>
+
+    <!-- RELATED -->
+    <div class="glass-card">
+        <div class="glass-card-title"><i class="fas fa-film"></i> Vous pourriez aimer</div>
+        <div class="related-grid" id="relatedGrid"></div>
+    </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -642,158 +379,254 @@ body {
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
 <script>
+/* ============================================
+   🎬 BLAST FLIX PLAYER - COMPACT
+   ============================================ */
+
 const params = new URLSearchParams(window.location.search);
 const data = {
-  subjectId: params.get('subjectId') || '',
-  title: params.get('title') || 'Film',
-  poster: params.get('poster') || '',
-  year: params.get('year') || '',
-  rating: params.get('rating') || '',
-  genre: params.get('genre') || '',
-  desc: params.get('desc') || 'Aucune description.'
+    subjectId: params.get('subjectId') || '',
+    title: params.get('title') || 'Film',
+    poster: params.get('poster') || '',
+    year: params.get('year') || '2025',
+    rating: params.get('rating') || 'N/A',
+    genre: params.get('genre') || 'Drama',
+    desc: params.get('desc') || 'Aucune description disponible.',
+    type: params.get('type') || 'movie', // 'movie' oswa 'series'
+    season: params.get('season') || '1',
+    episode: params.get('episode') || '1',
+    totalEpisodes: params.get('totalEpisodes') || '0'
 };
 
-document.getElementById('infoTitle').textContent = data.title;
+// Detecte si se seri oswa fim
+const isSeries = data.type === 'series' || parseInt(data.totalEpisodes) > 1;
+
+// Header
+document.getElementById('headerTitle').textContent = data.title;
+
+// Info
 document.getElementById('infoPoster').src = data.poster || 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image';
-document.getElementById('infoDesc').textContent = data.desc;
+document.getElementById('infoTitle').textContent = data.title;
 document.getElementById('infoMeta').innerHTML = `
-  ${data.year ? `<span><i class="fas fa-calendar"></i> ${data.year}</span>` : ''}
-  ${data.rating ? `<span class="rating"><i class="fas fa-star"></i> ${data.rating}</span>` : ''}
-  ${data.genre ? `<span><i class="fas fa-tag"></i> ${data.genre}</span>` : ''}
+    <span><i class="fas fa-calendar"></i> ${data.year}</span>
+    <span><i class="fas fa-star"></i> ${data.rating}</span>
+    <span>1080p</span>
 `;
+document.getElementById('infoGenres').textContent = data.genre.split(',').join(' · ');
+document.getElementById('storyText').textContent = data.desc;
 
-const videoEl = document.getElementById('playerVideo');
-const loadingEl = document.getElementById('loading');
-const errorEl = document.getElementById('error');
-const errorMsg = document.getElementById('errorMsg');
-const bigPlay = document.getElementById('bigPlay');
+// Play button text (seri vs fim)
+const playBtnText = isSeries 
+    ? `Play S${data.season}:E${data.episode}` 
+    : 'Play';
+document.getElementById('playBtnText').textContent = playBtnText;
 
+// Video
+const videoEl = document.getElementById('player-video');
+const loadingOverlay = document.getElementById('plyr-loading-overlay');
 let player = null;
-let streamUrl = null;
 
 window.addEventListener('load', () => {
-  if (typeof Plyr !== 'undefined') {
-    player = new Plyr(videoEl, {
-      controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
-      settings: ['speed'],
-      speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
-      seekTime: 10
-    });
-    player.on('play', () => bigPlay.classList.add('hidden'));
-  }
-  loadVideo();
+    if (typeof Plyr !== 'undefined') {
+        player = new Plyr(videoEl, {
+            controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
+            settings: ['speed'],
+            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+            seekTime: 10
+        });
+        
+        player.on('playing', () => loadingOverlay.classList.remove('active'));
+        player.on('waiting', () => loadingOverlay.classList.add('active'));
+        player.on('canplay', () => loadingOverlay.classList.remove('active'));
+        player.on('error', () => loadingOverlay.classList.remove('active'));
+    }
+    loadVideo();
+    loadCast();
+    loadRelated();
+    if (isSeries) loadEpisodes();
 });
 
 async function loadVideo() {
-  if (!data.subjectId) {
-    showError('Aucun ID fourni.');
-    return;
-  }
-  hideError();
-  showLoading();
-
-  try {
-    const res = await fetch(`/api/sources/${data.subjectId}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
+    loadingOverlay.classList.add('active');
     
-    const sources = json.results || [];
-    if (sources.length === 0) throw new Error('Aucune source.');
-    
-    streamUrl = sources[0].stream_url;
-    
-    if (player) {
-      player.source = {
-        type: 'video',
-        sources: [{ src: streamUrl, type: 'video/mp4' }],
-        poster: data.poster
-      };
-    } else {
-      videoEl.src = streamUrl;
+    try {
+        let streams = null;
+        
+        try {
+            const res = await fetch('streams.json', { cache: 'no-store' });
+            if (res.ok) {
+                const sources = await res.json();
+                const entry = sources[data.subjectId] || sources['default'];
+                if (entry && entry.streams && entry.streams.length > 0) {
+                    streams = entry.streams;
+                } else if (entry && entry.url) {
+                    streams = [{ url: entry.url, type: entry.type || 'video/mp4', quality: entry.quality || 'Auto' }];
+                }
+            }
+        } catch (e) {
+            console.warn('Pas de streams.json');
+        }
+        
+        if (!streams) {
+            streams = [{
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                type: 'video/mp4',
+                quality: 'Demo'
+            }];
+        }
+        
+        const first = streams[0];
+        const isHls = (first.type && first.type.includes('mpegURL')) || first.url.endsWith('.m3u8');
+        
+        if (player) {
+            player.source = {
+                type: 'video',
+                sources: [{ src: first.url, type: isHls ? 'application/x-mpegURL' : 'video/mp4' }],
+                poster: data.poster
+            };
+        } else {
+            videoEl.src = first.url;
+        }
+        
+    } catch (err) {
+        console.error('Erreur vidéo:', err);
+        loadingOverlay.classList.remove('active');
     }
-    
-    hideLoading();
-    
-    setTimeout(() => {
-      const p = player ? player.play() : videoEl.play();
-      if (p && p.catch) p.catch(() => hideLoading());
-    }, 500);
-    
-  } catch (err) {
-    hideLoading();
-    showError(err.message);
-  }
 }
 
-function showLoading() { loadingEl.classList.remove('hidden'); }
-function hideLoading() { loadingEl.classList.add('hidden'); }
-function showError(msg) { errorMsg.textContent = msg; errorEl.classList.add('show'); }
-function hideError() { errorEl.classList.remove('show'); }
-
-window.retryVideo = function() {
-  hideError();
-  if (player) player.stop();
-  videoEl.src = '';
-  loadVideo();
-};
-
-function startPlay() {
-  bigPlay.classList.add('hidden');
-  if (player) player.play().catch(() => {});
-  else videoEl.play().catch(() => {});
+function loadCast() {
+    const cast = [
+        { name: 'Omar Sy', character: 'Assane Diop', avatar: 'https://pbcdnw.aoneroom.com/image/2025/11/02/f80f926a679b2bdea660df61c596379b.jpg' },
+        { name: 'Ludivine Sagnier', character: 'Claire', avatar: 'https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg' },
+        { name: 'Clotilde Hesme', character: 'Juliette', avatar: 'https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg' },
+        { name: 'Hervé Pierre', character: 'Hubert', avatar: 'https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg' },
+        { name: 'Soufiane Guerrab', character: 'Youssef', avatar: 'https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg' }
+    ];
+    
+    const grid = document.getElementById('castGrid');
+    grid.innerHTML = cast.map(c => `
+        <div class="cast-item">
+            <img class="cast-avatar" src="${c.avatar}" alt="${c.name}" loading="lazy"
+                onerror="this.src='https://via.placeholder.com/60x60/333/666?text=${c.name.charAt(0)}'">
+            <div class="cast-name">${c.name}</div>
+            <div class="cast-char">${c.character}</div>
+        </div>
+    `).join('');
 }
-
-bigPlay.addEventListener('click', startPlay);
-document.getElementById('playBtn').addEventListener('click', () => {
-  startPlay();
-  document.getElementById('videoWrap').scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
-
-document.getElementById('shareBtn').addEventListener('click', async () => {
-  const sd = { title: `${data.title} - BLAST FLIX`, text: `Regarde ${data.title} !`, url: window.location.href };
-  try {
-    if (navigator.share) await navigator.share(sd);
-    else { await navigator.clipboard.writeText(sd.url); showToast('🔗 Lien copié !'); }
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      try { await navigator.clipboard.writeText(sd.url); showToast('🔗 Lien copié !'); } catch {}
-    }
-  }
-});
 
 const RELATED = [
-  { subjectId: "8759851328492438440", title: "Train Dreams", poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year: "2025", rating: 7.7 },
-  { subjectId: "4956801153355891744", title: "Stranger Things", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year: "2016", rating: 8.6 },
-  { subjectId: "144265366439707640", title: "One Battle After Another", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year: "2025", rating: 8.2 },
-  { subjectId: "488603172416769952", title: "Roofman", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year: "2025", rating: 7.2 },
-  { subjectId: "5821547884994614176", title: "Now You See Me", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg", year: "2025", rating: 6.3 },
-  { subjectId: "3646928918696838480", title: "IT: Welcome to Derry", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg", year: "2025", rating: 7.7 }
+    { id: '8759851328492438440', title: 'Train Dreams', poster: 'https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg', year: '2025', rating: 7.7 },
+    { id: '4956801153355891744', title: 'Stranger Things', poster: 'https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg', year: '2016', rating: 8.6 },
+    { id: '144265366439707640', title: 'One Battle After Another', poster: 'https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg', year: '2025', rating: 8.2 },
+    { id: '488603172416769952', title: 'Roofman', poster: 'https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg', year: '2025', rating: 7.2 },
+    { id: '5821547884994614176', title: 'Now You See Me', poster: 'https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg', year: '2025', rating: 6.3 },
+    { id: '3646928918696838480', title: 'IT: Welcome to Derry', poster: 'https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg', year: '2025', rating: 7.7 }
 ];
 
-const pool = RELATED.filter(m => m.subjectId !== data.subjectId);
-const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 6);
+function loadRelated() {
+    const pool = RELATED.filter(m => m.id !== data.subjectId);
+    const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 6);
+    
+    const grid = document.getElementById('relatedGrid');
+    grid.innerHTML = shuffled.map(m => {
+        const p = new URLSearchParams({
+            subjectId: m.id, title: m.title, poster: m.poster,
+            year: m.year, rating: String(m.rating), genre: 'Drama', desc: '',
+            type: 'movie', totalEpisodes: '0'
+        });
+        return `
+            <a href="player.html?${p.toString()}" class="related-card">
+                <img class="related-poster" src="${m.poster}" alt="${m.title}" loading="lazy"
+                    onerror="this.style.background='#1c1c1f';this.src=''">
+                <div class="related-info">
+                    <div class="related-title-text">${m.title}</div>
+                    <div class="related-meta">${m.year} • ⭐ ${m.rating}</div>
+                </div>
+            </a>
+        `;
+    }).join('');
+}
 
-document.getElementById('relatedGrid').innerHTML = shuffled.map(m => {
-  const p = new URLSearchParams({
-    subjectId: m.subjectId, title: m.title, poster: m.poster,
-    year: m.year, rating: String(m.rating)
-  });
-  return `
-    <a href="player.html?${p.toString()}" class="related-card">
-      <img class="related-poster" src="${m.poster}" alt="${m.title}" loading="lazy">
-      <div class="related-info">
-        <div class="related-title-text">${m.title}</div>
-        <div class="related-meta">${m.year} • ⭐ ${m.rating}</div>
-      </div>
-    </a>
-  `;
-}).join('');
+function loadEpisodes() {
+    document.getElementById('episodesCard').style.display = 'block';
+    const list = document.getElementById('episodesList');
+    const totalEps = parseInt(data.totalEpisodes) || 10;
+    const currentEp = parseInt(data.episode);
+    
+    let html = '';
+    for (let i = 1; i <= totalEps; i++) {
+        const active = i === currentEp;
+        html += `
+            <button class="episode-item ${active ? 'active' : ''}" onclick="playEpisode(${i})">
+                <div class="episode-num">${i}</div>
+                <div class="episode-title">Episode ${i}</div>
+                <div class="episode-sub">45m</div>
+            </button>
+        `;
+    }
+    list.innerHTML = html;
+}
+
+function playEpisode(ep) {
+    const p = new URLSearchParams({
+        subjectId: data.subjectId,
+        title: data.title,
+        poster: data.poster,
+        year: data.year,
+        rating: data.rating,
+        genre: data.genre,
+        desc: data.desc,
+        type: data.type,
+        season: data.season,
+        episode: String(ep),
+        totalEpisodes: data.totalEpisodes
+    });
+    window.location.href = `player.html?${p.toString()}`;
+}
+
+document.getElementById('playMainBtn').addEventListener('click', () => {
+    if (player) {
+        player.play();
+        document.querySelector('.video-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => showToast('💾 Sauvegardé'));
+document.getElementById('listBtn').addEventListener('click', () => showToast('➕ Ajouté à ma liste'));
+
+document.getElementById('shareBtn').addEventListener('click', async () => {
+    const shareData = {
+        title: data.title + ' - BLAST FLIX',
+        text: `Regarde ${data.title} !`,
+        url: window.location.href
+    };
+    try {
+        if (navigator.share) await navigator.share(shareData);
+        else {
+            await navigator.clipboard.writeText(shareData.url);
+            showToast('🔗 Lien copié !');
+        }
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+            try {
+                await navigator.clipboard.writeText(shareData.url);
+                showToast('🔗 Lien copié !');
+            } catch {}
+        }
+    }
+});
+
+function changeLanguage(lang, btn) {
+    document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    showToast(`🌐 ${lang}`);
+}
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2600);
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
 }
 </script>
 </body>
