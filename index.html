@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Lecture - BLAST FLIX</title>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
+    <style>
+/* ============ RESET & BASE ============ */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+
+:root {
+    --primary: #00f0ff;
+    --secondary: #ff00e5;
+    --bg-dark: #0a0a0a;
+    --bg-card: rgba(255, 255, 255, 0.04);
+    --border-glass: rgba(255, 255, 255, 0.1);
+    --text: #f3f4f6;
+    --text-dim: rgba(209, 213, 219, 0.65);
+    --radius: 22px;
+    --radius-sm: 14px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: 40px;
+}
+
+/* ============ BACKGROUND ORBS ============ */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: 
+        radial-gradient(circle at 10% 10%, rgba(107, 114, 128, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 90% 90%, rgba(156, 163, 175, 0.35) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(75, 85, 99, 0.3) 0%, transparent 50%);
+    filter: blur(60px);
+}
+
+/* ============ PLAYER PAGE ============ */
+.player-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* PLAYER HEADER */
+.player-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    margin: 0 -20px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.player-back {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.player-back:hover {
+    background: rgba(0, 240, 255, 0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.player-title {
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+/* ============ PLAYER CONTENT ============ */
+.player-content {
+    padding: 24px 0;
+}
+
+/* VIDEO CONTAINER */
+.video-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: black;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--primary);
+    box-shadow: 
+        0 0 60px rgba(0, 240, 255, 0.25),
+        0 20px 60px rgba(0, 0, 0, 0.7);
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Plyr overrides */
+.video-container .plyr {
+    height: 100%;
+    border-radius: var(--radius);
+}
+
+.video-container .plyr--video {
+    background: black;
+}
+
+/* CUSTOM LOADING OVERLAY */
+.plyr-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    transition: opacity 0.4s, visibility 0.4s;
+}
+
+.plyr-loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.plyr-loading-spinner {
+    text-align: center;
+}
+
+.spinner-circle {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--primary);
+    border-right-color: var(--secondary);
+    animation: spin 1s linear infinite;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* ============ ERROR OVERLAY ============ */
+.video-error {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(15px);
+    z-index: 11;
+    gap: 16px;
+    padding: 20px;
+    text-align: center;
+    border-radius: var(--radius);
+}
+
+.video-error.show { display: flex; }
+
+.video-error i {
+    font-size: 60px;
+    color: #ff4444;
+}
+
+.video-error-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+}
+
+.video-error-msg {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 400px;
+    line-height: 1.6;
+}
+
+.video-error-btn {
+    margin-top: 10px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #000;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.video-error-btn:hover {
+    transform: scale(1.05);
+}
+
+/* ============ INFO CARD ============ */
+.info-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(26px);
+    -webkit-backdrop-filter: blur(26px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.info-header {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.info-poster {
+    width: 140px;
+    aspect-ratio: 2/3;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.info-content {
+    flex: 1;
+    min-width: 240px;
+}
+
+.info-title {
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 800;
+    margin-bottom: 14px;
+    line-height: 1.2;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+}
+
+.info-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.info-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+.info-meta i {
+    font-size: 12px;
+    color: var(--primary);
+}
+
+.info-meta .rating i {
+    color: #ffd700;
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+}
+
+.info-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+}
+
+/* ============ CREATOR BADGE ============ */
+.creator-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.12) 0%, rgba(255, 0, 229, 0.08) 100%);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+.creator-badge i {
+    color: var(--primary);
+    font-size: 16px;
+}
+
+.creator-badge .creator-label {
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+.creator-badge .creator-id {
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 14px;
+}
+
+/* ============ ACTIONS ============ */
+.info-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s;
+    font-family: inherit;
+    text-decoration: none;
+}
+
+.action-btn i {
+    font-size: 14px;
+}
+
+.action-btn.primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #000;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+}
+
+.action-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.5);
+}
+
+.action-btn.glass {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    color: var(--text);
+    backdrop-filter: blur(20px);
+}
+
+.action-btn.glass:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+/* ============ RELATED SECTION ============ */
+.related-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.related-title i {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+.movies-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.movie-card {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(20px);
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.movie-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    border-color: var(--primary);
+    box-shadow: 0 15px 45px rgba(0, 240, 255, 0.25);
+}
+
+.movie-poster-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2/3;
+    overflow: hidden;
+}
+
+.movie-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    transition: transform 0.4s ease;
+}
+
+.movie-card:hover .movie-poster {
+    transform: scale(1.08);
+}
+
+.movie-poster-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 45%);
+    pointer-events: none;
+}
+
+.movie-play {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 240, 255, 0.3);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+
+.movie-play i {
+    font-size: 16px;
+    margin-left: 2px;
+}
+
+.movie-card:hover .movie-play {
+    background: rgba(0, 240, 255, 0.7);
+    transform: scale(1.15);
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.9);
+}
+
+.movie-rating {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 3;
+}
+
+.movie-rating i {
+    color: #ffd700;
+    font-size: 11px;
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.7));
+}
+
+.movie-info {
+    padding: 12px 14px;
+    position: relative;
+    z-index: 2;
+}
+
+.movie-title-text {
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 6px;
+    transition: color 0.3s;
+}
+
+.movie-card:hover .movie-title-text {
+    color: var(--primary);
+}
+
+.movie-meta-row {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-wrap: wrap;
+}
+
+.movie-meta-row span {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px) {
+    .movies-row { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+
+@media (max-width: 600px) {
+    .player-page { padding: 0 14px; }
+    .player-header { margin: 0 -14px; padding: 12px 14px; }
+    .player-title { font-size: 14px; }
+    .info-card { padding: 20px; }
+    .info-poster { width: 100px; }
+    .info-title { font-size: 22px; }
+    .info-desc { font-size: 14px; }
+    .movies-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .movie-play { width: 36px; height: 36px; bottom: 8px; left: 8px; }
+    .movie-play i { font-size: 14px; }
+    .info-actions { gap: 8px; }
+    .action-btn { padding: 10px 16px; font-size: 13px; }
+    .creator-badge { font-size: 12px; padding: 8px 14px; }
+    .creator-badge .creator-id { font-size: 12px; }
+}
+
+/* ============ PLYR OVERRIDES ============ */
+.plyr--video .plyr__controls {
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+}
+
+.plyr__control--overlaid {
+    background: rgba(0, 240, 255, 0.25) !important;
+    border: 2px solid var(--primary) !important;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.5) !important;
+}
+
+.plyr__control--overlaid:hover {
+    background: rgba(0, 240, 255, 0.6) !important;
+}
+
+.plyr--video .plyr__progress__buffer {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.plyr--video .plyr__progress input[type="range"]::-webkit-slider-thumb {
+    background: var(--primary) !important;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.8) !important;
+}
+
+.plyr--video .plyr__progress input[type="range"]::-moz-range-thumb {
+    background: var(--primary) !important;
+}
+    </style>
+</head>
+<body>
+    <!-- PLAYER PAGE -->
+    <div class="player-page">
+        <!-- HEADER -->
+        <div class="player-header">
+            <a href="index.html" class="player-back">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="player-title" id="player-title">Chargement...</div>
+        </div>
+        
+        <!-- CONTENT -->
+        <div class="player-content">
+            <!-- Loading Overlay -->
+            <div class="plyr-loading-overlay" id="plyr-loading-overlay">
+                <div class="plyr-loading-spinner">
+                    <div class="spinner-circle"></div>
+                    <div class="loading-text">Chargement de la vidéo...</div>
+                </div>
+            </div>
+            
+            <!-- Video Player -->
+            <div class="video-container" id="video-container">
+                <video id="player-video" playsinline webkit-playsinline crossorigin controls>
+                    Your browser does not support the video tag.
+                </video>
+                
+                <!-- Error Overlay -->
+                <div class="video-error" id="video-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="video-error-title">Vidéo indisponible</div>
+                    <div class="video-error-msg" id="video-error-msg">Impossible de charger la vidéo.</div>
+                    <button class="video-error-btn" onclick="retryVideo()">
+                        <i class="fas fa-redo"></i> Réessayer
+                    </button>
+                </div>
+            </div>
+            
+            <!-- INFO CARD -->
+            <div class="info-card">
+                <div class="info-header">
+                    <img id="info-poster" class="info-poster" src="" alt="">
+                    <div class="info-content">
+                        <h1 id="info-title" class="info-title">Chargement...</h1>
+                        <div id="info-meta" class="info-meta"></div>
+                        <p id="info-desc" class="info-desc"></p>
+                        
+                        <!-- Créé par Engine -->
+                        <div class="creator-badge">
+                            <i class="fas fa-star"></i>
+                            <span class="creator-label">Créé par</span>
+                            <span class="creator-id">Engine 50934946793</span>
+                        </div>
+                        
+                        <div class="info-actions">
+                            <button class="action-btn primary" id="play-btn">
+                                <i class="fas fa-play"></i> Regarder
+                            </button>
+                            <button class="action-btn glass" id="share-btn">
+                                <i class="fas fa-share-alt"></i> Partager
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RELATED -->
+            <div>
+                <h3 class="related-title">
+                    <i class="fas fa-film"></i>
+                    Vous pourriez aimer
+                </h3>
+                <div class="movies-row" id="related-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+    <script>
+    /* ============================================
+       📥 PARSE URL PARAMS
+       ============================================ */
+    const params = new URLSearchParams(window.location.search);
+    const data = {
+        subjectId: params.get('subjectId') || '',
+        title: params.get('title') || 'Film',
+        poster: params.get('poster') || '',
+        year: params.get('year') || '',
+        rating: params.get('rating') || '',
+        genre: params.get('genre') || '',
+        desc: params.get('desc') || 'Aucune description disponible.'
+    };
+
+    /* ============================================
+       🎨 UPDATE INFO
+       ============================================ */
+    document.getElementById('player-title').textContent = data.title;
+    document.getElementById('info-title').textContent = data.title;
+    document.getElementById('info-poster').src = data.poster;
+    document.getElementById('info-poster').alt = data.title;
+    document.getElementById('info-desc').textContent = data.desc;
+
+    // Meta
+    document.getElementById('info-meta').innerHTML = `
+        ${data.year ? `<span><i class="fas fa-calendar"></i> ${data.year}</span>` : ''}
+        ${data.rating ? `<span class="rating"><i class="fas fa-star"></i> ${data.rating}</span>` : ''}
+        ${data.genre ? `<span><i class="fas fa-tag"></i> ${data.genre}</span>` : ''}
+    `;
+
+    /* ============================================
+       🎬 INIT PLYR PLAYER
+       ============================================ */
+    const videoElement = document.getElementById('player-video');
+    const loadingOverlay = document.getElementById('plyr-loading-overlay');
+    const errorOverlay = document.getElementById('video-error');
+    const errorMsg = document.getElementById('video-error-msg');
+
+    let player = null;
+
+    // Wait for Plyr to load
+    window.addEventListener('load', () => {
+        initPlayer();
+        loadVideo();
+    });
+
+    function initPlayer() {
+        player = new Plyr(videoElement, {
+            controls: [
+                'play-large',
+                'rewind',
+                'play',
+                'fast-forward',
+                'progress',
+                'current-time',
+                'duration',
+                'mute',
+                'volume',
+                'settings',
+                'pip',
+                'airplay',
+                'fullscreen'
+            ],
+            settings: ['speed'],
+            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+            seekTime: 10,
+            rewind: { seekTime: 15 },
+            autoplay: false,
+            keyboard: { focused: true, global: true },
+            tooltips: { controls: true, seek: true },
+            fullscreen: { enabled: true, fallback: true, iosNative: true }
+        });
+
+        // Player events
+        player.on('ready', () => {
+            console.log('✅ Player ready');
+            hideLoading();
+        });
+
+        player.on('waiting', () => showLoading());
+        player.on('loadstart', () => showLoading());
+        player.on('canplay', () => hideLoading());
+        player.on('playing', () => hideLoading());
+        player.on('error', (e) => {
+            console.error('❌ Player error:', e);
+            hideLoading();
+            showError('Erreur de lecture. Vérifiez votre connexion.');
+        });
+
+        player.on('enterfullscreen', () => {
+            // Try landscape lock on mobile
+            if (isMobile() && screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {});
+            }
+        });
+
+        player.on('exitfullscreen', () => {
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
+        });
+    }
+
+    /* ============================================
+       🎬 LOAD VIDEO PA SUBJECTID
+       ============================================ */
+    async function loadVideo() {
+        if (!data.subjectId) {
+            showError("Aucun ID de film fourni. Impossible de charger la vidéo.");
+            return;
+        }
+
+        hideError();
+        showLoading();
+
+        try {
+            console.log("🔍 Recherche stream pour subjectId:", data.subjectId);
+
+            // ⚠️ ENDPOINTS POSIB - Modifye selon API egzak la
+            const API_BASE = "https://test-acdn.aoneroom.com";
+            
+            const endpoints = [
+                `${API_BASE}/api/stream/${data.subjectId}`,
+                `${API_BASE}/stream/${data.subjectId}`,
+                `${API_BASE}/api/movie/${data.subjectId}/stream`,
+                `${API_BASE}/api/detail/${data.subjectId}`,
+                `${API_BASE}/movie/${data.subjectId}`,
+                `${API_BASE}/play/${data.subjectId}`,
+                `${API_BASE}/sources/${data.subjectId}`
+            ];
+
+            let streamUrl = null;
+            let lastError = null;
+
+            for (const endpoint of endpoints) {
+                try {
+                    console.log("➡️ Essai:", endpoint);
+                    const res = await fetch(endpoint, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (!res.ok) {
+                        console.warn(`  ⚠️ ${res.status} - ${endpoint}`);
+                        continue;
+                    }
+
+                    const contentType = res.headers.get('content-type') || '';
+                    
+                    // Direct video file
+                    if (contentType.includes('video') || contentType.includes('mpegurl')) {
+                        streamUrl = endpoint;
+                        console.log("✅ Stream direct:", streamUrl);
+                        break;
+                    }
+
+                    // JSON response
+                    if (contentType.includes('json')) {
+                        const json = await res.json();
+                        console.log("📦 JSON response:", json);
+                        
+                        // Try multiple paths
+                        streamUrl = 
+                            json.stream_url || 
+                            json.video_url || 
+                            json.url ||
+                            json.data?.stream_url || 
+                            json.data?.video_url || 
+                            json.data?.url ||
+                            json.data?.sources?.[0]?.url ||
+                            json.sources?.[0]?.url ||
+                            json.results?.sources?.[0]?.stream_url ||
+                            json.results?.[0]?.stream_url ||
+                            null;
+                        
+                        if (streamUrl) {
+                            console.log("✅ Stream URL trouvé:", streamUrl);
+                            break;
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`  ❌ ${endpoint}:`, e.message);
+                    lastError = e;
+                }
+            }
+
+            if (!streamUrl) {
+                throw new Error(lastError?.message || "Aucun stream trouvé. L'API ne retourne pas de vidéo.");
+            }
+
+            // Load into player
+            console.log("🎬 Chargement vidéo:", streamUrl);
+            
+            if (player) {
+                player.source = {
+                    type: 'video',
+                    sources: [{ src: streamUrl, type: 'video/mp4' }],
+                    poster: data.poster
+                };
+
+                // Auto-play
+                setTimeout(() => {
+                    player.play().catch(err => {
+                        console.log('Autoplay bloqué:', err.message);
+                    });
+                }, 500);
+            }
+
+        } catch (err) {
+            console.error("❌ Erreur chargement:", err);
+            hideLoading();
+            showError(err.message || "Impossible de charger la vidéo.");
+        }
+    }
+
+    /* ============================================
+       HELPERS
+       ============================================ */
+    function showLoading() {
+        loadingOverlay.classList.remove('hidden');
+    }
+
+    function hideLoading() {
+        loadingOverlay.classList.add('hidden');
+    }
+
+    function showError(msg) {
+        errorMsg.textContent = msg;
+        errorOverlay.classList.add('show');
+    }
+
+    function hideError() {
+        errorOverlay.classList.remove('show');
+    }
+
+    window.retryVideo = function() {
+        hideError();
+        if (player) {
+            player.source = null;
+            player.stop();
+        }
+        loadVideo();
+    };
+
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    /* ============================================
+       ▶️ PLAY BUTTON
+       ============================================ */
+    document.getElementById('play-btn').onclick = () => {
+        if (player) {
+            player.play().catch(() => {});
+            player.fullscreen.enter();
+        }
+    };
+
+    /* ============================================
+       🔗 SHARE
+       ============================================ */
+    document.getElementById('share-btn').onclick = async () => {
+        const shareData = {
+            title: `${data.title} - BLAST FLIX`,
+            text: `Regarde ${data.title} sur BLAST FLIX !`,
+            url: window.location.href
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(shareData.url);
+                alert('🔗 Lien copié !');
+            }
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                try {
+                    await navigator.clipboard.writeText(shareData.url);
+                    alert('🔗 Lien copié !');
+                } catch {}
+            }
+        }
+    };
+
+    /* ============================================
+       🎬 RELATED MOVIES
+       ============================================ */
+    const RELATED = [
+        { subjectId: "8759851328492438440", title: "Train Dreams", poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year: "2025", rating: 7.7 },
+        { subjectId: "3854326812578922640", title: "After the Hunt", poster: "https://pbcdnw.aoneroom.com/image/2025/11/21/40a1b8238733d1169d079a5e7af0fc7f.jpg", year: "2025", rating: 6.2 },
+        { subjectId: "407974060606504992", title: "The Family Plan 2", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/873fd90dff1123846fe6cc34c1010f10.jpg", year: "2025", rating: 5.6 },
+        { subjectId: "144265366439707640", title: "One Battle After Another", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year: "2025", rating: 8.2 },
+        { subjectId: "488603172416769952", title: "Roofman", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year: "2025", rating: 7.2 },
+        { subjectId: "5821547884994614176", title: "Now You See Me", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg", year: "2025", rating: 6.3 },
+        { subjectId: "4956801153355891744", title: "Stranger Things", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year: "2016", rating: 8.6 },
+        { subjectId: "3646928918696838480", title: "IT: Welcome to Derry", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg", year: "2025", rating: 7.7 },
+        { subjectId: "9028867555875774472", title: "Wednesday", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/0
