@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Lecture - BLAST FLIX</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  
+  <style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --neon-cyan: #00f0ff; --neon-pink: #ff00e5; --neon-gold: #ffd700;
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --text-primary: #f3f4f6;
+  --text-secondary: rgba(209, 213, 219, 0.65);
+  --radius: 22px; --radius-sm: 14px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  background: #0a0a0a; color: var(--text-primary);
+  min-height: 100vh; padding-bottom: 40px;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -1;
+  background: radial-gradient(circle at 10% 10%, rgba(107, 114, 128, 0.4) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(156, 163, 175, 0.35) 0%, transparent 50%);
+  filter: blur(60px);
+}
+.glass-header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(26px);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.back-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 14px; font-weight: 600;
+  transition: all 0.3s;
+}
+.back-btn:hover { background: rgba(0, 240, 255, 0.15); border-color: var(--neon-cyan); }
+.back-btn i { font-size: 16px; }
+.header-title { font-size: 16px; font-weight: 800; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+.video-wrapper { width: 100%; aspect-ratio: 16/9; background: black; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--neon-cyan); box-shadow: 0 0 60px rgba(0, 240, 255, 0.25); position: relative; margin-bottom: 24px; }
+.video-wrapper video { width: 100%; height: 100%; display: block; }
+.video-wrapper:fullscreen { border-radius: 0; border: none; margin: 0; width: 100vw; height: 100vh; }
+
+.video-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 8; gap: 20px; transition: opacity 0.4s, visibility 0.4s; }
+.video-loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.video-loading-spinner { width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.1); border-top-color: var(--neon-cyan); border-right-color: var(--neon-pink); animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.video-loading-text { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); letter-spacing: 1px; animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.video-error { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); z-index: 10; gap: 16px; padding: 20px; text-align: center; }
+.video-error.show { display: flex; }
+.video-error i { font-size: 60px; color: #ff4444; }
+.video-error-title { font-size: 18px; font-weight: 700; }
+.video-error-msg { font-size: 13px; color: rgba(255,255,255,0.6); max-width: 400px; line-height: 1.6; }
+.video-error-btn { margin-top: 10px; padding: 12px 24px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink)); color: #000; border: none; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+.big-play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.4); z-index: 7; cursor: pointer; transition: opacity 0.3s; }
+.big-play-overlay.hidden { opacity: 0; pointer-events: none; }
+.big-play-btn { width: 100px; height: 100px; border-radius: 50%; background: rgba(0, 240, 255, 0.3); backdrop-filter: blur(15px); border: 2px solid var(--neon-cyan); display: flex; align-items: center; justify-content: center; animation: playPulse 2s ease-in-out infinite; }
+@keyframes playPulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 240, 255, 0.6); } 50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(0, 240, 255, 0.9); } }
+.big-play-btn i { font-size: 48px; color: white; margin-left: 6px; filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)); }
+
+.info-card { background: var(--glass-bg); backdrop-filter: blur(26px); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; }
+.info-header { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 24px; }
+.info-poster { width: 140px; aspect-ratio: 2/3; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0; border: 1px solid var(--glass-border); }
+.info-content { flex: 1; min-width: 240px; }
+.info-title { font-size: clamp(24px, 4vw, 32px); font-weight: 800; margin-bottom: 14px; }
+.info-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.info-meta span { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 50px; font-size: 13px; font-weight: 600; }
+.info-meta i { color: var(--neon-cyan); }
+.info-meta .rating i { color: var(--neon-gold); }
+.info-desc { font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 16px; }
+
+.creator-badge { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(255, 0, 229, 0.08)); border: 1px solid rgba(0, 240, 255, 0.35); border-radius: 50px; font-size: 13px; font-weight: 600; }
+.creator-badge i { color: var(--neon-cyan); font-size: 16px; }
+.creator-badge .label { color: var(--text-secondary); }
+.creator-badge .id { font-family: 'Monaco', monospace; font-weight: 800; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-size: 14px; }
+
+.info-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.action-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.3s; text-decoration: none; font-family: inherit; }
+.action-btn.primary { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink)); color: #000; }
+.action-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0, 240, 255, 0.5); }
+.action-btn.glass { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); }
+.action-btn.glass:hover { border-color: var(--neon-cyan); }
+
+.related-section { margin-top: 32px; }
+.related-title { font-size: 20px; font-weight: 800; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+.related-title i { color: var(--neon-cyan); }
+.related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.related-card { border-radius: var(--radius-sm); overflow: hidden; background: var(--glass-bg); border: 1px solid var(--glass-border); text-decoration: none; color: inherit; transition: all 0.35s; display: block; }
+.related-card:hover { transform: translateY(-6px); border-color: var(--neon-cyan); box-shadow: 0 12px 40px rgba(0, 240, 255, 0.25); }
+.related-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+.related-info { padding: 10px 12px; }
+.related-title-text { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+.related-meta { font-size: 11px; color: var(--text-secondary); }
+
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); color: #f3f4f6; padding: 14px 24px; border-radius: 50px; font-size: 14px; font-weight: 600; z-index: 10000; opacity: 0; transition: all 0.35s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.plyr--video .plyr__controls { background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+.plyr__control--overlaid { background: rgba(0, 240, 255, 0.3) !important; border: 2px solid var(--neon-cyan) !important; }
+
+@media (max-width: 768px) {
+  .container { padding: 14px; }
+  .info-card { padding: 20px; }
+  .info-poster { width: 100px; }
+  .info-title { font-size: 22px; }
+  .related-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .big-play-btn { width: 70px; height: 70px; }
+  .big-play-btn i { font-size: 32px; }
+}
+  </style>
+</head>
+<body>
+
+<header class="glass-header">
+  <a href="javascript:history.back()" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+    Retour
+  </a>
+  <div class="header-title">BLAST FLIX</div>
+  <div style="width: 80px;"></div>
+</header>
+
+<div class="container">
+  <div class="video-wrapper" id="videoWrapper">
+    <video id="playerVideo" playsinline webkit-playsinline crossorigin controls></video>
+    
+    <div class="big-play-overlay" id="bigPlayOverlay">
+      <div class="big-play-btn"><i class="fas fa-play"></i></div>
+    </div>
+    
+    <div class="video-loading" id="videoLoading">
+      <div class="video-loading-spinner"></div>
+      <div class="video-loading-text">Chargement de la vidéo...</div>
+    </div>
+    
+    <div class="video-error" id="videoError">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div class="video-error-title">Vidéo indisponible</div>
+      <div class="video-error-msg" id="videoErrorMessage">Impossible de charger la vidéo.</div>
+      <button class="video-error-btn" onclick="retryVideo()">
+        <i class="fas fa-redo"></i> Réessayer
+      </button>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-header">
+      <img id="infoPoster" class="info-poster" src="" alt="">
+      <div class="info-content">
+        <h1 id="infoTitle" class="info-title">Chargement...</h1>
+        <div id="infoMeta" class="info-meta"></div>
+        <p id="infoDesc" class="info-desc"></p>
+        <div class="creator-badge">
+          <i class="fas fa-star"></i>
+          <span class="label">Créé par</span>
+          <span class="id">Engine 50934946793</span>
+        </div>
+        <div class="info-actions">
+          <button class="action-btn primary" id="playBtn">
+            <i class="fas fa-play"></i> Regarder
+          </button>
+          <button class="action-btn glass" id="shareBtn">
+            <i class="fas fa-share-alt"></i> Partager
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="related-section">
+    <h3 class="related-title">
+      <i class="fas fa-film"></i>
+      Vous pourriez aimer
+    </h3>
+    <div class="related-grid" id="relatedGrid"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+<script>
+/* ============================================
+   📥 PARSE URL
+   ============================================ */
+const params = new URLSearchParams(window.location.search);
+const data = {
+  subjectId: params.get('subjectId') || '',
+  title: params.get('title') || 'Film',
+  poster: params.get('poster') || '',
+  year: params.get('year') || '',
+  rating: params.get('rating') || '',
+  genre: params.get('genre') || '',
+  desc: params.get('desc') || 'Aucune description disponible.'
+};
+
+/* ============================================
+   ⚙️ API CONFIG - fastai-simga.vercel.app
+   ============================================ */
+const API_CONFIG = {
+  BASE_URL: 'https://fastai-simga.vercel.app',
+  ENDPOINTS: {
+    INFO: '/api/info',
+    SOURCES: '/api/sources'
+  },
+  FALLBACK_APIS: [
+    'https://testmovieboxapi-ab2c4c4adb04.herokuapp.com',
+    'https://test-acdn.aoneroom.com'
+  ],
+  TIMEOUT: 15000
+};
+
+/* ============================================
+   🎬 UPDATE INFO
+   ============================================ */
+document.getElementById('infoTitle').textContent = data.title;
+document.getElementById('infoPoster').src = data.poster || 'https://via.placeholder.com/300x450/1a1a1a/666?text=No+Image';
+document.getElementById('infoPoster').alt = data.title;
+document.getElementById('infoDesc').textContent = data.desc;
+
+document.getElementById('infoMeta').innerHTML = `
+  ${data.year ? `<span><i class="fas fa-calendar"></i> ${data.year}</span>` : ''}
+  ${data.rating ? `<span class="rating"><i class="fas fa-star"></i> ${data.rating}</span>` : ''}
+  ${data.genre ? `<span><i class="fas fa-tag"></i> ${data.genre}</span>` : ''}
+`;
+
+/* ============================================
+   🎥 INIT PLAYER
+   ============================================ */
+const videoElement = document.getElementById('playerVideo');
+const loadingEl = document.getElementById('videoLoading');
+const errorEl = document.getElementById('videoError');
+const errorMsg = document.getElementById('videoErrorMessage');
+const bigPlayOverlay = document.getElementById('bigPlayOverlay');
+
+let player = null;
+let currentStreamUrl = null;
+
+window.addEventListener('load', () => {
+  if (typeof Plyr !== 'undefined') {
+    player = new Plyr(videoElement, {
+      controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
+      settings: ['speed'],
+      speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+      seekTime: 10,
+      autoplay: false,
+      keyboard: { focused: true, global: true }
+    });
+    
+    player.on('play', () => bigPlayOverlay.classList.add('hidden'));
+  }
+  loadVideo();
+});
+
+/* ============================================
+   🎬 LOAD VIDEO PA SUBJECTID
+   ============================================ */
+async function loadVideo() {
+  if (!data.subjectId) {
+    showError('Aucun ID de film fourni.');
+    return;
+  }
+
+  hideError();
+  showLoading();
+
+  try {
+    console.log('🔍 Chargement pour subjectId:', data.subjectId);
+
+    // Chèche nan plizyè API
+    const allApis = [API_CONFIG.BASE_URL, ...API_CONFIG.FALLBACK_APIS];
+    const endpoints = [];
+
+    for (const api of allApis) {
+      endpoints.push(`${api}/api/sources/${data.subjectId}`);
+      endpoints.push(`${api}/api/stream/${data.subjectId}`);
+      endpoints.push(`${api}/api/info/${data.subjectId}`);
+    }
+
+    let streamUrl = null;
+    let lastError = null;
+
+    for (const endpoint of endpoints) {
+      try {
+        console.log('➡️ Essai:', endpoint);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+        
+        const res = await fetch(endpoint, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
+        if (!res.ok) {
+          console.warn(`⚠️ ${res.status} - ${endpoint}`);
+          continue;
+        }
+
+        const contentType = res.headers.get('content-type') || '';
+        
+        if (contentType.includes('video') || contentType.includes('mpegurl')) {
+          streamUrl = endpoint;
+          console.log('✅ Direct stream:', streamUrl);
+          break;
+        }
+
+        if (contentType.includes('json')) {
+          const json = await res.json();
+          console.log('📦 JSON:', json);
+          
+          streamUrl = 
+            json.stream_url ||
+            json.video_url ||
+            json.url ||
+            json.data?.stream_url ||
+            json.data?.video_url ||
+            json.data?.url ||
+            json.data?.sources?.[0]?.url ||
+            json.data?.processedSources?.[0]?.proxyUrl ||
+            json.data?.processedSources?.[0]?.directUrl ||
+            json.sources?.[0]?.url ||
+            json.sources?.[0]?.stream_url ||
+            json.results?.sources?.[0]?.stream_url ||
+            json.results?.[0]?.stream_url ||
+            json.results?.[0]?.url ||
+            (Array.isArray(json.results) && json.results[0]?.url) ||
+            null;
+          
+          if (streamUrl) {
+            console.log('✅ Stream trouvé:', streamUrl);
+            break;
+          }
+        }
+      } catch (e) {
+        console.warn('❌', endpoint, e.message);
+        lastError = e;
+      }
+    }
+
+    if (!streamUrl) {
+      throw new Error('Aucune source vidéo trouvée. L\'API est peut-être indisponible.');
+    }
+
+    console.log('🎬 Chargement:', streamUrl);
+    currentStreamUrl = streamUrl;
+
+    if (player) {
+      player.source = {
+        type: 'video',
+        sources: [{ src: streamUrl, type: 'video/mp4' }],
+        poster: data.poster
+      };
+    } else {
+      videoElement.src = streamUrl;
+    }
+
+    hideLoading();
+
+    // Auto-play
+    setTimeout(() => {
+      const playPromise = player ? player.play() : videoElement.play();
+      if (playPromise && playPromise.catch) playPromise.catch(() => hideLoading());
+    }, 500);
+
+  } catch (err) {
+    console.error('❌ Error:', err);
+    hideLoading();
+    showError(err.message || 'Erreur de chargement.');
+  }
+}
+
+function showLoading() { loadingEl.classList.remove('hidden'); }
+function hideLoading() { loadingEl.classList.add('hidden'); }
+function showError(msg) { errorMsg.textContent = msg; errorEl.classList.add('show'); }
+function hideError() { errorEl.classList.remove('show'); }
+
+window.retryVideo = function() {
+  hideError();
+  if (player) player.stop();
+  videoElement.src = '';
+  loadVideo();
+};
+
+function startPlayback() {
+  bigPlayOverlay.classList.add('hidden');
+  if (player) {
+    player.play().catch(() => {
+      if (currentStreamUrl) {
+        player.source = { type: 'video', sources: [{ src: currentStreamUrl, type: 'video/mp4' }] };
+        player.play().catch(() => {});
+      }
+    });
+  } else {
+    videoElement.play().catch(() => {});
+  }
+}
+
+bigPlayOverlay.addEventListener('click', startPlayback);
+
+document.getElementById('playBtn').addEventListener('click', () => {
+  startPlayback();
+  document.getElementById('videoWrapper').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const shareData = {
+    title: `${data.title} - BLAST FLIX`,
+    text: `Regarde ${data.title} sur BLAST FLIX !`,
+    url: window.location.href
+  };
+  try {
+    if (navigator.share) await navigator.share(shareData);
+    else {
+      await navigator.clipboard.writeText(shareData.url);
+      showToast('🔗 Lien copié !');
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+        showToast('🔗 Lien copié !');
+      } catch {}
+    }
+  }
+});
+
+/* ============================================
+   🎬 RELATED MOVIES
+   ============================================ */
+const RELATED = [
+  { subjectId: "8759851328492438440", title: "Train Dreams", poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year: "2025", rating: 7.7, genre: "Drama", desc: "Based on Denis Johnson's novella." },
+  { subjectId: "4956801153355891744", title: "Stranger Things", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year: "2016", rating: 8.6, genre: "Drama", desc: "Supernatural forces." },
+  { subjectId: "144265366439707640", title: "One Battle After Another", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year: "2025", rating: 8.2, genre: "Action", desc: "Ex-revolutionaries." },
+  { subjectId: "488603172416769952", title: "Roofman", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year: "2025", rating: 7.2, genre: "Crime", desc: "A criminal hides." },
+  { subjectId: "5821547884994614176", title: "Now You See Me", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg", year: "2025", rating: 6.3, genre: "Crime", desc: "A diamond heist." },
+  { subjectId: "3646928918696838480", title: "IT: Welcome to Derry", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg", year: "2025", rating: 7.7, genre: "Horror", desc: "A couple moves." },
+  { subjectId: "9028867555875774472", title: "Wednesday", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/0dbb4e91afb214a1ccebb8a9aa93ce35.jpg", year: "2022", rating: 8.0, genre: "Comedy", desc: "Wednesday Addams." },
+  { subjectId: "1216407338207298384", title: "One Piece", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/502f5a9ee6616315a1dd6e3a96256987.jpg", year: "2023", rating: 8.3, genre: "Action", desc: "Luffy's voyage." },
+  { subjectId: "1716151170995028536", title: "Landman", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/fb97784b6e658e8c6d7813fb0cd8975d.jpg", year: "2024", rating: 8.2, genre: "Drama", desc: "West Texas oil." },
+  { subjectId: "5260672975765916136", title: "Home Alone", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/628d4d8a9f5c798e41e6584298581a13.jpg", year: "1990", rating: 7.7, genre: "Comedy", desc: "A boy defends home." },
+  { subjectId: "4548438624232169480", title: "The Grinch", poster: "https://pbcdnw.aoneroom.com/image/2023/02/15/0b5a669e3716664cf67b0ad980aeb73b.jpg", year: "2018", rating: 6.4, genre: "Animation", desc: "The Grinch." },
+  { subjectId: "4923184478689855992", title: "Die Hard 2", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/7cb05853b2133cb1d5c0fb00ab751829.jpg", year: "1990", rating: 7.2, genre: "Action", desc: "John McClane." }
+];
+
+const pool = RELATED.filter(m => m.subjectId !== data.subjectId);
+const shuffled = pool.sort(() => Math.random() - 0.5);
+const related = shuffled.slice(0, 6);
+
+document.getElementById('relatedGrid').innerHTML = related.map(m => {
+  const p = new URLSearchParams({
+    subjectId: m.subjectId, title: m.title, poster: m.poster,
+    year: m.year, rating: m.rating, genre: m.genre, desc: m.desc || ''
+  });
+  return `
+    <a href="player.html?${p.toString()}" class="related-card">
+      <img class="related-poster" src="${m.poster}" alt="${m.title}" loading="lazy">
+      <div class="related-info">
+        <div class="related-title-text">${m.title}</div>
+        <div class="related-meta">${m.year} • ⭐ ${m.rating}</div>
+      </div>
+    </a>
+  `;
+}).join('');
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>
