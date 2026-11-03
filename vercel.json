@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "name": "blast-flix",
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "app.js", "use": "@vercel/static" },
+    { "src": "player.js", "use": "@vercel/static" },
+    { "src": "categories.js", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/app.js", "dest": "/app.js" },
+    { "src": "/player.js", "dest": "/player.js" },
+    { "src": "/categories.js", "dest": "/categories.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/(.*).js",
+      "headers": [
+        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    }
+  ]
+}
