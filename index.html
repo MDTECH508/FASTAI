@@ -6,10 +6,8 @@
   <meta name="theme-color" content="#0a0a0a" />
   <title>BLAST FLIX - Regardez des Films en Ligne</title>
   <style>
-/* ============ RESET & BASE ============ */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { scroll-behavior: smooth; }
-
 :root {
   --gray-100: #f3f4f6; --gray-300: #d1d5db; --gray-400: #9ca3af;
   --gray-500: #6b7280; --gray-600: #4b5563; --gray-700: #374151;
@@ -22,7 +20,6 @@ html { scroll-behavior: smooth; }
   --text-secondary: rgba(209, 213, 219, 0.65);
   --radius: 22px; --radius-sm: 14px;
 }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
   background: var(--black); color: var(--text-primary);
@@ -59,7 +56,7 @@ body {
   border-radius: 0 0 var(--radius) var(--radius);
   border-top: none; border-left: none; border-right: none;
 }
-.logo { display: flex; align-items: center; gap: 10px; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .logo-text {
   font-size: 20px; font-weight: 800; letter-spacing: 1.5px;
   color: var(--gray-100); text-shadow: 0 0 18px rgba(255, 255, 255, 0.25);
@@ -112,7 +109,6 @@ body {
   background-size: cover; background-position: center;
   filter: blur(2px) brightness(0.45) grayscale(0.35);
   transform: scale(1.05); z-index: 0;
-  transition: background-image 0.8s ease-in-out;
 }
 .hero-bg::after {
   content: ''; position: absolute; inset: 0;
@@ -178,11 +174,15 @@ body {
   color: var(--text-secondary); font-size: 13px; font-weight: 600;
   white-space: nowrap; cursor: pointer;
   transition: all 0.3s; backdrop-filter: blur(10px);
+  font-family: inherit;
+  display: inline-flex; align-items: center; gap: 6px;
 }
+.cat-pill svg { width: 16px; height: 16px; }
 .cat-pill.active, .cat-pill:hover {
   background: rgba(255,255,255,0.10); border-color: var(--gray-400);
   color: var(--gray-100); box-shadow: 0 0 20px rgba(255, 255, 255, 0.18);
 }
+.cat-pill.active svg { stroke: var(--neon-cyan); }
 
 /* CONTENT */
 .content { padding: 0 20px; }
@@ -198,6 +198,7 @@ body {
 .see-all {
   background: none; border: none; color: var(--gray-400);
   font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+  font-family: inherit; text-decoration: none;
 }
 .see-all:hover { color: var(--gray-100); text-shadow: 0 0 12px rgba(255,255,255,0.55); }
 
@@ -213,15 +214,34 @@ body {
   backdrop-filter: blur(20px); cursor: pointer;
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 .movie-card:hover {
   transform: translateY(-6px) scale(1.02);
   border-color: var(--gray-400);
   box-shadow: 0 12px 40px rgba(255, 255, 255, 0.15);
 }
+.movie-poster-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2/3;
+  overflow: hidden;
+}
 .movie-poster {
-  width: 100%; aspect-ratio: 2/3; object-fit: cover;
+  width: 100%; height: 100%; object-fit: cover;
   display: block; background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  transition: transform 0.35s ease;
+}
+.movie-card:hover .movie-poster {
+  transform: scale(1.05);
+}
+.movie-poster-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  color: var(--text-secondary);
 }
 .movie-info { padding: 10px 12px; }
 .movie-title {
@@ -251,125 +271,40 @@ body {
   width: 12px; height: 12px; fill: #ffd700;
   filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
 }
-.movie-bookmark {
-  position: absolute; top: 8px; left: 8px;
-  width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: white; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 5;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  opacity: 0; transform: scale(0.8);
-}
-.movie-card:hover .movie-bookmark { opacity: 1; transform: scale(1); }
-.movie-bookmark:hover {
-  background: rgba(0, 240, 255, 0.2);
-  border-color: var(--neon-cyan); transform: scale(1.1);
-}
-.movie-bookmark.active {
-  background: rgba(0, 240, 255, 0.3);
-  border-color: var(--neon-cyan); color: var(--neon-cyan);
-  opacity: 1; transform: scale(1);
-}
-.movie-bookmark svg { width: 16px; height: 16px; stroke-width: 2.2; }
 
-/* SEE ALL MODAL */
-.seeall-overlay {
-  position: fixed; inset: 0;
-  background: rgba(10, 10, 10, 0.95);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  z-index: 400;
-  display: none;
-  overflow-y: auto;
-  animation: seeAllFadeIn 0.4s ease;
-}
-.seeall-overlay.active { display: block; }
-@keyframes seeAllFadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.seeall-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 20px 100px;
-  animation: seeAllSlideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes seeAllSlideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.seeall-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  position: sticky;
-  top: 0;
-  background: rgba(10, 10, 10, 0.95);
-  backdrop-filter: blur(20px);
-  z-index: 10;
-  padding-top: 10px;
-  margin-left: -20px;
-  margin-right: -20px;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-.seeall-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--gray-100);
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
-  display: flex; align-items: center; gap: 10px;
-}
-.seeall-close {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: white; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.3s;
-}
-.seeall-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: rotate(90deg);
-}
-
-.seeall-filters {
-  display: flex; gap: 10px;
-  margin-bottom: 20px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.seeall-filters::-webkit-scrollbar { display: none; }
-.seeall-filter {
-  padding: 8px 18px;
-  border-radius: 50px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
+/* PLAY BUTTON - ANLÈ, PA DERANJE POSTER */
+.play-overlay-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(0, 240, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid var(--neon-cyan);
+  color: white;
   cursor: pointer;
-  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
   font-family: inherit;
 }
-.seeall-filter.active,
-.seeall-filter:hover {
-  background: rgba(0, 240, 255, 0.15);
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+.play-overlay-btn svg {
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  fill: white;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
 }
-
-.seeall-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
+.play-overlay-btn:hover {
+  background: rgba(0, 240, 255, 0.6);
+  transform: scale(1.15);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.9);
 }
 
 /* FOOTER */
@@ -429,6 +364,7 @@ body {
   transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-family: inherit; font-size: 10px; font-weight: 600;
   letter-spacing: 0.3px; overflow: hidden;
+  text-decoration: none;
 }
 .nav-item .nav-icon {
   position: relative; width: 26px; height: 26px;
@@ -569,124 +505,6 @@ body {
 }
 .ads-later:hover { color: rgba(255, 255, 255, 0.9); }
 
-/* MODALS */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  z-index: 300; display: none;
-  align-items: center; justify-content: center; padding: 20px;
-}
-.modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal-close {
-  position: absolute; top: 14px; right: 14px;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--glass-border);
-  color: white; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 10; transition: all 0.3s;
-}
-.modal-close:hover { background: var(--gray-600); box-shadow: 0 0 20px rgba(255, 255, 255, 0.30); }
-
-/* PLAYER */
-.player-card {
-  width: 100%; max-width: 900px; padding: 24px;
-  border-radius: var(--radius); position: relative;
-}
-.video-wrapper {
-  width: 100%; aspect-ratio: 16/9; background: black;
-  border-radius: var(--radius-sm); overflow: hidden;
-  margin-bottom: 16px; border: 1px solid var(--gray-500);
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.15); position: relative;
-}
-.video-wrapper video { width: 100%; height: 100%; display: block; }
-.player-info h3 {
-  font-size: 20px; margin-bottom: 8px;
-  color: var(--gray-100); text-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
-}
-.player-info p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
-
-/* AUTH */
-.auth-card {
-  width: 100%; max-width: 420px; padding: 40px 30px;
-  border-radius: var(--radius); position: relative; text-align: center;
-}
-.auth-title {
-  font-size: 22px; font-weight: 800; margin-bottom: 8px;
-  color: var(--gray-100); text-shadow: 0 0 18px rgba(255, 255, 255, 0.25);
-}
-.auth-sub { color: var(--text-secondary); font-size: 14px; margin-bottom: 30px; }
-.auth-option {
-  width: 100%; padding: 16px; margin-bottom: 12px;
-  border-radius: var(--radius-sm);
-  background: var(--glass-bg); border: 1px solid var(--glass-border);
-  color: white; font-size: 15px; font-weight: 600;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  gap: 10px; transition: all 0.3s;
-  font-family: inherit; backdrop-filter: blur(20px);
-}
-.auth-option:hover {
-  border-color: var(--gray-400); background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.18);
-}
-
-/* NETFLIX PLAYER */
-.nf-controls {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%);
-  opacity: 1; transition: opacity 0.3s; pointer-events: none;
-}
-.nf-controls > * { pointer-events: auto; }
-.nf-controls.hidden { opacity: 0; }
-.nf-big-play {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
-  border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
-  width: 90px; height: 90px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: white; transition: all 0.2s;
-}
-.nf-big-play:hover { background: rgba(255,255,255,0.15); transform: translate(-50%, -50%) scale(1.1); }
-.nf-big-play.hidden { display: none; }
-.nf-bottom { padding: 0 20px 20px; }
-.nf-progress-container {
-  height: 6px; background: rgba(255,255,255,0.2);
-  border-radius: 3px; cursor: pointer;
-  position: relative; margin-bottom: 12px;
-}
-.nf-progress-buffer, .nf-progress-played {
-  position: absolute; top: 0; left: 0; height: 100%; border-radius: 3px;
-}
-.nf-progress-buffer { background: rgba(255,255,255,0.3); }
-.nf-progress-played { background: #e50914; }
-.nf-buttons { display: flex; align-items: center; gap: 12px; }
-.nf-btn {
-  background: none; border: none; color: white; cursor: pointer;
-  padding: 8px; border-radius: 4px;
-  display: flex; align-items: center; justify-content: center;
-}
-.nf-btn:hover { background: rgba(255,255,255,0.1); }
-.nf-time { font-size: 13px; color: rgba(255,255,255,0.7); margin-right: auto; }
-.nf-lang-selector, .nf-quality-selector { position: relative; }
-.nf-lang-menu, .nf-quality-menu {
-  position: absolute; bottom: 45px; right: 0;
-  background: rgba(20,20,20,0.95); backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
-  padding: 6px; display: none; min-width: 140px;
-  max-height: 220px; overflow-y: auto;
-}
-.nf-lang-menu.show, .nf-quality-menu.show { display: block; }
-.nf-lang-item, .nf-quality-item {
-  display: block; width: 100%; text-align: left;
-  padding: 8px 12px; background: none; border: none;
-  color: white; font-size: 13px; cursor: pointer; border-radius: 4px;
-}
-.nf-lang-item:hover, .nf-quality-item:hover { background: rgba(255,255,255,0.1); }
-.nf-quality-item.active { color: #e50914; font-weight: 600; }
-
 /* LOADER */
 .loader-overlay {
   position: fixed; inset: 0;
@@ -743,17 +561,18 @@ body {
   40% { transform: translateY(-8px); opacity: 1; }
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .hero { min-height: 340px; padding: 24px; margin: 14px; }
-  .movie-grid, .seeall-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+  .movie-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
   .content { padding: 0 14px; }
   .bottom-nav { bottom: 10px; width: calc(100% - 20px); }
   .nav-item { padding: 6px 12px; }
   .nav-item .nav-icon { width: 24px; height: 24px; }
   .nav-item .nav-icon svg { width: 22px; height: 22px; }
   .nav-item .nav-label { font-size: 9px; }
+  .play-overlay-btn { width: 36px; height: 36px; bottom: 8px; left: 8px; }
+  .play-overlay-btn svg { width: 16px; height: 16px; }
 }
 @media (max-width: 400px) {
   .logo-text { font-size: 17px; }
@@ -778,7 +597,6 @@ body {
     <div class="loader-dots"><span></span><span></span><span></span></div>
   </div>
 
-  <!-- BACKGROUND -->
   <div class="bg-orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -787,7 +605,7 @@ body {
 
   <!-- HEADER -->
   <header class="glass-header">
-    <div class="logo">
+    <a href="index.html" class="logo">
       <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
         <path d="M4 4h16v16H4z" stroke="url(#neonGrad)" stroke-width="1.5" stroke-linejoin="round"/>
         <path d="M9 8l6 4-6 4V8z" fill="url(#neonGrad)"/>
@@ -800,13 +618,12 @@ body {
         </defs>
       </svg>
       <span class="logo-text">BLAST FLIX</span>
-    </div>
+    </a>
     <nav class="nav-links">
-      <a href="#home" class="active">Accueil</a>
-      <a href="#movie">Films</a>
-      <a href="#tv">Séries</a>
-      <a href="#anime">Anime</a>
-      <a href="#trending">Populaire</a>
+      <a href="index.html" class="active">Accueil</a>
+      <a href="seall.html">Films</a>
+      <a href="seall.html">Séries</a>
+      <a href="seall.html">Anime</a>
     </nav>
     <div class="header-actions">
       <button class="icon-btn" id="searchBtn" aria-label="Rechercher">
@@ -837,312 +654,73 @@ body {
   </div>
 
   <!-- HERO -->
-  <section class="hero glass-card" id="heroSection">
-    <div class="hero-bg" id="heroBg"></div>
+  <section class="hero glass-card">
+    <div class="hero-bg" style="background-image: url('https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg');"></div>
     <div class="hero-content">
       <span class="hero-badge">🔥 TOP TENDANCE</span>
-      <h1 class="hero-title" id="heroTitle">Chargement...</h1>
-      <div class="hero-meta" id="heroMeta"></div>
-      <p class="hero-desc" id="heroDesc"></p>
+      <h1 class="hero-title">Train Dreams</h1>
+      <div class="hero-meta">
+        <span>📅 2025</span>
+        <span>⭐ 7.7</span>
+        <span>🎭 Drama</span>
+      </div>
+      <p class="hero-desc">Based on Denis Johnson's beloved novella, Train Dreams is the moving portrait of Robert Grainier, a logger and railroad worker who leads a life of unexpected depth and beauty.</p>
       <div class="hero-actions">
-        <button class="btn btn-primary" id="playHero">
+        <a href="player.html?title=Train%20Dreams&poster=https%3A%2F%2Fpbcdnw.aoneroom.com%2Fimage%2F2025%2F11%2F17%2Fad421550a04b88b8696a04264ec5a37c.jpg&year=2025&rating=7.7&genre=Drama&video=https%3A%2F%2Fcommondatastorage.googleapis.com%2Fgtv-videos-bucket%2Fsample%2FBigBuckBunny.mp4&desc=Based%20on%20Denis%20Johnson's%20beloved%20novella%2C%20Train%20Dreams%20is%20the%20moving%20portrait%20of%20Robert%20Grainier" class="btn btn-primary">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z"/>
           </svg>
           Regarder Maintenant
-        </button>
-        <button class="btn btn-glass" id="infoHero">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 16v-4M12 8h.01"/>
-          </svg>
-          Plus d'Infos
-        </button>
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- CATEGORY TABS -->
-  <section class="category-tabs" id="categoryTabs"></section>
+  <!-- CATEGORY TABS (ak SVG icons) -->
+  <section class="category-tabs" id="categoryTabs">
+    <button class="cat-pill active" data-cat="all">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/></svg>
+      Tous
+    </button>
+    <button class="cat-pill" data-cat="Drama">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg>
+      Drama
+    </button>
+    <button class="cat-pill" data-cat="Action">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Action
+    </button>
+    <button class="cat-pill" data-cat="Crime">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      Crime
+    </button>
+    <button class="cat-pill" data-cat="Romance">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Romance
+    </button>
+    <button class="cat-pill" data-cat="Western">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/></svg>
+      Western
+    </button>
+    <button class="cat-pill" data-cat="Comedy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+      Comedy
+    </button>
+    <button class="cat-pill" data-cat="Thriller">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Thriller
+    </button>
+  </section>
 
-  <!-- ============================================
-       🎬 FIM PRENSIPAL (HTML STATIK)
-       Fim sa yo parèt dirèkteman nan paj la
-       ============================================ -->
+  <!-- MOVIE GRID -->
   <main class="content">
-    <section class="section" id="homeSection">
+    <section class="section">
       <div class="section-header">
         <h2 class="section-title">🎬 Populaires Maintenant</h2>
-        <button class="see-all" id="seeAllBtn">Voir Tout →</button>
+        <a href="seall.html" class="see-all">Voir Tout →</a>
       </div>
       <div class="movie-grid" id="movieGrid">
-
-        <!-- ===== TRAIN DREAMS ===== -->
-        <div class="movie-card" data-title="Train Dreams" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            7.7
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg" alt="Train Dreams" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Train Dreams</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2025</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Drama</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== STRANGER THINGS ===== -->
-        <div class="movie-card" data-title="Stranger Things" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            8.6
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg" alt="Stranger Things" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Stranger Things</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2016</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Drama</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== BEL-AIR ===== -->
-        <div class="movie-card" data-title="Bel-Air" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            6.4
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/12/01/b7092c27e35d9b58b31fd679e35ed6ea.jpg" alt="Bel-Air" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Bel-Air</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2022</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Drama</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== THE ABANDONS ===== -->
-        <div class="movie-card" data-title="The Abandons" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            6.7
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/12/01/fa46824a82234b25f90dea876a85da84.jpg" alt="The Abandons" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">The Abandons</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2025</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Western</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== NOW YOU SEE ME ===== -->
-        <div class="movie-card" data-title="Now You See Me: Now You Don't" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            6.3
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg" alt="Now You See Me" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Now You See Me: Now You Don't</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2025</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Crime</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== TROLL 2 ===== -->
-        <div class="movie-card" data-title="Troll 2" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            7.0
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/12/01/08db8bc2c65a6fd73be7295ed5ce38b7.jpg" alt="Troll 2" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Troll 2</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2025</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Action</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== REGRETTING YOU ===== -->
-        <div class="movie-card" data-title="Regretting You" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            6.0
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/12/04/51195406c983bc7d69f71487426ca0b3.jpg" alt="Regretting You" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Regretting You</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2025</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Drama</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== THE WITCHER ===== -->
-        <div class="movie-card" data-title="The Witcher" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            7.9
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/11/25/a0556db0b6923ac7c210fe8b92168135.jpg" alt="The Witcher" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">The Witcher</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2019</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Action</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== LANDMAN ===== -->
-        <div class="movie-card" data-title="Landman" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            8.2
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/12/02/fb97784b6e658e8c6d7813fb0cd8975d.jpg" alt="Landman" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Landman</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2024</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Drama</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== DEAR X ===== -->
-        <div class="movie-card" data-title="Dear X" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            6.8
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/11/03/4c259736189c9a20e42e96a5dd7e5c73.jpg" alt="Dear X" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Dear X</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2025</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Crime</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== TAXI DRIVER ===== -->
-        <div class="movie-card" data-title="Taxi Driver" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            8.1
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/11/02/96a9c51973ee296b4539d48c40740ad2.jpg" alt="Taxi Driver" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Taxi Driver</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2021</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Action</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== AJOSEPO ===== -->
-        <div class="movie-card" data-title="Ajosepo" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            8.8
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/11/03/b04aa69cc737d9c8b23dd69b60cf2f13.jpg" alt="Ajosepo" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Ajosepo</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2024</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Comedy</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== MAXTON HALL ===== -->
-        <div class="movie-card" data-title="Maxton Hall" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            7.5
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/11/03/ff6604f0c8c3c65e866442a4230f5bea.jpeg" alt="Maxton Hall" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Maxton Hall</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2024</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Romance</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== LAST SAMURAI STANDING ===== -->
-        <div class="movie-card" data-title="Last Samurai Standing" data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4">
-          <div class="rating-badge">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            7.6
-          </div>
-          <button class="movie-bookmark" title="Ajouter à ma liste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <img class="movie-poster" src="https://pbcdnw.aoneroom.com/image/2025/11/12/71475ce6dd9c4d383c844d29a17a5435.jpg" alt="Last Samurai Standing" loading="lazy">
-          <div class="movie-info">
-            <div class="movie-title">Last Samurai Standing</div>
-            <div class="movie-meta">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> 2025</span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg> Action</span>
-            </div>
-          </div>
-        </div>
-
+        <!-- Fim yo ap enjekte pa JavaScript -->
       </div>
     </section>
   </main>
@@ -1167,7 +745,7 @@ body {
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
-    <button class="nav-item active" data-tab="home">
+    <a href="index.html" class="nav-item active">
       <div class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 10.5L12 3l9 7.5"/>
@@ -1175,8 +753,8 @@ body {
         </svg>
       </div>
       <span class="nav-label">Accueil</span>
-    </button>
-    <button class="nav-item" data-tab="movie">
+    </a>
+    <a href="seall.html" class="nav-item">
       <div class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -1184,7 +762,7 @@ body {
         </svg>
       </div>
       <span class="nav-label">Films</span>
-    </button>
+    </a>
     <button class="nav-item" data-tab="search">
       <div class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1214,77 +792,11 @@ body {
     </button>
   </nav>
 
-  <!-- ============================================
-       SEE ALL MODAL - Tout fim nan categories.js
-       ============================================ -->
-  <div class="seeall-overlay" id="seeAllOverlay">
-    <div class="seeall-container">
-      <div class="seeall-header">
-        <h2 class="seeall-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="4" width="20" height="16" rx="2"/>
-            <path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/>
-          </svg>
-          Tous les Films
-        </h2>
-        <button class="seeall-close" id="seeAllClose" aria-label="Fermer">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <div class="seeall-filters" id="seeAllFilters"></div>
-      <div class="seeall-grid" id="seeAllGrid"></div>
-    </div>
-  </div>
-
-  <!-- PLAYER MODAL -->
-  <div class="modal-overlay" id="playerModal">
-    <div class="glass-card player-card">
-      <button class="modal-close" id="closePlayer">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 6L6 18M6 6l12 12"/>
-        </svg>
-      </button>
-      <div class="video-wrapper">
-        <video id="videoPlayer" controls playsinline></video>
-      </div>
-      <div class="player-info" id="playerInfo"></div>
-    </div>
-  </div>
-
-  <!-- AUTH MODAL -->
-  <div class="modal-overlay" id="authModal">
-    <div class="glass-card auth-card">
-      <button class="modal-close" id="closeAuth">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 6L6 18M6 6l12 12"/>
-        </svg>
-      </button>
-      <h2 class="auth-title">Bienvenue sur BLAST FLIX</h2>
-      <p class="auth-sub">Choisissez comment continuer</p>
-      <button class="auth-option" id="loginBtn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-          <path d="M10 17l5-5-5-5M15 12H3"/>
-        </svg>
-        <span>Se Connecter avec un Compte</span>
-      </button>
-      <button class="auth-option" id="guestBtn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
-        </svg>
-        <span>Continuer sans Compte</span>
-      </button>
-    </div>
-  </div>
-
   <!-- ADS -->
   <div class="ads-overlay" id="adsOverlay">
     <div class="ads-card">
       <span class="ads-tag">Sponsorisé</span>
-      <button class="ads-close" id="adsClose" aria-label="Fermer">
+      <button class="ads-close" id="adsClose">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <path d="M18 6L6 18M6 6l12 12"/>
         </svg>
@@ -1295,20 +807,15 @@ body {
         </svg>
       </div>
       <h2 class="ads-title">Suivez BLAST TEAM !</h2>
-      <p class="ads-subtitle">
-        Rejoignez <strong>@BLAST TEAM</strong> sur WhatsApp pour les nouveaux films et annonces exclusives !
-      </p>
+      <p class="ads-subtitle">Rejoignez <strong>@BLAST TEAM</strong> sur WhatsApp pour les nouveaux films !</p>
       <a href="https://whatsapp.com/channel/0029Vb6tw1G42Dcja42wiY3R" target="_blank" rel="noopener" class="ads-btn" id="adsFollow">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/>
-        </svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg>
         Suivre le Canal
       </a>
       <button class="ads-later" id="adsLater">Plus tard</button>
     </div>
   </div>
 
-  <!-- SCRIPTS -->
   <script>
     // LOADER
     window.addEventListener('load', () => {
@@ -1320,31 +827,228 @@ body {
     (function () {
       let adsShown = false;
       let adsClosed = sessionStorage.getItem("blast_ads_closed");
-      function showAds() {
-        if (adsShown || adsClosed) return;
-        adsShown = true;
-        document.getElementById('adsOverlay')?.classList.add('active');
-      }
       function closeAds() {
         document.getElementById('adsOverlay')?.classList.remove('active');
         sessionStorage.setItem("blast_ads_closed", "1");
         adsClosed = "1";
       }
-      setTimeout(showAds, 2500);
+      if (!adsClosed) {
+        setTimeout(() => {
+          if (adsShown) return;
+          adsShown = true;
+          document.getElementById('adsOverlay')?.classList.add('active');
+        }, 2500);
+      }
       document.getElementById('adsClose')?.addEventListener('click', closeAds);
       document.getElementById('adsLater')?.addEventListener('click', closeAds);
       document.getElementById('adsOverlay')?.addEventListener('click', (e) => {
         if (e.target.id === 'adsOverlay') closeAds();
       });
       document.getElementById('adsFollow')?.addEventListener('click', () => setTimeout(closeAds, 300));
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeAds();
-      });
     })();
   </script>
 
-  <script src="categories.js"></script>
-  <script src="player.js"></script>
-  <script src="app.js"></script>
+  <script>
+    // ============================================
+    // 🎬 MOVIES DATA + RENDER
+    // ============================================
+    (function () {
+      const MOVIES = [
+        {
+          title: "Train Dreams",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg",
+          year: "2025", rating: 7.7, genre: "Drama",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          desc: "Based on Denis Johnson's beloved novella, Train Dreams is the moving portrait of Robert Grainier, a logger and railroad worker who leads a life of unexpected depth and beauty."
+        },
+        {
+          title: "Stranger Things",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg",
+          year: "2016", rating: 8.6, genre: "Drama",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          desc: "In 1980s Indiana, a group of young friends witness supernatural forces and secret government exploits."
+        },
+        {
+          title: "Bel-Air",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/b7092c27e35d9b58b31fd679e35ed6ea.jpg",
+          year: "2022", rating: 6.4, genre: "Drama",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          desc: "The life of a teen is forever transformed when he moves from the streets of west Philadelphia to live with his relatives."
+        },
+        {
+          title: "The Abandons",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/fa46824a82234b25f90dea876a85da84.jpg",
+          year: "2025", rating: 6.7, genre: "Western",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          desc: "When a corrupt force of wealth and power covets the lands of a group of diverse families."
+        },
+        {
+          title: "Now You See Me: Now You Don't",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg",
+          year: "2025", rating: 6.3, genre: "Crime",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+          desc: "A diamond heist reunites retired Horsemen illusionists with new performers."
+        },
+        {
+          title: "Troll 2",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/08db8bc2c65a6fd73be7295ed5ce38b7.jpg",
+          year: "2025", rating: 7.0, genre: "Action",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+          desc: "Nora, Andreas and Captain Kris leap back into action when a dangerous new troll awakes."
+        },
+        {
+          title: "Regretting You",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/51195406c983bc7d69f71487426ca0b3.jpg",
+          year: "2025", rating: 6.0, genre: "Romance",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+          desc: "A mother and daughter must grapple with what's left after a devastating accident."
+        },
+        {
+          title: "The Witcher",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/11/25/a0556db0b6923ac7c210fe8b92168135.jpg",
+          year: "2019", rating: 7.9, genre: "Action",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          desc: "Geralt of Rivia, a solitary monster hunter, struggles to find his place in a world."
+        },
+        {
+          title: "Landman",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/fb97784b6e658e8c6d7813fb0cd8975d.jpg",
+          year: "2024", rating: 8.2, genre: "Drama",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          desc: "A modern-day tale of fortune seeking in the world of West Texas oil rigs."
+        },
+        {
+          title: "Dear X",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/4c259736189c9a20e42e96a5dd7e5c73.jpg",
+          year: "2025", rating: 6.8, genre: "Crime",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          desc: "A woman dons a mask to flee her situation and rise to power."
+        },
+        {
+          title: "Taxi Driver",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/96a9c51973ee296b4539d48c40740ad2.jpg",
+          year: "2021", rating: 8.1, genre: "Action",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          desc: "The story of a deluxe taxi driver who gets revenge on behalf of his passengers."
+        },
+        {
+          title: "Ajosepo",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/b04aa69cc737d9c8b23dd69b60cf2f13.jpg",
+          year: "2024", rating: 8.8, genre: "Comedy",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          desc: "A young couple must deal with all kinds of family tensions on the eve of their wedding."
+        },
+        {
+          title: "Maxton Hall",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/ff6604f0c8c3c65e866442a4230f5bea.jpeg",
+          year: "2024", rating: 7.5, genre: "Romance",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+          desc: "Quick-witted scholarship student Ruby unwittingly witnesses a secret at Maxton Hall."
+        },
+        {
+          title: "Last Samurai Standing",
+          poster: "https://pbcdnw.aoneroom.com/image/2025/11/12/71475ce6dd9c4d383c844d29a17a5435.jpg",
+          year: "2025", rating: 7.6, genre: "Action",
+          video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          desc: "In 1878, 292 samurais gather for a battle royale lured by a 100 billion yen prize."
+        }
+      ];
+
+      const grid = document.getElementById('movieGrid');
+      if (!grid) return;
+
+      grid.innerHTML = MOVIES.map(m => {
+        // URL pou player.html
+        const params = new URLSearchParams({
+          title: m.title,
+          poster: m.poster,
+          year: m.year,
+          rating: m.rating,
+          genre: m.genre,
+          video: m.video,
+          desc: m.desc
+        });
+        const playerUrl = `player.html?${params.toString()}`;
+
+        return `
+          <div class="movie-card" data-cat="${m.genre}">
+            <div class="movie-poster-wrap">
+              <a href="${playerUrl}">
+                <img class="movie-poster" src="${m.poster}" alt="${m.title}" loading="lazy">
+              </a>
+              <div class="rating-badge">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                ${m.rating}
+              </div>
+              <!-- BOUTON PLAY SVG ANLÈ, PA DERANJE POSTER -->
+              <a href="${playerUrl}" class="play-overlay-btn" title="Regarder">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </a>
+            </div>
+            <div class="movie-info">
+              <div class="movie-title">${m.title}</div>
+              <div class="movie-meta">
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  ${m.year}
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/></svg>
+                  ${m.genre}
+                </span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Filtre pa kategori
+      document.querySelectorAll('#categoryTabs .cat-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('#categoryTabs .cat-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          const cat = pill.dataset.cat;
+          grid.querySelectorAll('.movie-card').forEach(card => {
+            if (cat === 'all' || card.dataset.cat === cat) {
+              card.style.display = '';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      // Bottom nav buttons
+      document.querySelectorAll('.nav-item[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.classList.add('rippling');
+          setTimeout(() => btn.classList.remove('rippling'), 600);
+          const tab = btn.dataset.tab;
+          if (tab === 'search') {
+            document.getElementById('searchOverlay')?.classList.add('active');
+            setTimeout(() => document.getElementById('searchInput')?.focus(), 100);
+          }
+        });
+      });
+
+      // Search
+      document.getElementById('searchBtn')?.addEventListener('click', () => {
+        document.getElementById('searchOverlay')?.classList.add('active');
+        setTimeout(() => document.getElementById('searchInput')?.focus(), 100);
+      });
+      document.getElementById('closeSearch')?.addEventListener('click', () => {
+        document.getElementById('searchOverlay')?.classList.remove('active');
+      });
+      document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        grid.querySelectorAll('.movie-card').forEach(card => {
+          const title = card.querySelector('.movie-title').textContent.toLowerCase();
+          card.style.display = (!q || title.includes(q)) ? '' : 'none';
+        });
+      });
+    })();
+  </script>
 </body>
   </html>
