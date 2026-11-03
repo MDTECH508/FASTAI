@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="BLAST FLIX - Regardez les meilleurs films et séries en HD gratuitement." />
+  <title>BLAST FLIX - Films & Séries en HD</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+/* ============ RESET ============ */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --gray-100: #f3f4f6; --gray-400: #9ca3af; --gray-600: #4b5563;
+  --black: #0a0a0a;
+  --neon-cyan: #00f0ff; --neon-pink: #ff00e5; --neon-purple: #a855f7;
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --text-primary: #f3f4f6;
+  --text-secondary: rgba(209, 213, 219, 0.65);
+  --radius: 22px; --radius-sm: 14px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  background: var(--black); color: var(--text-primary);
+  min-height: 100vh; overflow-x: hidden;
+  padding-bottom: 120px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============ BACKGROUND ============ */
+.bg-orbs {
+  position: fixed; inset: 0; z-index: -1;
+  overflow: hidden; pointer-events: none;
+}
+.orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(100px); opacity: 0.35;
+  animation: float 22s ease-in-out infinite;
+  will-change: transform;
+}
+.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #6b7280, transparent 70%); top: -150px; left: -120px; }
+.orb-2 { width: 600px; height: 600px; background: radial-gradient(circle, #9ca3af, transparent 70%); bottom: -220px; right: -160px; animation-delay: -8s; }
+.orb-3 { width: 420px; height: 420px; background: radial-gradient(circle, #4b5563, transparent 70%); top: 40%; left: 50%; animation-delay: -15s; }
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, -40px) scale(1.1); }
+  66% { transform: translate(-40px, 50px) scale(0.95); }
+}
+
+/* ============ GLASS ============ */
+.glass-card, .glass-header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(26px) saturate(160%);
+  -webkit-backdrop-filter: blur(26px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ============ HEADER ============ */
+.glass-header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  border-top: none; border-left: none; border-right: none;
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-icon {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--neon-cyan);
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
+}
+.logo-text {
+  font-size: 20px; font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+}
+.nav-links { display: flex; gap: 22px; }
+.nav-links a {
+  color: var(--text-secondary); text-decoration: none;
+  font-size: 14px; font-weight: 600;
+  transition: all var(--transition);
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+  transform: scaleX(0);
+  transition: transform var(--transition);
+}
+.nav-links a.active, .nav-links a:hover { color: var(--gray-100); }
+.nav-links a.active::after, .nav-links a:hover::after { transform: scaleX(1); }
+.header-actions { display: flex; gap: 8px; }
+.icon-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all var(--transition);
+  backdrop-filter: blur(10px);
+}
+.icon-btn:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+  transform: scale(1.05);
+}
+
+/* ============ SEARCH ============ */
+.search-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(20px);
+  z-index: 200;
+  display: none;
+  align-items: flex-start; justify-content: center;
+  padding-top: 120px;
+  animation: fadeIn 0.3s ease;
+}
+.search-overlay.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.search-box {
+  width: 90%; max-width: 600px;
+  padding: 8px 8px 8px 24px;
+  border-radius: 50px;
+  display: flex; align-items: center; gap: 12px;
+}
+.search-box input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text-primary); font-size: 16px; padding: 12px 0;
+  font-family: inherit;
+}
+.search-box input::placeholder { color: var(--text-secondary); }
+
+/* ============ HERO ============ */
+.hero {
+  margin: 20px; border-radius: var(--radius); overflow: hidden;
+  position: relative; min-height: 420px;
+  display: flex; align-items: flex-end; padding: 32px;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  filter: blur(3px) brightness(0.4) grayscale(0.3);
+  transform: scale(1.05);
+  z-index: 0;
+  transition: background-image 0.8s ease-in-out;
+}
+.hero-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,10,10,0.98) 10%, transparent 75%);
+}
+.hero-content { position: relative; z-index: 2; max-width: 620px; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 229, 0.2));
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 50px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+.hero-title {
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 14px;
+  text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+}
+.hero-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-bottom: 14px; font-size: 14px;
+  color: var(--text-secondary);
+}
+.hero-meta span {
+  padding: 4px 10px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.hero-desc {
+  font-size: 15px; line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 22px; max-width: 520px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ============ BUTTONS ============ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 26px;
+  border-radius: 50px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; border: none;
+  transition: all var(--transition);
+  font-family: inherit; text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+  color: #050505;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 45px rgba(0, 240, 255, 0.8);
+}
+.btn-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  backdrop-filter: blur(20px);
+}
+.btn-glass:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+}
+
+/* ============ CATEGORIES ============ */
+.category-tabs {
+  display: flex; gap: 10px;
+  padding: 0 20px 20px;
+  overflow-x: auto; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+.cat-pill {
+  padding: 10px 20px;
+  border-radius: 50px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 13px; font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition);
+  backdrop-filter: blur(10px);
+  font-family: inherit;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.cat-pill i { font-size: 14px; }
+.cat-pill.active, .cat-pill:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(255, 0, 229, 0.1));
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+.cat-pill.active i { filter: drop-shadow(0 0 6px currentColor); }
+
+/* ============ CONTENT ============ */
+.content { padding: 0 20px; }
+.section { margin-bottom: 40px; }
+.section-header {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 18px;
+}
+.section-title {
+  font-size: 20px; font-weight: 800;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title i {
+  color: var(--neon-cyan);
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6));
+}
+.see-all {
+  background: none; border: none;
+  color: var(--text-secondary);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+  text-decoration: none;
+  display: flex; align-items: center; gap: 4px;
+}
+.see-all:hover {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+}
+
+/* ============ MOVIE GRID ============ */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+.movie-card {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.movie-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 12px 40px rgba(0, 240, 255, 0.25);
+}
+.movie-poster-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2/3;
+  overflow: hidden;
+}
+.movie-poster {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  transition: transform 0.35s ease;
+}
+.movie-card:hover .movie-poster { transform: scale(1.05); }
+.movie-info { padding: 10px 12px; }
+.movie-title {
+  font-size: 13px; font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+  transition: color 0.3s;
+}
+.movie-card:hover .movie-title { color: var(--neon-cyan); }
+.movie-meta {
+  display: flex; gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+.movie-meta span {
+  display: inline-flex; align-items: center; gap: 3px;
+}
+.movie-meta i { font-size: 10px; opacity: 0.8; }
+
+.rating-badge {
+  position: absolute; top: 8px; right: 8px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  font-size: 11px; font-weight: 700;
+  color: var(--gray-100);
+  display: flex; align-items: center; gap: 3px;
+  z-index: 3;
+}
+.rating-badge i {
+  color: #ffd700;
+  font-size: 10px;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+}
+
+.play-overlay-btn {
+  position: absolute;
+  bottom: 10px; left: 10px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: rgba(0, 240, 255, 0.3);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid var(--neon-cyan);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+  pointer-events: none;
+}
+.play-overlay-btn i { font-size: 16px; margin-left: 2px; }
+.movie-card:hover .play-overlay-btn {
+  background: rgba(0, 240, 255, 0.7);
+  transform: scale(1.15);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.9);
+}
+
+/* ============ SKELETON ============ */
+.skeleton-card {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+}
+.skeleton-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.skeleton-info { padding: 10px 12px; }
+.skeleton-line {
+  height: 12px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.skeleton-line.short { width: 60%; }
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============ EMPTY STATE ============ */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-secondary);
+}
+.empty-state i {
+  font-size: 64px;
+  color: rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+  display: block;
+}
+.empty-state p { font-size: 16px; margin-bottom: 8px; }
+.empty-state small { font-size: 13px; opacity: 0.6; }
+
+/* ============ FOOTER ============ */
+.site-footer {
+  text-align: center;
+  padding: 50px 20px 140px;
+  border-top: 1px solid var(--glass-border);
+  margin-top: 30px;
+}
+.footer-logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 18px; font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--gray-100);
+  margin-bottom: 10px;
+}
+.footer-logo i { color: var(--neon-cyan); }
+.powered {
+  font-size: 13px; color: var(--text-secondary);
+  margin-bottom: 24px; letter-spacing: 0.5px;
+}
+.grad-text {
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+.footer-links {
+  display: flex; justify-content: center; gap: 22px;
+  flex-wrap: wrap; margin-bottom: 20px;
+}
+.footer-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color var(--transition);
+}
+.footer-links a:hover { color: var(--neon-cyan); }
+.copyright { font-size: 12px; color: var(--gray-600); }
+
+/* ============ BOTTOM NAV ============ */
+.bottom-nav {
+  position: fixed; bottom: 16px; left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px); max-width: 480px;
+  border-radius: var(--radius);
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 8px 6px; z-index: 90;
+  background: rgba(15, 15, 15, 0.75);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.6), 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+}
+.nav-item {
+  position: relative;
+  background: none; border: none;
+  color: var(--text-secondary);
+  display: flex; flex-direction: column; align-items: center;
+  gap: 3px;
+  padding: 8px 14px; border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: inherit; font-size: 10px; font-weight: 600;
+  letter-spacing: 0.3px; overflow: hidden;
+  text-decoration: none;
+}
+.nav-item i {
+  font-size: 20px;
+  transition: all 0.35s ease;
+}
+.nav-item .nav-label { transition: all 0.3s ease; opacity: 0.75; }
+.nav-item:hover { color: var(--gray-100); background: rgba(255, 255, 255, 0.04); }
+.nav-item.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(255, 0, 229, 0.10) 100%);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.05);
+}
+.nav-item.active i {
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.9));
+  animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-item.active .nav-label {
+  opacity: 1;
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.7);
+  color: #ffffff;
+}
+.nav-item.active::after {
+  content: '';
+  position: absolute; bottom: 4px; left: 50%;
+  transform: translateX(-50%);
+  width: 16px; height: 2px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+@keyframes iconPop {
+  0% { transform: scale(0.8) rotate(-8deg); }
+  50% { transform: scale(1.2) rotate(4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ============ LOADER ============ */
+.loader-overlay {
+  position: fixed; inset: 0;
+  background: #050505; z-index: 999;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.loader-overlay.hidden {
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+.loader-logo {
+  width: 120px; height: 120px;
+  filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.4)) drop-shadow(0 0 40px rgba(255, 0, 229, 0.2));
+}
+.loader-logo .logo-path {
+  fill: none; stroke-width: 6;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 700; stroke-dashoffset: 700;
+  animation: drawPath 2.2s ease-in-out infinite;
+}
+.loader-logo .logo-path-cyan { stroke: var(--neon-cyan); }
+.loader-logo .logo-path-pink { stroke: var(--neon-pink); opacity: 0.85; animation-delay: 0.15s; }
+@keyframes drawPath {
+  0% { stroke-dashoffset: 700; opacity: 0.3; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -700; opacity: 0.3; }
+}
+.loader-text {
+  font-size: 22px; font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, #4b5563 0%, #e5e7eb 25%, #ffffff 50%, #e5e7eb 75%, #4b5563 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerText 2s linear infinite;
+}
+@keyframes shimmerText {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.loader-sub {
+  font-size: 11px; color: var(--gray-600);
+  letter-spacing: 3px; text-transform: uppercase; opacity: 0.7;
+}
+.loader-dots { display: flex; gap: 6px; }
+.loader-dots span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gray-400);
+  animation: bounce 1.2s ease-in-out infinite;
+}
+.loader-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loader-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ============ TOAST ============ */
+.toast {
+  position: fixed; bottom: 120px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #f3f4f6;
+  padding: 14px 24px;
+  border-radius: 50px;
+  font-size: 14px; font-weight: 600;
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: calc(100% - 40px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============ ADS ============ */
+.ads-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  z-index: 500;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.ads-overlay.active { display: flex; animation: adsFadeIn 0.5s ease; }
+@keyframes adsFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.ads-card {
+  position: relative; max-width: 420px; width: 100%;
+  background: linear-gradient(145deg, rgba(20, 25, 20, 0.98), rgba(15, 20, 15, 0.98));
+  border: 1px solid rgba(37, 211, 102, 0.4);
+  border-radius: 26px;
+  padding: 32px 26px 26px;
+  text-align: center;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 60px rgba(37, 211, 102, 0.25);
+  animation: adsSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes adsSlideUp {
+  from { transform: translateY(60px) scale(0.9); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.ads-close {
+  position: absolute; top: 12px; right: 12px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+  z-index: 10;
+}
+.ads-close:hover { background: rgba(255, 255, 255, 0.2); transform: rotate(90deg); }
+.ads-tag {
+  position: absolute; top: 12px; left: 12px;
+  padding: 3px 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+.ads-wa-icon {
+  width: 80px; height: 80px;
+  margin: 0 auto 16px; border-radius: 50%;
+  background: linear-gradient(135deg, #25D366, #1da851);
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  box-shadow: 0 0 30px rgba(37, 211, 102, 0.6);
+  animation: adsPulse 2.5s ease-in-out infinite;
+}
+@keyframes adsPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.ads-wa-icon i { font-size: 44px; }
+.ads-title {
+  font-size: 20px; font-weight: 800;
+  color: #25D366;
+  margin-bottom: 8px;
+}
+.ads-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+.ads-subtitle strong { color: #25D366; font-weight: 700; }
+.ads-btn {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, #25D366, #1da851);
+  border: none; border-radius: 50px;
+  color: #fff;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  text-decoration: none;
+  transition: all var(--transition);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+.ads-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(37, 211, 102, 0.6);
+}
+.ads-later {
+  background: none; border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px; cursor: pointer;
+  font-family: inherit;
+  padding: 8px;
+}
+.ads-later:hover { color: rgba(255, 255, 255, 0.9); }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero { min-height: 340px; padding: 24px; margin: 14px; }
+  .movie-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+  .content { padding: 0 14px; }
+  .bottom-nav { bottom: 10px; width: calc(100% - 20px); }
+  .nav-item { padding: 6px 12px; }
+  .nav-item i { font-size: 18px; }
+  .nav-item .nav-label { font-size: 9px; }
+  .play-overlay-btn { width: 36px; height: 36px; bottom: 8px; left: 8px; }
+  .play-overlay-btn i { font-size: 14px; }
+  .logo-text { font-size: 17px; }
+  .hero-title { font-size: 24px; }
+}
+  </style>
+</head>
+<body>
+
+  <!-- LOADER -->
+  <div class="loader-overlay" id="loader">
+    <svg class="loader-logo" viewBox="0 0 200 200">
+      <path class="logo-path logo-path-cyan" d="M 40 40 L 100 160 L 160 40" />
+      <path class="logo-path logo-path-pink" d="M 40 40 L 100 100 L 160 40" opacity="0.5" />
+    </svg>
+    <div class="loader-text">BLAST FLIX</div>
+    <div class="loader-sub">Chargement</div>
+    <div class="loader-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="glass-header">
+    <a href="index.html" class="logo">
+      <div class="logo-icon"><i class="fas fa-play-circle"></i></div>
+      <span class="logo-text">BLAST FLIX</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="active">Accueil</a>
+      <a href="seall.html">Films</a>
+      <a href="seall.html">Séries</a>
+      <a href="seall.html">Anime</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="searchBtn" aria-label="Rechercher">
+        <i class="fas fa-search"></i>
+      </button>
+      <button class="icon-btn" id="profileBtn" aria-label="Profil">
+        <i class="fas fa-user"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- SEARCH -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="glass-card search-box">
+      <i class="fas fa-search" style="color:var(--text-secondary);font-size:20px;"></i>
+      <input type="text" id="searchInput" placeholder="Rechercher un film, série, anime..." />
+      <button class="icon-btn" id="closeSearch">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="heroSection">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-content">
+      <span class="hero-badge">
+        <i class="fas fa-fire"></i>
+        TOP TENDANCE
+      </span>
+      <h1 class="hero-title" id="heroTitle">Chargement...</h1>
+      <div class="hero-meta" id="heroMeta"></div>
+      <p class="hero-desc" id="heroDesc"></p>
+      <div class="hero-actions">
+        <a href="#" class="btn btn-primary" id="playHero">
+          <i class="fas fa-play"></i>
+          Regarder
+        </a>
+        <a href="#" class="btn btn-glass" id="infoHero">
+          <i class="fas fa-info-circle"></i>
+          Plus d'infos
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="category-tabs" id="categoryTabs">
+    <button class="cat-pill active" data-cat="all">
+      <i class="fas fa-globe"></i> Tous
+    </button>
+    <button class="cat-pill" data-cat="Trending">
+      <i class="fas fa-fire"></i> Trending
+    </button>
+    <button class="cat-pill" data-cat="Hollywood">
+      <i class="fas fa-film"></i> Hollywood
+    </button>
+    <button class="cat-pill" data-cat="Nollywood">
+      <i class="fas fa-video"></i> Nollywood
+    </button>
+    <button class="cat-pill" data-cat="Anime">
+      <i class="fas fa-dragon"></i> Anime
+    </button>
+    <button class="cat-pill" data-cat="K-Drama">
+      <i class="fas fa-heart"></i> K-Drama
+    </button>
+    <button class="cat-pill" data-cat="Horror">
+      <i class="fas fa-ghost"></i> Horreur
+    </button>
+    <button class="cat-pill" data-cat="Romance">
+      <i class="fas fa-heart"></i> Romance
+    </button>
+    <button class="cat-pill" data-cat="Action">
+      <i class="fas fa-bolt"></i> Action
+    </button>
+    <button class="cat-pill" data-cat="Comedy">
+      <i class="fas fa-face-laugh"></i> Comédie
+    </button>
+  </section>
+
+  <!-- CONTENT -->
+  <main class="content" id="mainContent">
+    <!-- Trending -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-fire"></i>
+          Trending Now
+        </h2>
+        <a href="seall.html?cat=Trending" class="see-all">
+          Voir tout <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="movie-grid" id="movieGridTrending">
+        <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-info"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-info"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-info"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-info"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-info"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-info"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+      </div>
+    </section>
+
+    <!-- Hollywood -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-film"></i>
+          Hollywood
+        </h2>
+        <a href="seall.html?cat=Hollywood" class="see-all">
+          Voir tout <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="movie-grid" id="movieGridHollywood"></div>
+    </section>
+
+    <!-- Nollywood -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-video"></i>
+          Nollywood
+        </h2>
+        <a href="seall.html?cat=Nollywood" class="see-all">
+          Voir tout <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="movie-grid" id="movieGridNollywood"></div>
+    </section>
+
+    <!-- Anime -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-dragon"></i>
+          Anime
+        </h2>
+        <a href="seall.html?cat=Anime" class="see-all">
+          Voir tout <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="movie-grid" id="movieGridAnime"></div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-logo">
+      <i class="fas fa-play-circle"></i>
+      <span>BLAST FLIX</span>
+    </div>
+    <p class="powered">Powered by <span class="grad-text">FAKE FLIX</span></p>
+    <div class="footer-links">
+      <a href="#about">À propos</a>
+      <a href="#privacy">Confidentialité</a>
+      <a href="#terms">Conditions</a>
+    </div>
+    <p class="copyright">© 2026 BLAST FLIX. Tous droits réservés.</p>
+  </footer>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottomNav">
+    <a href="index.html" class="nav-item active">
+      <i class="fas fa-home"></i>
+      <span class="nav-label">Accueil</span>
+    </a>
+    <a href="seall.html" class="nav-item">
+      <i class="fas fa-film"></i>
+      <span class="nav-label">Films</span>
+    </a>
+    <button class="nav-item" data-tab="search">
+      <i class="fas fa-search"></i>
+      <span class="nav-label">Recherche</span>
+    </button>
+    <a href="seall.html" class="nav-item">
+      <i class="fas fa-download"></i>
+      <span class="nav-label">Téléch.</span>
+    </a>
+    <button class="nav-item" data-tab="profile">
+      <i class="fas fa-user"></i>
+      <span class="nav-label">Moi</span>
+    </button>
+  </nav>
+
+  <!-- ADS -->
+  <div class="ads-overlay" id="adsOverlay">
+    <div class="ads-card">
+      <span class="ads-tag">Sponsorisé</span>
+      <button class="ads-close" id="adsClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="ads-wa-icon">
+        <i class="fab fa-whatsapp"></i>
+      </div>
+      <h2 class="ads-title">Suivez BLAST TEAM !</h2>
+      <p class="ads-subtitle">
+        Rejoignez <strong>@BLAST TEAM</strong> sur WhatsApp pour les nouveaux films !
+      </p>
+      <a href="https://whatsapp.com/channel/0029Vb6tw1G42Dcja42wiY3R" target="_blank" rel="noopener" class="ads-btn" id="adsFollow">
+        <i class="fab fa-whatsapp"></i>
+        Suivre le Canal
+      </a>
+      <button class="ads-later" id="adsLater">Plus tard</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  /* ============================================
+     ⚙️ CONFIG
+     ============================================ */
+  const CONFIG = {
+    API_BASE: window.location.hostname === 'localhost' 
+      ? 'http://localhost:3000' 
+      : window.location.origin,
+    PLAYER_PATH: 'player.html',
+    SEALL_PATH: 'seall.html'
+  };
+
+  /* ============================================
+     📊 STATE
+     ============================================ */
+  const STATE = {
+    heroMovies: [],
+    heroIndex: 0,
+    heroTimer: null,
+    allMovies: [],
+    categories: {},
+    searchQuery: '',
+    isLoading: false
+  };
+
+  /* ============================================
+     🎬 FALLBACK DATA
+     ============================================ */
+  const FALLBACK_MOVIES = [
+    { subjectId: "8759851328492438440", title: "Train Dreams", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg" }, releaseDate: "2025-11-21", imdbRatingValue: "7.7", genre: "Drama", description: "Based on Denis Johnson's beloved novella." },
+    { subjectId: "4956801153355891744", title: "Stranger Things", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg" }, releaseDate: "2016-07-15", imdbRatingValue: "8.6", genre: "Drama,Fantasy,Horror", description: "Supernatural forces in Indiana." },
+    { subjectId: "144265366439707640", title: "One Battle After Another", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg" }, releaseDate: "2025-09-26", imdbRatingValue: "8.2", genre: "Action,Crime,Drama", description: "Ex-revolutionaries reunite." },
+    { subjectId: "488603172416769952", title: "Roofman", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg" }, releaseDate: "2025-10-10", imdbRatingValue: "7.2", genre: "Crime,Drama", description: "A criminal hides in a toy store." },
+    { subjectId: "5821547884994614176", title: "Now You See Me", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg" }, releaseDate: "2025-11-14", imdbRatingValue: "6.3", genre: "Crime,Thriller", description: "A diamond heist." },
+    { subjectId: "3646928918696838480", title: "IT: Welcome to Derry", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg" }, releaseDate: "2025-10-26", imdbRatingValue: "7.7", genre: "Horror", description: "A couple moves to Derry, Maine." },
+    { subjectId: "9028867555875774472", title: "Wednesday", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/02/0dbb4e91afb214a1ccebb8a9aa93ce35.jpg" }, releaseDate: "2022-11-23", imdbRatingValue: "8.0", genre: "Comedy,Crime", description: "Wednesday Addams as student." },
+    { subjectId: "1216407338207298384", title: "One Piece", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/01/502f5a9ee6616315a1dd6e3a96256987.jpg" }, releaseDate: "2023-08-31", imdbRatingValue: "8.3", genre: "Action,Adventure", description: "Luffy's epic voyage." },
+    { subjectId: "1716151170995028536", title: "Landman", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/12/02/fb97784b6e658e8c6d7813fb0cd8975d.jpg" }, releaseDate: "2024-11-17", imdbRatingValue: "8.2", genre: "Drama", description: "West Texas oil rigs." },
+    { subjectId: "5260672975765916136", title: "Home Alone", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/01/628d4d8a9f5c798e41e6584298581a13.jpg" }, releaseDate: "1990-11-16", imdbRatingValue: "7.7", genre: "Comedy,Family", description: "A boy defends his home." },
+    { subjectId: "4548438624232169480", title: "The Grinch", cover: { url: "https://pbcdnw.aoneroom.com/image/2023/02/15/0b5a669e3716664cf67b0ad980aeb73b.jpg" }, releaseDate: "2018-11-09", imdbRatingValue: "6.4", genre: "Animation", description: "The grumpy Grinch." },
+    { subjectId: "4923184478689855992", title: "Die Hard 2", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/01/7cb05853b2133cb1d5c0fb00ab751829.jpg" }, releaseDate: "1990-07-03", imdbRatingValue: "7.2", genre: "Action,Thriller", description: "John McClane saves the airport." },
+    { subjectId: "5818215316253462312", title: "Elf", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/01/e99797bc5226ae898ce4bf4badf5e467.jpg" }, releaseDate: "2003-11-07", imdbRatingValue: "7.1", genre: "Comedy,Family", description: "Buddy the oversized elf." },
+    { subjectId: "3650256853168278024", title: "Pluribus", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/12/04/726b78ce1cebbf027af6c8175752d26c.jpg" }, releaseDate: "2025-11-07", imdbRatingValue: "8.4", genre: "Drama,Sci-Fi", description: "A world overtaken by forced happiness." },
+    { subjectId: "4820822255225686840", title: "Dark", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/03/e617d431f604d5f223f1b54ed4b9a44f.jpg" }, releaseDate: "2017-12-01", imdbRatingValue: "8.7", genre: "Crime,Drama", description: "Supernatural family saga." },
+    { subjectId: "575375178381902192", title: "The Institute", cover: { url: "https://pbcdnw.aoneroom.com/image/2025/11/28/24986c763c5904b296c06cce1aee830a.jpg" }, releaseDate: "2025-07-13", imdbRatingValue: "6.7", genre: "Horror", description: "A teen genius wakes up in a strange place." }
+  ];
+
+  /* ============================================
+     🚀 INIT
+     ============================================ */
+  document.addEventListener('DOMContentLoaded', () => {
+    initLoader();
+    initAds();
+    setupEventListeners();
+    loadHomepage();
+  });
+
+  /* ============ LOADER ============ */
+  function initLoader() {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loader')?.classList.add('hidden');
+      }, 800);
+    });
+    // Fallback
+    setTimeout(() => {
+      document.getElementById('loader')?.classList.add('hidden');
+    }, 4000);
+  }
+
+  /* ============ ADS ============ */
+  function initAds() {
+    const adsClosed = sessionStorage.getItem('blast_ads_closed');
+    if (!adsClosed) {
+      setTimeout(() => {
+        document.getElementById('adsOverlay')?.classList.add('active');
+      }, 3000);
+    }
+    
+    function closeAds() {
+      document.getElementById('adsOverlay')?.classList.remove('active');
+      sessionStorage.setItem('blast_ads_closed', '1');
+    }
+    
+    document.getElementById('adsClose')?.addEventListener('click', closeAds);
+    document.getElementById('adsLater')?.addEventListener('click', closeAds);
+    document.getElementById('adsOverlay')?.addEventListener('click', (e) => {
+      if (e.target.id === 'adsOverlay') closeAds();
+    });
+    document.getElementById('adsFollow')?.addEventListener('click', () => {
+      setTimeout(closeAds, 300);
+    });
+  }
+
+  /* ============ EVENT LISTENERS ============ */
+  function setupEventListeners() {
+    // === SEARCH ===
+    const searchBtn = document.getElementById('searchBtn');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const closeSearch = document.getElementById('closeSearch');
+    const searchInput = document.getElementById('searchInput');
+
+    searchBtn?.addEventListener('click', () => {
+      searchOverlay?.classList.add('active');
+      setTimeout(() => searchInput?.focus(), 100);
+    });
+
+    closeSearch?.addEventListener('click', () => {
+      searchOverlay?.classList.remove('active');
+      searchInput.value = '';
+      filterAllSections('');
+    });
+
+    searchOverlay?.addEventListener('click', (e) => {
+      if (e.target === searchOverlay) {
+        searchOverlay.classList.remove('active');
+        searchInput.value = '';
+        filterAllSections('');
+      }
+    });
+
+    searchInput?.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      STATE.searchQuery = q;
+      filterAllSections(q);
+    });
+
+    // ESC key closes search
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchOverlay?.classList.remove('active');
+        searchInput.value = '';
+        filterAllSections('');
+      }
+    });
+
+    // === PROFILE ===
+    document.getElementById('profileBtn')?.addEventListener('click', () => {
+      showToast('👤 Mode invité');
+    });
+
+    // === BOTTOM NAV ===
+    document.querySelectorAll('.nav-item[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        if (tab === 'search') {
+          searchOverlay?.classList.add('active');
+          setTimeout(() => searchInput?.focus(), 100);
+        } else if (tab === 'profile') {
+          showToast('👤 Mode invité');
+        }
+      });
+    });
+
+    // === CATEGORY PILLS ===
+    document.querySelectorAll('.cat-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const cat = pill.dataset.cat;
+        handleCategoryClick(cat);
+      });
+    });
+
+    // === HERO BUTTONS (default, replaced after data loads) ===
+    document.getElementById('playHero')?.addEventListener('click', (e) => {
+      if (STATE.heroMovies.length > 0) {
+        e.preventDefault();
+        const movie = STATE.heroMovies[STATE.heroIndex];
+        window.location.href = buildPlayerUrl(movie);
+      }
+    });
+
+    document.getElementById('infoHero')?.addEventListener('click', (e) => {
+      if (STATE.heroMovies.length > 0) {
+        e.preventDefault();
+        const movie = STATE.heroMovies[STATE.heroIndex];
+        window.location.href = buildPlayerUrl(movie);
+      }
+    });
+  }
+
+  /* ============ CATEGORY HANDLER ============ */
+  function handleCategoryClick(cat) {
+    if (cat === 'all') {
+      renderAllSections();
+      return;
+    }
+
+    // Search for matching category in STATE.categories
+    const categoryKeys = {
+      'Trending': ['Trending Now🔥', 'Trending Now', 'Trending'],
+      'Hollywood': ['Hollywood Movie', 'Hollywood Movies', 'Hollywood'],
+      'Nollywood': ['Nollywood', 'Latest Nollywood Movies', 'Nollywood Movies'],
+      'Anime': ['Anime[English Dubbed]', 'Anime', 'Anime Series'],
+      'K-Drama': ['K-Drama', 'Korean Drama', 'K-Drama Series'],
+      'Horror': ['Horror Movies', 'Horror', 'Horror Series'],
+      'Romance': ['💓Teen Romance 💓', 'Romance', 'Romance Movies', 'Teen Romance'],
+      'Action': ['Action Movies', 'Action', 'Action Series'],
+      'Comedy': ['Comedy Movies', 'Comedy', 'Comedy Series']
+    };
+
+    const keysToTry = categoryKeys[cat] || [cat];
+    let movies = [];
+    
+    for (const key of keysToTry) {
+      if (STATE.categories[key]) {
+        movies = STATE.categories[key];
+        break;
+      }
+    }
+
+    // If no category found, filter from allMovies by genre
+    if (movies.length === 0) {
+      movies = STATE.allMovies.filter(m => 
+        (m.genre || '').toLowerCase().includes(cat.toLowerCase())
+      );
+    }
+
+    // Render in main content
+    const mainContent = document.getElementById('mainContent');
+    if (mainContent) {
+      mainContent.innerHTML = `
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-filter"></i>
+              ${cat}
+            </h2>
+            <span style="font-size:13px;color:var(--text-secondary);">${movies.length} films</span>
+          </div>
+          <div class="movie-grid" id="filteredGrid"></div>
+        </section>
+      `;
+      
+      const grid = document.getElementById('filteredGrid');
+      if (grid) {
+        if (movies.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-film"></i>
+              <p>Aucun film dans cette catégorie</p>
+              <small>Essayez une autre catégorie</small>
+            </div>
+          `;
+        } else {
+          grid.innerHTML = movies.map(createMovieCard).join('');
+        }
+      }
+    }
+  }
+
+  /* ============ LOAD HOMEPAGE ============ */
+  async function loadHomepage() {
+    try {
+      console.log('🔍 Chargement homepage depuis API...');
+      
+      const res = await fetch(`${CONFIG.API_BASE}/api/homepage`, {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      
+      const data = await res.json();
+      console.log('✅ Homepage data:', data);
+
+      const homepageData = data.data || data;
+      
+      if (!homepageData || !homepageData.operatingList) {
+        throw new Error('Invalid homepage data');
+      }
+
+      // Extract categories
+      homepageData.operatingList.forEach(cat => {
+        if (cat.type === 'SUBJECTS_MOVIE' && cat.subjects && cat.subjects.length > 0) {
+          STATE.categories[cat.title] = cat.subjects;
+          STATE.allMovies.push(...cat.subjects);
+        }
+      });
+
+      console.log('✅ Categories loaded:', Object.keys(STATE.categories));
+      console.log('✅ Total movies:', STATE.allMovies.length);
+
+      // Setup hero
+      const trending = STATE.categories['Trending Now🔥'] || 
+                       STATE.categories['Trending Now'] || 
+                       STATE.categories['Trending'] || 
+                       STATE.allMovies.slice(0, 10);
+      
+      if (trending.length > 0) {
+        STATE.heroMovies = trending.slice(0, 10);
+        updateHero();
+        startHeroRotation();
+      }
+
+      // Render all sections
+      renderAllSections();
+
+    } catch (err) {
+      console.error('❌ API error:', err.message);
+      console.log('🎬 Using fallback data...');
+      useFallbackData();
+    }
+  }
+
+  /* ============ FALLBACK ============ */
+  function useFallbackData() {
+    STATE.allMovies = FALLBACK_MOVIES;
+    STATE.categories['Trending Now🔥'] = FALLBACK_MOVIES.slice(0, 10);
+    STATE.categories['Hollywood Movie'] = FALLBACK_MOVIES.filter(m => 
+      m.genre.toLowerCase().includes('action') || m.genre.toLowerCase().includes('crime')
+    );
+    STATE.categories['Nollywood'] = FALLBACK_MOVIES.filter(m => 
+      m.genre.toLowerCase().includes('drama')
+    );
+    STATE.categories['Anime[English Dubbed]'] = FALLBACK_MOVIES.filter(m => 
+      m.genre.toLowerCase().includes('animation')
+    );
+    
+    STATE.heroMovies = FALLBACK_MOVIES.slice(0, 5);
+    updateHero();
+    startHeroRotation();
+    renderAllSections();
+  }
+
+  /* ============ RENDER SECTIONS ============ */
+  function renderAllSections() {
+    renderSection('movieGridTrending', 
+      STATE.categories['Trending Now🔥'] || 
+      STATE.categories['Trending Now'] || 
+      STATE.categories['Trending'] || 
+      STATE.allMovies.slice(0, 12)
+    );
+    
+    renderSection('movieGridHollywood', 
+      STATE.categories['Hollywood Movie'] || 
+      STATE.categories['Hollywood'] || 
+      STATE.allMovies.filter(m => (m.genre || '').toLowerCase().includes('action')).slice(0, 12)
+    );
+    
+    renderSection('movieGridNollywood', 
+      STATE.categories['Nollywood'] || 
+      STATE.categories['Latest Nollywood Movies'] || 
+      STATE.allMovies.filter(m => (m.genre || '').toLowerCase().includes('drama')).slice(0, 12)
+    );
+    
+    renderSection('movieGridAnime', 
+      STATE.categories['Anime[English Dubbed]'] || 
+      STATE.categories['Anime'] || 
+      STATE.allMovies.filter(m => (m.genre || '').toLowerCase().includes('animation')).slice(0, 12)
+    );
+  }
+
+  function renderSection(containerId, movies) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!movies || movies.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-film"></i>
+          <p>Aucun film disponible</p>
+          <small>Revenez plus tard</small>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = movies.slice(0, 12).map(createMovieCard).join('');
+  }
+
+  function createMovieCard(movie) {
+    const rating = movie.imdbRatingValue && movie.imdbRatingValue !== '0' && movie.imdbRatingValue !== 'N/A'
+      ? movie.imdbRatingValue 
+      : null;
+    const year = (movie.releaseDate || '').split('-')[0] || '';
+    const genre = (movie.genre || '').split(',')[0] || '';
+    const poster = movie.cover?.url || movie.thumbnail || 'https://via.placeholder.com/300x450/1a1a1a/666?text=No+Image';
+    const playerUrl = buildPlayerUrl(movie);
+
+    return `
+      <a href="${playerUrl}" class="movie-card" data-genre="${movie.genre || ''}" data-title="${(movie.title || '').replace(/"/g, '&quot;')}">
+        <div class="movie-poster-wrap">
+          <img class="movie-poster" 
+               src="${poster}" 
+               alt="${(movie.title || 'Film').replace(/"/g, '&quot;')}" 
+               loading="lazy"
+               onerror="this.src='https://via.placeholder.com/300x450/1a1a1a/666?text=No+Image'">
+          ${rating ? `
+            <div class="rating-badge">
+              <i class="fas fa-star"></i>
+              ${rating}
+            </div>
+          ` : ''}
+          <div class="play-overlay-btn">
+            <i class="fas fa-play"></i>
+          </div>
+        </div>
+        <div class="movie-info">
+          <div class="movie-title">${movie.title || 'Sans titre'}</div>
+          <div class="movie-meta">
+            ${year ? `<span><i class="fas fa-calendar"></i> ${year}</span>` : ''}
+            ${genre ? `<span><i class="fas fa-tag"></i> ${genre}</span>` : ''}
+          </div>
+        </div>
+      </a>
+    `;
+  }
+
+  /* ============ BUILD PLAYER URL ============ */
+  function buildPlayerUrl(movie) {
+    const params = new URLSearchParams({
+      subjectId: movie.subjectId || '',
+      title: movie.title || 'Film',
+      poster: movie.cover?.url || movie.thumbnail || '',
+      year: (movie.releaseDate || '').split('-')[0] || '',
+      rating: movie.imdbRatingValue || '',
+      genre: movie.genre || '',
+      desc: movie.description || ''
+    });
+    return `${CONFIG.PLAYER_PATH}?${params.toString()}`;
+  }
+
+  /* ============ HERO ============ */
+  function updateHero() {
+    if (!STATE.heroMovies.length) return;
+    const movie = STATE.heroMovies[STATE.heroIndex];
+    
+    const heroBg = document.getElementById('heroBg');
+    const heroTitle = document.getElementById('heroTitle');
+    const heroMeta = document.getElementById('heroMeta');
+    const heroDesc = document.getElementById('heroDesc');
+    const playHero = document.getElementById('playHero');
+    const infoHero = document.getElementById('infoHero');
+    
+    if (heroBg) heroBg.style.backgroundImage = `url(${movie.cover?.url || movie.thumbnail || ''})`;
+    if (heroTitle) heroTitle.textContent = movie.title || 'Sans titre';
+    if (heroMeta) {
+      const year = (movie.releaseDate || '').split('-')[0];
+      const genre = (movie.genre || '').split(',')[0];
+      heroMeta.innerHTML = `
+        ${year ? `<span><i class="fas fa-calendar"></i> ${year}</span>` : ''}
+        ${movie.imdbRatingValue ? `<span><i class="fas fa-star" style="color:#ffd700"></i> ${movie.imdbRatingValue}</span>` : ''}
+        ${genre ? `<span><i class="fas fa-tag"></i> ${genre}</span>` : ''}
+      `;
+    }
+    if (heroDesc) heroDesc.textContent = movie.description || '';
+    
+    const playerUrl = buildPlayerUrl(movie);
+    if (playHero) playHero.href = playerUrl;
+    if (infoHero) infoHero.href = playerUrl;
+  }
+
+  function startHeroRotation() {
+    if (STATE.heroTimer) clearInterval(STATE.heroTimer);
+    STATE.heroTimer = setInterval(() => {
+      STATE.heroIndex = (STATE.heroIndex + 1) % STATE.heroMovies.length;
+      updateHero();
+    }, 6000);
+  }
+
+  /* ============ FILTER ============ */
+  function filterAllSections(query) {
+    document.querySelectorAll('.movie-card').forEach(card => {
+      if (!query) {
+        card.style.display = '';
+        return;
+      }
+      const title = (card.dataset.title || '').toLowerCase();
+      const genre = (card.dataset.genre || '').toLowerCase();
+      const match = title.includes(query) || genre.includes(query);
+      card.style.display = match ? '' : 'none';
+    });
+
+    // Show "no results" if all hidden
+    if (query) {
+      const visibleCards = Array.from(document.querySelectorAll('.movie-card'))
+        .filter(c => c.style.display !== 'none');
+      
+      if (visibleCards.length === 0) {
+        const grid = document.getElementById('movieGridTrending');
+        if (grid && !grid.querySelector('.no-results')) {
+          // Don't modify - keep showing hidden cards
+        }
+      }
+    }
+  }
+
+  /* ============ TOAST ============ */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.innerHTML = `<i class="fas fa-check-circle" style="color:var(--neon-cyan)"></i> ${msg}`;
+    t.classList.add('show');
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  /* ============ DEBUG ============ */
+  window.BLAST_DEBUG = {
+    state: STATE,
+    categories: () => Object.keys(STATE.categories),
+    loadHomepage: loadHomepage,
+    fallback: useFallbackData
+  };
+
+  console.log('🎬 BLAST FLIX loaded');
+  console.log('💡 Debug: window.BLAST_DEBUG');
+  </script>
+</body>
+  </html>
