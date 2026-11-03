@@ -11,13 +11,15 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
         :root {
-            --black:#000; --charcoal:#121214; --slate:#1c1c1f;
-            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2;
+            --black:#000; --charcoal:#121214; --slate:#1c1c1f; --graphite:#26262a;
+            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --pink:#ff375f;
+            --gold:#ffd700;
             --glass-1:rgba(255,255,255,0.035);
             --glass-2:rgba(255,255,255,0.07);
             --glass-border:rgba(255,255,255,0.09);
             --glass-border-bright:rgba(255,255,255,0.22);
             --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.2);
+            --glass-inner-shadow:inset 0 -1px 0 rgba(0,0,0,0.2);
             --text:#f5f5f7;
             --text-dim:rgba(245,245,247,0.55);
             --text-mute:rgba(245,245,247,0.35);
@@ -33,7 +35,6 @@
             background:var(--black); color:var(--text); min-height:100vh;
             letter-spacing:-0.01em; overflow-x:hidden;
         }
-        
         .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); overflow:hidden; }
         .bg-neo::before {
             content:''; position:absolute; inset:0;
@@ -42,8 +43,6 @@
                 radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.12), transparent);
             filter:blur(80px);
         }
-        
-        /* ===== HEADER ===== */
         .header {
             position:sticky; top:0; z-index:100; padding:12px 16px;
             background:rgba(10,10,12,0.55);
@@ -62,18 +61,15 @@
         }
         .back-btn:hover { border-color:var(--cyan); background:rgba(100,210,255,0.15); }
         .header-title { font-size:15px; font-weight:700; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        
-        /* ===== VIDEO ===== */
         .container { max-width:1000px; margin:0 auto; padding:16px; }
         .video-container {
             position:relative; width:100%; aspect-ratio:16/9; background:#000;
             border-radius:var(--r-lg); overflow:hidden;
             border:1px solid var(--glass-border-bright);
             box-shadow:0 0 40px rgba(100,210,255,0.15), var(--shadow-3), var(--glass-highlight);
-            margin-bottom:18px;
+            margin-bottom:16px;
         }
         .video-container video { width:100%; height:100%; display:block; }
-        
         .plyr-loading-overlay {
             position:absolute; inset:0; display:none; flex-direction:column;
             align-items:center; justify-content:center; background:rgba(0,0,0,0.85);
@@ -89,30 +85,28 @@
         @keyframes spin { to { transform:rotate(360deg); } }
         .loading-text { font-size:12px; font-weight:600; color:var(--text-dim); letter-spacing:2px; text-transform:uppercase; }
         
-        /* ===== INFO CARD ===== */
         .info-card {
             background:var(--glass-1); backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border); border-radius:var(--r-lg);
-            padding:20px; margin-bottom:16px;
+            padding:18px; margin-bottom:14px;
             box-shadow:var(--glass-highlight), var(--shadow-2);
         }
-        .info-header { display:flex; gap:16px; align-items:flex-start; margin-bottom:18px; }
+        .info-header { display:flex; gap:14px; align-items:flex-start; margin-bottom:16px; }
         .info-poster {
-            width:80px; aspect-ratio:2/3; object-fit:cover;
+            width:75px; aspect-ratio:2/3; object-fit:cover;
             border-radius:var(--r-sm); border:1px solid var(--glass-border-bright);
             box-shadow:var(--shadow-2); flex-shrink:0;
         }
         .info-content { flex:1; min-width:0; }
-        .info-title { font-size:20px; font-weight:800; line-height:1.2; margin-bottom:8px; }
+        .info-title { font-size:18px; font-weight:800; line-height:1.2; margin-bottom:6px; }
         .info-meta {
-            display:flex; flex-wrap:wrap; gap:10px;
-            font-size:11px; color:var(--text-dim); font-weight:600; margin-bottom:8px;
+            display:flex; flex-wrap:wrap; gap:8px;
+            font-size:11px; color:var(--text-dim); font-weight:600; margin-bottom:6px;
         }
         .info-meta span { display:inline-flex; align-items:center; gap:4px; }
         .info-meta i { color:var(--cyan); font-size:10px; }
-        .info-genres { font-size:11px; color:var(--text-mute); text-transform:uppercase; letter-spacing:0.5px; }
+        .info-genres { font-size:10px; color:var(--text-mute); text-transform:uppercase; letter-spacing:0.5px; }
         
-        /* ===== PLAY BUTTON (SMALL) ===== */
         .play-btn-small {
             width:100%; padding:13px 18px;
             background:#fff; color:var(--black);
@@ -121,27 +115,29 @@
             font-size:14px; font-weight:800; font-family:inherit;
             transition:all var(--spring);
             box-shadow:0 8px 24px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.5);
-            margin-bottom:12px;
+            margin-bottom:10px;
         }
         .play-btn-small:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5); }
         .play-btn-small i { font-size:13px; }
         
-        /* ===== ACTION ROW (SMALL) ===== */
-        .action-row {
-            display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
-        }
+        .action-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
         .action-btn-mini {
             padding:10px 8px; background:var(--glass-2);
             border:1px solid var(--glass-border); border-radius:var(--r-md);
             color:var(--text); cursor:pointer; font-family:inherit;
             display:flex; flex-direction:column; align-items:center; gap:4px;
             transition:all var(--spring); box-shadow:var(--glass-highlight);
+            position:relative;
         }
         .action-btn-mini:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
-        .action-btn-mini i { font-size:14px; color:var(--cyan); }
+        .action-btn-mini svg {
+            width:20px; height:20px; stroke:var(--cyan); fill:none;
+            stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+            transition:all var(--spring);
+        }
+        .action-btn-mini.active svg { stroke:var(--gold); fill:var(--gold); }
         .action-btn-mini span { font-size:10px; font-weight:600; }
         
-        /* ===== GLASS CARD SMALL ===== */
         .glass-card {
             background:var(--glass-1); backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border); border-radius:var(--r-lg);
@@ -154,10 +150,31 @@
         }
         .glass-card-title i { color:var(--cyan); font-size:13px; }
         
-        /* ===== STORY ===== */
-        .story-text { font-size:13px; line-height:1.6; color:var(--text-dim); }
+        .quality-row { display:flex; gap:8px; flex-wrap:wrap; }
+        .quality-pill {
+            padding:10px 16px; background:var(--glass-2);
+            border:1px solid var(--glass-border); border-radius:50px;
+            color:var(--text); cursor:pointer; font-family:inherit;
+            font-size:12px; font-weight:700; transition:all var(--spring);
+            display:inline-flex; align-items:center; gap:6px;
+            position:relative;
+        }
+        .quality-pill:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
+        .quality-pill.active { border-color:var(--cyan); background:rgba(100,210,255,0.15); color:var(--cyan); }
+        .quality-pill.premium { border-color:rgba(255,215,0,0.4); }
+        .quality-pill.premium .quality-label { color:var(--gold); }
+        .quality-pill.premium.active { border-color:var(--gold); background:rgba(255,215,0,0.15); }
+        .quality-pill.premium.active .quality-label { color:var(--gold); }
+        .quality-crown { font-size:9px; color:var(--gold); filter:drop-shadow(0 0 4px rgba(255,215,0,0.6)); }
+        .quality-badge {
+            position:absolute; top:-6px; right:-6px;
+            background:linear-gradient(135deg, var(--gold), #ffaa00);
+            color:var(--black); font-size:8px; font-weight:900;
+            padding:2px 6px; border-radius:50px;
+            box-shadow:0 2px 8px rgba(255,215,0,0.5);
+            letter-spacing:0.5px;
+        }
         
-        /* ===== LANGUAGE (COMPACT) ===== */
         .lang-row { display:flex; gap:8px; flex-wrap:wrap; }
         .lang-pill {
             padding:8px 14px; background:var(--glass-2);
@@ -170,11 +187,9 @@
         .lang-pill.active { border-color:var(--cyan); background:rgba(100,210,255,0.15); color:var(--cyan); }
         .lang-pill i { font-size:11px; }
         
-        /* ===== CAST (COMPACT) ===== */
-        .cast-scroll {
-            display:flex; gap:12px; overflow-x:auto; padding-bottom:6px;
-            scrollbar-width:none;
-        }
+        .story-text { font-size:13px; line-height:1.6; color:var(--text-dim); }
+        
+        .cast-scroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
         .cast-scroll::-webkit-scrollbar { display:none; }
         .cast-item { flex-shrink:0; text-align:center; width:70px; }
         .cast-avatar {
@@ -185,31 +200,54 @@
         .cast-name { font-size:10px; font-weight:700; line-height:1.2; margin-bottom:2px; }
         .cast-char { font-size:9px; color:var(--text-mute); }
         
-        /* ===== EPISODES ===== */
+        .episodes-list { display:flex; flex-direction:column; gap:8px; }
         .episode-item {
-            display:flex; align-items:center; gap:10px;
-            padding:10px 12px; background:var(--glass-2);
-            border:1px solid var(--glass-border); border-radius:var(--r-md);
-            margin-bottom:8px; cursor:pointer; font-family:inherit;
+            display:flex; align-items:center; gap:12px;
+            padding:10px 12px; background:rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:var(--r-md);
+            cursor:pointer; font-family:inherit;
             color:var(--text); transition:all var(--spring);
-            box-shadow:var(--glass-highlight); text-align:left; width:100%;
+            text-align:left; width:100%;
         }
-        .episode-item:hover { border-color:var(--cyan); background:rgba(100,210,255,0.08); }
-        .episode-item.active { border-color:var(--cyan); background:rgba(100,210,255,0.12); }
-        .episode-num {
-            width:36px; height:36px; border-radius:10px;
-            background:linear-gradient(135deg, var(--cyan), var(--blue));
+        .episode-item:hover { background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.12); }
+        .episode-item.active { background:rgba(100,210,255,0.1); border-color:var(--cyan); }
+        .episode-num-circle {
+            width:52px; height:52px; border-radius:50%;
+            background:rgba(255,255,255,0.06);
             display:flex; align-items:center; justify-content:center;
-            color:var(--black); font-size:14px; font-weight:900; flex-shrink:0;
+            color:var(--text); font-size:18px; font-weight:900;
+            flex-shrink:0;
         }
-        .episode-title { font-size:12px; font-weight:700; flex:1; }
-        .episode-sub { font-size:10px; color:var(--text-dim); }
+        .episode-item.active .episode-num-circle {
+            background:rgba(100,210,255,0.2);
+            color:var(--cyan);
+        }
+        .episode-details { flex:1; min-width:0; }
+        .episode-title { font-size:15px; font-weight:800; margin-bottom:3px; }
+        .episode-sub { font-size:12px; color:var(--text-mute); font-weight:500; }
+        .episode-actions { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+        .episode-download {
+            width:40px; height:40px; border-radius:50%;
+            background:rgba(255,255,255,0.06);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--text-dim); font-size:14px;
+            border:none; cursor:pointer; font-family:inherit;
+            transition:all var(--spring);
+        }
+        .episode-download:hover { background:rgba(100,210,255,0.15); color:var(--cyan); }
+        .episode-play {
+            width:52px; height:52px; border-radius:50%;
+            background:#fff; color:var(--black);
+            display:flex; align-items:center; justify-content:center;
+            font-size:18px; border:none; cursor:pointer; font-family:inherit;
+            transition:all var(--spring);
+            box-shadow:0 4px 16px rgba(255,255,255,0.2);
+        }
+        .episode-play:hover { transform:scale(1.08); box-shadow:0 6px 20px rgba(255,255,255,0.3); }
+        .episode-play i { margin-left:3px; }
         
-        /* ===== RELATED ===== */
-        .related-grid {
-            display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));
-            gap:10px;
-        }
+        .related-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; }
         .related-card {
             background:var(--glass-1); border:1px solid var(--glass-border);
             border-radius:var(--r-md); overflow:hidden; text-decoration:none; color:inherit;
@@ -221,7 +259,6 @@
         .related-title-text { font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
         .related-meta { font-size:9px; color:var(--text-dim); }
         
-        /* ===== WHATSAPP ===== */
         .whatsapp-ads {
             background:var(--glass-1); backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border); border-radius:var(--r-lg);
@@ -246,7 +283,6 @@
             transition:all var(--spring); white-space:nowrap;
         }
         
-        /* ===== TOAST ===== */
         .toast {
             position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
             background:rgba(20,20,22,0.95); backdrop-filter:var(--blur-glass);
@@ -260,8 +296,11 @@
         @media (max-width:768px) {
             .container { padding:12px; }
             .info-card { padding:16px; }
-            .info-poster { width:70px; }
-            .info-title { font-size:18px; }
+            .info-poster { width:65px; }
+            .info-title { font-size:16px; }
+            .episode-num-circle { width:46px; height:46px; font-size:16px; }
+            .episode-play { width:46px; height:46px; font-size:16px; }
+            .episode-download { width:36px; height:36px; font-size:13px; }
         }
     </style>
 </head>
@@ -269,15 +308,12 @@
 
 <div class="bg-neo"></div>
 
-<!-- HEADER -->
 <div class="header">
     <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
     <div class="header-title" id="headerTitle">Chargement...</div>
 </div>
 
 <div class="container">
-
-    <!-- VIDEO PLAYER -->
     <div class="video-container">
         <video id="player-video" playsinline webkit-playsinline crossorigin controls></video>
         <div class="plyr-loading-overlay" id="plyr-loading-overlay">
@@ -286,7 +322,6 @@
         </div>
     </div>
 
-    <!-- INFO CARD -->
     <div class="info-card">
         <div class="info-header">
             <img id="infoPoster" class="info-poster" src="" alt="Poster">
@@ -297,30 +332,61 @@
             </div>
         </div>
         
-        <!-- PLAY BUTTON (SMALL) -->
         <button class="play-btn-small" id="playMainBtn">
             <i class="fas fa-play"></i>
             <span id="playBtnText">Play</span>
         </button>
         
-        <!-- ACTION ROW -->
         <div class="action-row">
-            <button class="action-btn-mini" id="saveBtn">
-                <i class="fas fa-download"></i>
+            <!-- BOUTON 1: TÉLÉCHARGER (SVG) -->
+            <button class="action-btn-mini" id="saveBtn" title="Télécharger">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
                 <span>Save</span>
             </button>
-            <button class="action-btn-mini" id="listBtn">
-                <i class="fas fa-plus"></i>
-                <span>List</span>
+            
+            <!-- BOUTON 2: FAVORI (SVG) -->
+            <button class="action-btn-mini" id="listBtn" title="Ajouter à ma liste">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span>Favori</span>
             </button>
-            <button class="action-btn-mini" id="shareBtn">
-                <i class="fas fa-share-nodes"></i>
+            
+            <!-- BOUTON 3: PARTAGER -->
+            <button class="action-btn-mini" id="shareBtn" title="Partager">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
                 <span>Partager</span>
             </button>
         </div>
     </div>
 
-    <!-- LANGUAGE (COMPACT) -->
+    <div class="glass-card">
+        <div class="glass-card-title"><i class="fas fa-tv"></i> Qualité</div>
+        <div class="quality-row" id="qualityRow">
+            <button class="quality-pill active" data-quality="360" onclick="changeQuality('360', this)">
+                <span class="quality-label">360p</span>
+            </button>
+            <button class="quality-pill" data-quality="480" onclick="changeQuality('480', this)">
+                <span class="quality-label">480p</span>
+            </button>
+            <button class="quality-pill premium" data-quality="1080" onclick="changeQuality('1080', this)">
+                <i class="fas fa-crown quality-crown"></i>
+                <span class="quality-label">1080p</span>
+                <span class="quality-badge">PRO</span>
+            </button>
+        </div>
+    </div>
+
     <div class="glass-card">
         <div class="glass-card-title"><i class="fas fa-language"></i> Language</div>
         <div class="lang-row">
@@ -336,25 +402,21 @@
         </div>
     </div>
 
-    <!-- STORY -->
     <div class="glass-card">
         <div class="glass-card-title"><i class="fas fa-book-open"></i> The story</div>
         <p class="story-text" id="storyText">Chargement...</p>
     </div>
 
-    <!-- CAST (COMPACT) -->
+    <div class="glass-card" id="episodesCard" style="display:none;">
+        <div class="glass-card-title"><i class="fas fa-list-ol"></i> Episodes</div>
+        <div class="episodes-list" id="episodesList"></div>
+    </div>
+
     <div class="glass-card">
         <div class="glass-card-title"><i class="fas fa-users"></i> Acteurs</div>
         <div class="cast-scroll" id="castGrid"></div>
     </div>
 
-    <!-- EPISODES (ONLY IF SERIES) -->
-    <div class="glass-card" id="episodesCard" style="display:none;">
-        <div class="glass-card-title"><i class="fas fa-list-ol"></i> Episodes</div>
-        <div id="episodesList"></div>
-    </div>
-
-    <!-- WHATSAPP ADS -->
     <div class="whatsapp-ads">
         <div class="whatsapp-icon"><i class="fab fa-whatsapp"></i></div>
         <div class="whatsapp-content">
@@ -366,12 +428,10 @@
         </a>
     </div>
 
-    <!-- RELATED -->
     <div class="glass-card">
         <div class="glass-card-title"><i class="fas fa-film"></i> Vous pourriez aimer</div>
         <div class="related-grid" id="relatedGrid"></div>
     </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
@@ -379,10 +439,6 @@
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
 <script>
-/* ============================================
-   🎬 BLAST FLIX PLAYER - COMPACT
-   ============================================ */
-
 const params = new URLSearchParams(window.location.search);
 const data = {
     subjectId: params.get('subjectId') || '',
@@ -392,19 +448,15 @@ const data = {
     rating: params.get('rating') || 'N/A',
     genre: params.get('genre') || 'Drama',
     desc: params.get('desc') || 'Aucune description disponible.',
-    type: params.get('type') || 'movie', // 'movie' oswa 'series'
+    type: params.get('type') || 'movie',
     season: params.get('season') || '1',
     episode: params.get('episode') || '1',
     totalEpisodes: params.get('totalEpisodes') || '0'
 };
 
-// Detecte si se seri oswa fim
 const isSeries = data.type === 'series' || parseInt(data.totalEpisodes) > 1;
 
-// Header
 document.getElementById('headerTitle').textContent = data.title;
-
-// Info
 document.getElementById('infoPoster').src = data.poster || 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image';
 document.getElementById('infoTitle').textContent = data.title;
 document.getElementById('infoMeta').innerHTML = `
@@ -414,17 +466,45 @@ document.getElementById('infoMeta').innerHTML = `
 `;
 document.getElementById('infoGenres').textContent = data.genre.split(',').join(' · ');
 document.getElementById('storyText').textContent = data.desc;
+document.getElementById('playBtnText').textContent = isSeries ? `Play S${data.season}:E${data.episode}` : 'Play';
 
-// Play button text (seri vs fim)
-const playBtnText = isSeries 
-    ? `Play S${data.season}:E${data.episode}` 
-    : 'Play';
-document.getElementById('playBtnText').textContent = playBtnText;
+// === FAVORI (localStorage) ===
+const favoriteBtn = document.getElementById('listBtn');
+const FAVORITES_KEY = 'blastflix_favorites';
+let favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+
+function updateFavoriteBtn() {
+    const isFav = favorites.includes(data.subjectId);
+    favoriteBtn.classList.toggle('active', isFav);
+    favoriteBtn.querySelector('span').textContent = isFav ? 'Favori ✓' : 'Favori';
+}
+
+favoriteBtn.addEventListener('click', () => {
+    const idx = favorites.indexOf(data.subjectId);
+    if (idx > -1) {
+        favorites.splice(idx, 1);
+        showToast('💔 Retiré des favoris');
+    } else {
+        favorites.push(data.subjectId);
+        showToast('❤️ Ajouté aux favoris');
+    }
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    updateFavoriteBtn();
+});
+
+updateFavoriteBtn();
 
 // Video
 const videoEl = document.getElementById('player-video');
 const loadingOverlay = document.getElementById('plyr-loading-overlay');
 let player = null;
+let currentQuality = '360';
+
+const QUALITY_SOURCES = {
+    '360': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    '480': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    '1080': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+};
 
 window.addEventListener('load', () => {
     if (typeof Plyr !== 'undefined') {
@@ -434,23 +514,22 @@ window.addEventListener('load', () => {
             speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
             seekTime: 10
         });
-        
         player.on('playing', () => loadingOverlay.classList.remove('active'));
         player.on('waiting', () => loadingOverlay.classList.add('active'));
         player.on('canplay', () => loadingOverlay.classList.remove('active'));
         player.on('error', () => loadingOverlay.classList.remove('active'));
     }
-    loadVideo();
+    loadVideo('360');
     loadCast();
     loadRelated();
     if (isSeries) loadEpisodes();
 });
 
-async function loadVideo() {
+async function loadVideo(quality = '360') {
     loadingOverlay.classList.add('active');
-    
     try {
         let streams = null;
+        let streamUrl = null;
         
         try {
             const res = await fetch('streams.json', { cache: 'no-store' });
@@ -459,39 +538,53 @@ async function loadVideo() {
                 const entry = sources[data.subjectId] || sources['default'];
                 if (entry && entry.streams && entry.streams.length > 0) {
                     streams = entry.streams;
-                } else if (entry && entry.url) {
-                    streams = [{ url: entry.url, type: entry.type || 'video/mp4', quality: entry.quality || 'Auto' }];
                 }
             }
-        } catch (e) {
-            console.warn('Pas de streams.json');
+        } catch (e) { console.warn('Pas de streams.json'); }
+        
+        if (streams) {
+            const match = streams.find(s => (s.quality || '').toString().includes(quality));
+            streamUrl = match ? match.url : streams[0].url;
+        } else {
+            streamUrl = QUALITY_SOURCES[quality] || QUALITY_SOURCES['360'];
         }
         
-        if (!streams) {
-            streams = [{
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                type: 'video/mp4',
-                quality: 'Demo'
-            }];
-        }
-        
-        const first = streams[0];
-        const isHls = (first.type && first.type.includes('mpegURL')) || first.url.endsWith('.m3u8');
+        const isHls = streamUrl.endsWith('.m3u8');
         
         if (player) {
             player.source = {
                 type: 'video',
-                sources: [{ src: first.url, type: isHls ? 'application/x-mpegURL' : 'video/mp4' }],
+                sources: [{ src: streamUrl, type: isHls ? 'application/x-mpegURL' : 'video/mp4' }],
                 poster: data.poster
             };
         } else {
-            videoEl.src = first.url;
+            videoEl.src = streamUrl;
         }
-        
+        currentQuality = quality;
     } catch (err) {
         console.error('Erreur vidéo:', err);
         loadingOverlay.classList.remove('active');
     }
+}
+
+function changeQuality(quality, btn) {
+    document.querySelectorAll('.quality-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const currentTime = player ? player.currentTime : videoEl.currentTime;
+    const wasPlaying = player ? !player.paused : !videoEl.paused;
+    loadVideo(quality).then(() => {
+        setTimeout(() => {
+            if (player) {
+                player.currentTime = currentTime;
+                if (wasPlaying) player.play();
+            } else {
+                videoEl.currentTime = currentTime;
+                if (wasPlaying) videoEl.play();
+            }
+        }, 500);
+    });
+    const qualityLabel = quality === '1080' ? '1080p (Premium) 👑' : quality + 'p';
+    showToast(`Qualité: ${qualityLabel}`);
 }
 
 function loadCast() {
@@ -502,7 +595,6 @@ function loadCast() {
         { name: 'Hervé Pierre', character: 'Hubert', avatar: 'https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg' },
         { name: 'Soufiane Guerrab', character: 'Youssef', avatar: 'https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg' }
     ];
-    
     const grid = document.getElementById('castGrid');
     grid.innerHTML = cast.map(c => `
         <div class="cast-item">
@@ -526,7 +618,6 @@ const RELATED = [
 function loadRelated() {
     const pool = RELATED.filter(m => m.id !== data.subjectId);
     const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 6);
-    
     const grid = document.getElementById('relatedGrid');
     grid.innerHTML = shuffled.map(m => {
         const p = new URLSearchParams({
@@ -552,15 +643,24 @@ function loadEpisodes() {
     const list = document.getElementById('episodesList');
     const totalEps = parseInt(data.totalEpisodes) || 10;
     const currentEp = parseInt(data.episode);
-    
     let html = '';
     for (let i = 1; i <= totalEps; i++) {
         const active = i === currentEp;
         html += `
             <button class="episode-item ${active ? 'active' : ''}" onclick="playEpisode(${i})">
-                <div class="episode-num">${i}</div>
-                <div class="episode-title">Episode ${i}</div>
-                <div class="episode-sub">45m</div>
+                <div class="episode-num-circle">${i}</div>
+                <div class="episode-details">
+                    <div class="episode-title">Épisode ${i}</div>
+                    <div class="episode-sub">Episode ${i}</div>
+                </div>
+                <div class="episode-actions">
+                    <button class="episode-download" onclick="event.stopPropagation(); downloadEpisode(${i})">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="episode-play" onclick="event.stopPropagation(); playEpisode(${i})">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
             </button>
         `;
     }
@@ -569,19 +669,16 @@ function loadEpisodes() {
 
 function playEpisode(ep) {
     const p = new URLSearchParams({
-        subjectId: data.subjectId,
-        title: data.title,
-        poster: data.poster,
-        year: data.year,
-        rating: data.rating,
-        genre: data.genre,
-        desc: data.desc,
-        type: data.type,
-        season: data.season,
-        episode: String(ep),
+        subjectId: data.subjectId, title: data.title, poster: data.poster,
+        year: data.year, rating: data.rating, genre: data.genre, desc: data.desc,
+        type: data.type, season: data.season, episode: String(ep),
         totalEpisodes: data.totalEpisodes
     });
     window.location.href = `player.html?${p.toString()}`;
+}
+
+function downloadEpisode(ep) {
+    showToast(`📥 Téléchargement de l'épisode ${ep}...`);
 }
 
 document.getElementById('playMainBtn').addEventListener('click', () => {
@@ -592,8 +689,6 @@ document.getElementById('playMainBtn').addEventListener('click', () => {
 });
 
 document.getElementById('saveBtn').addEventListener('click', () => showToast('💾 Sauvegardé'));
-document.getElementById('listBtn').addEventListener('click', () => showToast('➕ Ajouté à ma liste'));
-
 document.getElementById('shareBtn').addEventListener('click', async () => {
     const shareData = {
         title: data.title + ' - BLAST FLIX',
@@ -630,4 +725,4 @@ function showToast(msg) {
 }
 </script>
 </body>
-  </html>
+                </html>
