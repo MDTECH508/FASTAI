@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "name": "blast-flix",
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "css.html", "use": "@vercel/static" },
+    { "src": "app.js", "use": "@vercel/static" },
+    { "src": "player.js", "use": "@vercel/static" },
+    { "src": "categories.js", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/css.html", "dest": "/css.html" },
+    { "src": "/app.js", "dest": "/app.js" },
+    { "src": "/player.js", "dest": "/player.js" },
+    { "src": "/categories.js", "dest": "/categories.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
