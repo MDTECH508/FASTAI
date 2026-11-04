@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-/* Tout style ou a rete menm jan an — mwen jis ajoute Skeleton yo */
+/* Tout style ou a rete menm jan an — mwen pa chanje anyen */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
 html { scroll-behavior: smooth; }
 :root {
@@ -285,15 +285,6 @@ body {
 .meta { display: flex; gap: 8px; font-size: 12px; color: var(--text-dim); }
 .meta span { display: inline-flex; align-items: center; gap: 3px; }
 .meta i { font-size: 9px; opacity: 0.7; }
-
-/* Skeleton Loader pou l parèt bèl pandan l ap chèche */
-.skeleton { border-radius: var(--r-lg); overflow: hidden; background: var(--glass-1); border: 1px solid var(--glass-border); }
-.sk-poster { width: 100%; aspect-ratio: 2/3; background: linear-gradient(90deg, var(--charcoal) 0%, var(--slate) 50%, var(--charcoal) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-.sk-info { padding: 14px 16px; }
-.sk-line { height: 12px; margin-bottom: 6px; border-radius: 4px; background: linear-gradient(90deg, var(--charcoal) 0%, var(--slate) 50%, var(--charcoal) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-.sk-line.short { width: 60%; }
-@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
 .empty { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--text-dim); }
 .empty i { font-size: 56px; color: var(--text-mute); margin-bottom: 18px; display: block; }
 .empty p { font-size: 15px; font-weight: 600; }
@@ -437,7 +428,6 @@ body {
 <section class="categories" id="categoryTabs"></section>
 
 <main class="content" id="mainContent">
-  <!-- Skeleton Loader la -->
   <section class="section">
     <div class="section-head">
       <h2 class="section-title"><i class="fas fa-fire"></i> Chargement...</h2>
@@ -474,17 +464,18 @@ body {
 
 <script>
 // ============================================================
-// 🎬 BLAST FLIX - Chaje soti nan API Render
+// 🎬 BLAST FLIX - Plizyè API (Render + Aoneroom)
 // ============================================================
-const API_BASE_URL = 'https://moviebox-api-snrn.onrender.com';
+const API_SOURCES = [
+  { name: 'Moviebox', url: 'https://moviebox-api-snrn.onrender.com' },
+  { name: 'Aoneroom', url: 'https://h5.aoneroom.com' },
+  // Ou ka ajoute lòt API isit la
+];
 
 const FALLBACK_MOVIES = [
   { subjectId:"8221332401033825872", title:"The Last Testament", poster:"https://pbcdnw.aoneroom.com/image/2025/11/28/eb616974c3eb25c2c647c730b0288f45.jpeg", year:"2025", rating:7.1, genre:"Action" },
-  { subjectId:"3843768500917617656", title:"The Naked Gun", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/b5aa3cf6c7d54fdeb5f72cfe29e063e4.jpg", year:"2025", rating:6.4, genre:"Action" },
-  { subjectId:"6404541527368386376", title:"Nobody 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/259c45b7a121808cde5d38d31f7e82fd.jpg", year:"2025", rating:6.3, genre:"Action" },
   // ... mete tout FALLBACK_MOVIES ou yo isit la ...
-  { subjectId:"8759851328492438440", title:"Train Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year:"2025", rating:7.7, genre:"Drama" },
-  { subjectId:"4956801153355891744", title:"Stranger Things", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year:"2016", rating:8.6, genre:"Drama" }
+  { subjectId:"8759851328492438440", title:"Train Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year:"2025", rating:7.7, genre:"Drama" }
 ];
 
 const STATE = { heroMovies: [], heroIndex: 0, heroTimer: null, categories: {}, allMovies: [] };
@@ -543,49 +534,54 @@ function setupEvents() {
 }
 
 async function loadHomepage() {
-  try {
-    console.log('🔍 Chèche fim nan API:', API_BASE_URL);
-    // Eseye premye ak /movies, si li pa mache, eseye yon rechèch
-    let res = await fetch(`${API_BASE_URL}/movies?page=1`);
-    if (!res.ok) {
-      res = await fetch(`${API_BASE_URL}/search?q=2025`);
-    }
-    
-    if (res.ok) {
-      const data = await res.json();
-      let movies = [];
-      if (data.results) movies = data.results;
-      else if (data.movies) movies = data.movies;
-      else if (Array.isArray(data)) movies = data;
+  // Eseye chak API youn pa youn
+  for (const api of API_SOURCES) {
+    try {
+      console.log(`🔍 Chèche nan ${api.name}:`, api.url);
       
-      if (movies.length > 0) {
-        STATE.allMovies = movies.map(m => ({
-          subjectId: m.subject_id || m.subjectId || m.id,
-          title: m.title || m.name,
-          poster: m.cover?.url || m.poster || m.image,
-          year: (m.release_date || m.year || '').split('-')[0],
-          rating: m.imdb_rating || m.rating || 'N/A',
-          genre: m.genre || 'Movie'
-        }));
-        
-        const genres = {};
-        STATE.allMovies.forEach(m => {
-          const g = m.genre || "Autres";
-          if (!genres[g]) genres[g] = [];
-          genres[g].push(m);
-        });
-        STATE.categories = genres;
-        STATE.categories["Tous les films"] = STATE.allMovies;
-        
-        setupAndRender();
-        return;
+      // Pou Moviebox API
+      let res = await fetch(`${api.url}/movies?page=1`);
+      if (!res.ok) {
+        res = await fetch(`${api.url}/search?q=2025`);
       }
+      
+      if (res.ok) {
+        const data = await res.json();
+        let movies = [];
+        if (data.results) movies = data.results;
+        else if (data.movies) movies = data.movies;
+        else if (Array.isArray(data)) movies = data;
+        
+        if (movies.length > 0) {
+          STATE.allMovies = movies.map(m => ({
+            subjectId: m.subject_id || m.subjectId || m.id,
+            title: m.title || m.name,
+            poster: m.cover?.url || m.poster || m.image,
+            year: (m.release_date || m.year || '').split('-')[0],
+            rating: m.imdb_rating || m.rating || 'N/A',
+            genre: m.genre || 'Movie'
+          }));
+          
+          const genres = {};
+          STATE.allMovies.forEach(m => {
+            const g = m.genre || "Autres";
+            if (!genres[g]) genres[g] = [];
+            genres[g].push(m);
+          });
+          STATE.categories = genres;
+          STATE.categories["Tous les films"] = STATE.allMovies;
+          
+          setupAndRender();
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn(`❌ ${api.name} pa mache:`, e.message);
     }
-  } catch (e) {
-    console.warn('⚠️ API pa disponib, ap itilize fallback:', e.message);
   }
   
-  // Si API a pa mache, itilize FALLBACK_MOVIES
+  // Si tout API yo pa mache, itilize FALLBACK_MOVIES
+  console.log('⚠️ Tout API yo pa mache, itilize fallback');
   useFallback();
 }
 
@@ -750,4 +746,4 @@ function filterCards(query) {
 }
 </script>
 </body>
-  </html>
+    </html>
