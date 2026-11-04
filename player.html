@@ -58,13 +58,13 @@
             flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
         }
         
-        /* IFRAME CONTAINER (WOTÈ FIKS 450px) */
+        /* IFRAME CONTAINER (WOTÈ 380px) */
         .iframe-wrap {
             position:relative;
             width:100%;
-            height:450px; /* WOTÈ FIKS */
+            height:380px;
             background:#000;
-            overflow:hidden; /* BLOKE SCROLL */
+            overflow:hidden;
             margin-bottom:16px;
         }
         .iframe-wrap iframe {
@@ -73,18 +73,18 @@
             width:100%; height:100%;
             border:none;
             display:block;
-            overflow:hidden; /* BLOKE SCROLL ANDEDAN IFRAME A */
-            scrollbar-width:none; /* Firefox */
+            overflow:hidden;
+            scrollbar-width:none;
         }
         .iframe-wrap iframe::-webkit-scrollbar {
-            display:none; /* Chrome/Safari */
+            display:none;
         }
         
-        /* MASK ANWO A (KACHE BAR RECHÈCH LA) */
+        /* MASK ANWO A (OGMANTE: 110px) */
         .iframe-wrap .mask-top {
             position:absolute;
             top:0; left:0; right:0;
-            height:70px;
+            height:110px; /* OGMANTE POU KOUVRI BAR LA */
             background:linear-gradient(to bottom, #000 85%, transparent 100%);
             z-index:10;
             pointer-events:none;
@@ -94,7 +94,7 @@
         .iframe-wrap .mask-bottom {
             position:absolute;
             bottom:0; left:0; right:0;
-            height:50px;
+            height:40px;
             background:linear-gradient(to top, #000 85%, transparent 100%);
             z-index:10;
             pointer-events:none;
@@ -235,7 +235,7 @@
         .suggest-meta { font-size:10px; color:var(--text-dim); }
         
         @media (max-width:768px) {
-            .iframe-wrap { height: 450px; }
+            .iframe-wrap { height: 380px; }
             .content { padding:0 12px 40px; }
             .info-title { font-size:16px; }
             .suggest-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:8px; }
@@ -252,7 +252,7 @@
     <div class="header-title" id="headerTitle">Chargement...</div>
 </header>
 
-<!-- IFRAME WRAPPER AK WOTÈ 450px AK MASK -->
+<!-- IFRAME WRAPPER AK WOTÈ 380px -->
 <div class="iframe-wrap">
     <iframe 
         id="playerIframe" 
@@ -260,7 +260,7 @@
         allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
         scrolling="no">
     </iframe>
-    <!-- MASK ANWO -->
+    <!-- MASK ANWO (110px) -->
     <div class="mask-top"></div>
     <!-- MASK ANBA -->
     <div class="mask-bottom"></div>
@@ -337,11 +337,6 @@ if (data.detailPath) {
 
 console.log('🔗 Iframe URL:', iframeUrl);
 iframe.src = iframeUrl;
-
-// ============================================================
-// ✅ BLOKE SCROLL NAN IFRAME A
-// ============================================================
-// scrolling="no" deja la, menm si.
 
 // ============================================================
 // ✅ SIJESYON FIM YO
