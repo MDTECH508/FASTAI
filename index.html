@@ -1,264 +1,362 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#000000">
-    <title>Lecture - BLAST FLIX</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
-        :root {
-            --black:#000; --charcoal:#121214; --slate:#1c1c1f;
-            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --gold:#ffd700;
-            --glass-1:rgba(255,255,255,0.035);
-            --glass-2:rgba(255,255,255,0.07);
-            --glass-border:rgba(255,255,255,0.09);
-            --glass-border-bright:rgba(255,255,255,0.22);
-            --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.2);
-            --text:#f5f5f7;
-            --text-dim:rgba(245,245,247,0.55);
-            --text-mute:rgba(245,245,247,0.35);
-            --r-sm:12px; --r-md:18px; --r-lg:24px;
-            --shadow-1:0 2px 8px rgba(0,0,0,0.4);
-            --shadow-2:0 8px 24px rgba(0,0,0,0.5);
-            --shadow-3:0 20px 60px rgba(0,0,0,0.7);
-            --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
-            --blur-glass:blur(40px) saturate(180%);
-        }
-        html, body {
-            font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;
-            background:var(--black); color:var(--text); min-height:100vh;
-            letter-spacing:-0.01em; overflow-x:hidden;
-        }
-        .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); overflow:hidden; }
-        .bg-neo::before {
-            content:''; position:absolute; inset:0;
-            background:
-                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.18), transparent),
-                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.12), transparent);
-            filter:blur(80px);
-        }
-        .header {
-            position:sticky; top:0; z-index:100; padding:12px 16px;
-            background:rgba(10,10,12,0.55);
-            backdrop-filter:var(--blur-glass); -webkit-backdrop-filter:var(--blur-glass);
-            border-bottom:1px solid var(--glass-border);
-            display:flex; align-items:center; gap:12px;
-            padding-top:calc(12px + env(safe-area-inset-top,0px));
-            box-shadow:var(--glass-highlight);
-        }
-        .back-btn {
-            width:38px; height:38px; border-radius:50%; background:var(--glass-2);
-            border:1px solid var(--glass-border); color:var(--text);
-            display:flex; align-items:center; justify-content:center;
-            text-decoration:none; font-size:14px; transition:all var(--spring);
-            box-shadow:var(--glass-highlight); flex-shrink:0;
-        }
-        .back-btn:hover { border-color:var(--cyan); background:rgba(100,210,255,0.15); }
-        .header-title { font-size:15px; font-weight:700; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .container { max-width:1000px; margin:0 auto; padding:16px; }
-        .video-container {
-            position:relative; width:100%; aspect-ratio:16/9; background:#000;
-            border-radius:var(--r-lg); overflow:hidden;
-            border:1px solid var(--glass-border-bright);
-            box-shadow:0 0 40px rgba(100,210,255,0.15), var(--shadow-3), var(--glass-highlight);
-            margin-bottom:16px;
-        }
-        .video-container video { width:100%; height:100%; display:block; }
-        .plyr-loading-overlay {
-            position:absolute; inset:0; display:none; flex-direction:column;
-            align-items:center; justify-content:center; background:rgba(0,0,0,0.85);
-            backdrop-filter:blur(20px); z-index:10; gap:16px;
-        }
-        .plyr-loading-overlay.active { display:flex; }
-        .spinner-circle {
-            width:50px; height:50px; border-radius:50%;
-            border:3px solid rgba(255,255,255,0.08);
-            border-top-color:var(--cyan); border-right-color:var(--purple);
-            animation:spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        .loading-text { font-size:12px; font-weight:600; color:var(--text-dim); letter-spacing:2px; text-transform:uppercase; }
-        .info-card {
-            background:var(--glass-1); backdrop-filter:var(--blur-glass);
-            border:1px solid var(--glass-border); border-radius:var(--r-lg);
-            padding:18px; margin-bottom:14px;
-            box-shadow:var(--glass-highlight), var(--shadow-2);
-        }
-        .info-header { display:flex; gap:14px; align-items:flex-start; margin-bottom:16px; }
-        .info-poster {
-            width:75px; aspect-ratio:2/3; object-fit:cover;
-            border-radius:var(--r-sm); border:1px solid var(--glass-border-bright);
-            box-shadow:var(--shadow-2); flex-shrink:0;
-        }
-        .info-content { flex:1; min-width:0; }
-        .info-title { font-size:18px; font-weight:800; line-height:1.2; margin-bottom:6px; }
-        .info-meta {
-            display:flex; flex-wrap:wrap; gap:8px;
-            font-size:11px; color:var(--text-dim); font-weight:600; margin-bottom:6px;
-        }
-        .info-meta span { display:inline-flex; align-items:center; gap:4px; }
-        .info-meta i { color:var(--cyan); font-size:10px; }
-        .play-btn-small {
-            width:100%; padding:13px 18px;
-            background:#fff; color:var(--black);
-            border:none; border-radius:50px; cursor:pointer;
-            display:flex; align-items:center; justify-content:center; gap:10px;
-            font-size:14px; font-weight:800; font-family:inherit;
-            transition:all var(--spring);
-            box-shadow:0 8px 24px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.5);
-            margin-bottom:10px;
-        }
-        .play-btn-small:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5); }
-        .play-btn-small i { font-size:13px; }
-        .toast {
-            position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
-            background:rgba(20,20,22,0.95); backdrop-filter:var(--blur-glass);
-            border:1px solid var(--glass-border-bright); color:var(--text);
-            padding:10px 20px; border-radius:50px; font-size:12px; font-weight:600;
-            z-index:10000; opacity:0; transition:all 0.3s var(--spring); pointer-events:none;
-        }
-        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <title>BLAST FLIX - Films & Séries</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+/* Liquid Glass Design */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; }
+:root {
+  --black: #000000; --charcoal: #121214; --slate: #1c1c1f; --graphite: #26262a;
+  --silver: #8a8a92; --white: #f5f5f7; --cyan: #64d2ff; --blue: #0a84ff; --purple: #bf5af2; --pink: #ff375f;
+  --glass-1: rgba(255,255,255,0.035); --glass-2: rgba(255,255,255,0.07); --glass-3: rgba(255,255,255,0.11);
+  --glass-border: rgba(255,255,255,0.09); --glass-border-bright: rgba(255,255,255,0.22);
+  --glass-highlight: inset 0 1px 0 rgba(255,255,255,0.20);
+  --glass-inner-shadow: inset 0 -1px 0 rgba(0,0,0,0.2);
+  --text: #f5f5f7; --text-dim: rgba(245,245,247,0.55); --text-mute: rgba(245,245,247,0.35);
+  --r-md: 20px; --r-lg: 28px; --r-xl: 34px; --r-2xl: 42px;
+  --shadow-1: 0 2px 8px rgba(0,0,0,0.4); --shadow-2: 0 8px 24px rgba(0,0,0,0.5); --shadow-3: 0 20px 60px rgba(0,0,0,0.7);
+  --spring: 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  --ease: 0.3s cubic-bezier(0.4,0,0.2,1);
+  --blur-glass: blur(40px) saturate(180%);
+  --blur-heavy: blur(60px) saturate(200%);
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  background: var(--black); color: var(--text); min-height: 100vh; overflow-x: hidden;
+  padding-bottom: 130px; letter-spacing: -0.01em; position: relative;
+}
+.bg-neo { position: fixed; inset: 0; z-index: -3; background: var(--black); overflow: hidden; }
+.bg-neo::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.22), transparent),
+    radial-gradient(ellipse 70% 50% at 100% 100%, rgba(10,132,255,0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 0% 50%, rgba(191,90,242,0.12), transparent);
+  filter: blur(80px);
+}
+.noise {
+  position: fixed; inset: 0; z-index: -1; opacity: 0.05; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+.orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: -2; opacity: 0.6; animation: orbFloat 25s ease-in-out infinite; }
+.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(100,210,255,0.5), transparent 70%); top: -200px; left: -180px; }
+.orb-2 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(191,90,242,0.4), transparent 70%); bottom: -250px; right: -200px; animation-delay: -10s; }
+.orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(10,132,255,0.35), transparent 70%); top: 40%; left: 50%; animation-delay: -5s; }
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(60px,-50px) scale(1.15); }
+  66% { transform: translate(-50px,60px) scale(0.9); }
+}
+.header {
+  position: sticky; top: 0; z-index: 100; padding: 16px 20px;
+  background: rgba(10,10,12,0.55);
+  backdrop-filter: var(--blur-glass); -webkit-backdrop-filter: var(--blur-glass);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex; align-items: center; justify-content: space-between;
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+  padding-top: calc(16px + env(safe-area-inset-top,0px));
+  box-shadow: var(--glass-highlight), 0 4px 24px rgba(0,0,0,0.3);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-mark {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--cyan), var(--blue), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--black); font-size: 16px;
+  box-shadow: 0 6px 20px rgba(100,210,255,0.5), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+.logo-text {
+  font-size: 19px; font-weight: 800; letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--white), var(--silver));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.actions { display: flex; gap: 10px; }
+.action-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--glass-2); border: 1px solid var(--glass-border);
+  color: var(--text); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all var(--spring);
+  backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+  text-decoration: none;
+  box-shadow: var(--glass-highlight), var(--glass-inner-shadow), var(--shadow-1);
+  position: relative; overflow: hidden;
+}
+.action-btn:hover {
+  background: rgba(100,210,255,0.18); border-color: var(--cyan); transform: scale(1.08);
+  box-shadow: var(--glass-highlight), 0 0 30px rgba(100,210,255,0.6), var(--shadow-2);
+}
+.action-btn i { font-size: 16px; }
+.content { padding: 0 20px; margin-top: 20px; }
+.section { margin-bottom: 44px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.section-title { font-size: 21px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.section-title i { font-size: 16px; color: var(--cyan); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 16px; }
+.card {
+  border-radius: var(--r-lg); overflow: hidden;
+  background: var(--glass-1);
+  border: 1px solid var(--glass-border);
+  cursor: pointer; transition: all 0.45s var(--spring);
+  position: relative; display: block; text-decoration: none; color: inherit;
+  box-shadow: var(--glass-highlight), var(--shadow-2);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.card:hover {
+  transform: translateY(-8px) scale(1.03);
+  border-color: var(--glass-border-bright);
+  box-shadow: var(--glass-highlight), 0 20px 50px rgba(0,0,0,0.7), 0 0 50px rgba(100,210,255,0.25);
+}
+.poster-wrap { position: relative; width: 100%; aspect-ratio: 2/3; overflow: hidden; }
+.poster {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  background: linear-gradient(135deg, var(--charcoal), var(--slate));
+  transition: transform 0.6s var(--ease);
+}
+.card:hover .poster { transform: scale(1.1); }
+.rating {
+  position: absolute; top: 12px; right: 12px; padding: 6px 11px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 10px; font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; gap: 4px; z-index: 3;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.rating i { color: var(--cyan); font-size: 10px; }
+.play-btn {
+  position: absolute; bottom: 12px; left: 12px;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(100,210,255,0.25);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid var(--cyan);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3; color: white;
+  box-shadow: var(--glass-highlight), 0 4px 16px rgba(100,210,255,0.5);
+  pointer-events: none; transition: all var(--spring);
+}
+.play-btn i { font-size: 16px; margin-left: 2px; }
+.card:hover .play-btn {
+  transform: scale(1.15); background: rgba(100,210,255,0.65);
+}
+.info { padding: 12px 14px; }
+.title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+.meta { font-size: 11px; color: var(--text-dim); }
+.skeleton { border-radius: var(--r-lg); overflow: hidden; background: var(--glass-1); border: 1px solid var(--glass-border); }
+.sk-poster { width: 100%; aspect-ratio: 2/3; background: linear-gradient(90deg, var(--charcoal) 0%, var(--slate) 50%, var(--charcoal) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+.sk-info { padding: 12px 14px; }
+.sk-line { height: 12px; margin-bottom: 6px; border-radius: 4px; background: linear-gradient(90deg, var(--charcoal) 0%, var(--slate) 50%, var(--charcoal) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+.sk-line.short { width: 60%; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.loader {
+  position: fixed; inset: 0; background: var(--black); z-index: 999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+  transition: opacity 0.6s, visibility 0.6s;
+}
+.loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-mark {
+  width: 100px; height: 100px; border-radius: 26px;
+  background: linear-gradient(135deg, var(--cyan), var(--blue), var(--purple));
+  display: flex; align-items: center; justify-content: center; font-size: 44px; color: var(--black);
+  box-shadow: 0 20px 60px rgba(100,210,255,0.5);
+  animation: markPulse 2s ease-in-out infinite;
+}
+@keyframes markPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.loader-text {
+  font-size: 20px; font-weight: 800; letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--silver), var(--white), var(--silver));
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shimmerText 2s linear infinite;
+}
+@keyframes shimmerText { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.bottom-nav {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  width: calc(100% - 32px); max-width: 440px; border-radius: var(--r-2xl);
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 10px 8px; z-index: 90;
+  background: rgba(20,20,22,0.65);
+  backdrop-filter: var(--blur-heavy); -webkit-backdrop-filter: var(--blur-heavy);
+  border: 1px solid var(--glass-border-bright);
+  box-shadow: var(--glass-highlight), 0 -8px 40px rgba(0,0,0,0.7);
+  padding-bottom: calc(10px + env(safe-area-inset-bottom,0px));
+}
+.nav-btn {
+  background: none; border: none; color: var(--text-dim);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 16px; border-radius: var(--r-md); cursor: pointer;
+  transition: all var(--spring); font-family: inherit; font-size: 10px; font-weight: 600;
+  position: relative; text-decoration: none;
+}
+.nav-btn i { font-size: 20px; }
+.nav-btn.active { color: var(--white); }
+.nav-btn.active i { color: var(--cyan); filter: drop-shadow(0 0 10px rgba(100,210,255,0.9)); }
+@media (max-width: 768px) {
+  .grid { grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 12px; }
+  .content { padding: 0 14px; }
+}
+  </style>
 </head>
 <body>
 
 <div class="bg-neo"></div>
+<div class="noise"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-<div class="header">
-    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
-    <div class="header-title" id="headerTitle">Chargement...</div>
+<div class="loader" id="loader">
+  <div class="loader-mark"><i class="fas fa-play"></i></div>
+  <div class="loader-text">BLAST FLIX</div>
 </div>
 
-<div class="container">
-    <div class="video-container">
-        <video id="player-video" playsinline webkit-playsinline crossorigin controls></video>
-        <div class="plyr-loading-overlay" id="plyr-loading-overlay">
-            <div class="spinner-circle"></div>
-            <div class="loading-text" id="loadingText">Chargement...</div>
-        </div>
+<header class="header">
+  <a href="index.html" class="logo">
+    <div class="logo-mark"><i class="fas fa-play"></i></div>
+    <span class="logo-text">BLAST FLIX</span>
+  </a>
+  <div class="actions">
+    <button class="action-btn"><i class="fas fa-search"></i></button>
+  </div>
+</header>
+
+<main class="content" id="mainContent">
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title"><i class="fas fa-fire"></i> Chargement...</h2>
     </div>
-
-    <div class="info-card">
-        <div class="info-header">
-            <img id="infoPoster" class="info-poster" src="" alt="Poster">
-            <div class="info-content">
-                <h1 id="infoTitle" class="info-title">Chargement...</h1>
-                <div class="info-meta" id="infoMeta"></div>
-            </div>
-        </div>
-        <button class="play-btn-small" id="playMainBtn">
-            <i class="fas fa-play"></i> Play
-        </button>
+    <div class="grid" id="movieGrid">
+      <div class="skeleton"><div class="sk-poster"></div><div class="sk-info"><div class="sk-line"></div><div class="sk-line short"></div></div></div>
+      <div class="skeleton"><div class="sk-poster"></div><div class="sk-info"><div class="sk-line"></div><div class="sk-line short"></div></div></div>
+      <div class="skeleton"><div class="sk-poster"></div><div class="sk-info"><div class="sk-line"></div><div class="sk-line short"></div></div></div>
+      <div class="skeleton"><div class="sk-poster"></div><div class="sk-info"><div class="sk-line"></div><div class="sk-line short"></div></div></div>
+      <div class="skeleton"><div class="sk-poster"></div><div class="sk-info"><div class="sk-line"></div><div class="sk-line short"></div></div></div>
+      <div class="skeleton"><div class="sk-poster"></div><div class="sk-info"><div class="sk-line"></div><div class="sk-line short"></div></div></div>
     </div>
-</div>
+  </section>
+</main>
 
-<div class="toast" id="toast"></div>
-
-<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-btn active"><i class="fas fa-home"></i><span>Accueil</span></a>
+  <a href="#" class="nav-btn"><i class="fas fa-film"></i><span>Films</span></a>
+  <a href="#" class="nav-btn"><i class="fas fa-search"></i><span>Recherche</span></a>
+  <a href="#" class="nav-btn"><i class="fas fa-download"></i><span>Téléch.</span></a>
+  <a href="#" class="nav-btn"><i class="fas fa-user"></i><span>Moi</span></a>
+</nav>
 
 <script>
 // ============================================================
-// ✅ API RENDER OU A
+// ✅ SEKRE: Itilize API MOOVIEBOX Dirèkteman (Oswa Render)
 // ============================================================
 const API_BASE_URL = 'https://moviebox-api-snrn.onrender.com';
+// Si w vle eseye dirèk:
+// const API_BASE_URL = 'https://h5-api.aoneroom.com/wefeed-h5api-bff';
 
-const params = new URLSearchParams(window.location.search);
-const data = {
-    subjectId: params.get('subjectId') || '',
-    title: params.get('title') || 'Film',
-    poster: params.get('poster') || '',
-    year: params.get('year') || '2025',
-    rating: params.get('rating') || 'N/A',
-    type: params.get('type') || 'movie'
-};
+const STATE = { allMovies: [] };
 
-document.getElementById('headerTitle').textContent = data.title;
-document.getElementById('infoPoster').src = data.poster || 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image';
-document.getElementById('infoTitle').textContent = data.title;
-document.getElementById('infoMeta').innerHTML = `
-    <span><i class="fas fa-calendar"></i> ${data.year}</span>
-    <span><i class="fas fa-star"></i> ${data.rating}</span>
-    <span>${data.type === 'series' ? 'Série' : 'Film'}</span>
-`;
-
-const videoEl = document.getElementById('player-video');
-const loadingOverlay = document.getElementById('plyr-loading-overlay');
-const loadingText = document.getElementById('loadingText');
-let player = null;
-
-window.addEventListener('load', () => {
-    if (typeof Plyr !== 'undefined') {
-        player = new Plyr(videoEl, {
-            controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
-            settings: ['speed'],
-            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
-        });
-        player.on('playing', () => loadingOverlay.classList.remove('active'));
-        player.on('waiting', () => loadingOverlay.classList.add('active'));
-        player.on('canplay', () => loadingOverlay.classList.remove('active'));
-    }
-    loadVideo();
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => document.getElementById("loader")?.classList.add("hidden"), 800);
+  loadMovies();
 });
 
-async function loadVideo() {
-    loadingOverlay.classList.add('active');
-    loadingText.textContent = 'Recherche de sources...';
+async function loadMovies() {
+  const grid = document.getElementById("movieGrid");
+  
+  try {
+    console.log('🔍 Chèche fim nan API...');
     
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/stream/${data.subjectId}`);
-        
-        if (!res.ok) throw new Error(`API error: ${res.status}`);
-        
-        const json = await res.json();
-        
-        if (json.streams && json.streams.length > 0) {
-            const best = json.streams[0];
-            loadingText.textContent = `Chargement ${best.quality}...`;
-            
-            if (player) {
-                player.source = {
-                    type: 'video',
-                    sources: [{ src: best.url, type: 'video/mp4' }],
-                    poster: data.poster
-                };
-            } else {
-                videoEl.src = best.url;
-            }
-            
-            loadingOverlay.classList.remove('active');
-            showToast(`✅ ${best.quality} prêt`);
-            return;
-        }
-        
-        throw new Error('No stream');
-    } catch (e) {
-        console.error('Erè:', e);
-        showToast('⚠️ Demo ap jwe');
-        
-        const demoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
-        if (player) {
-            player.source = { type: 'video', sources: [{ src: demoUrl, type: 'video/mp4' }] };
-        } else {
-            videoEl.src = demoUrl;
-        }
-        loadingOverlay.classList.remove('active');
+    // Eseye chèche fim popilè nan API a
+    const [moviesRes, seriesRes] = await Promise.allSettled([
+      fetch(`${API_BASE_URL}/movies?page=1&per_page=30`),
+      fetch(`${API_BASE_URL}/tv-series?page=1&per_page=30`)
+    ]);
+    
+    let allMovies = [];
+    
+    if (moviesRes.status === 'fulfilled' && moviesRes.value.ok) {
+      const data = await moviesRes.value.json();
+      const items = data.items || [];
+      console.log('✅ Movies:', items.length);
+      allMovies.push(...items.map(m => ({ ...m, type: 'movie' })));
     }
+    
+    if (seriesRes.status === 'fulfilled' && seriesRes.value.ok) {
+      const data = await seriesRes.value.json();
+      const items = data.items || [];
+      console.log('✅ Series:', items.length);
+      allMovies.push(...items.map(m => ({ ...m, type: 'series' })));
+    }
+    
+    if (allMovies.length === 0) {
+      throw new Error('API pa retounen anyen');
+    }
+    
+    STATE.allMovies = allMovies;
+    renderMovies(allMovies);
+    
+    document.querySelector('.section-title').innerHTML = `<i class="fas fa-fire"></i> Films Populaires (${allMovies.length})`;
+    
+  } catch (err) {
+    console.error('❌ Erè:', err);
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-dim);">
+        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ff4444; margin-bottom: 16px; display: block;"></i>
+        <p style="font-size: 15px;">API pa disponib. Tanpri eseye ankò.</p>
+        <button onclick="location.reload()" style="margin-top: 16px; padding: 12px 24px; background: var(--cyan); color: var(--black); border: none; border-radius: 50px; font-weight: 700; cursor: pointer;">
+          🔄 Réessayer
+        </button>
+      </div>
+    `;
+  }
 }
 
-document.getElementById('playMainBtn').addEventListener('click', () => {
-    if (player) player.play();
-});
-
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2400);
+function renderMovies(movies) {
+  const grid = document.getElementById("movieGrid");
+  
+  if (movies.length === 0) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-dim);">Aucun résultat</div>`;
+    return;
+  }
+  
+  grid.innerHTML = movies.map(m => {
+    const title = (m.title || 'Sans titre').replace(/"/g, '&quot;');
+    const poster = m.cover || 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image';
+    const year = m.year || '';
+    const rating = m.rating || '';
+    const subjectId = m.subject_id || m.subjectId || '';
+    const type = m.type || 'movie';
+    
+    const params = new URLSearchParams({
+      subjectId: subjectId,
+      title: m.title || '',
+      poster: poster,
+      year: year,
+      rating: rating,
+      type: type,
+      genre: 'Movie'
+    });
+    
+    return `
+      <a href="player.html?${params.toString()}" class="card">
+        <div class="poster-wrap">
+          <img class="poster" src="${poster}" alt="${title}" loading="lazy"
+               onerror="this.src='https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image'">
+          ${rating ? `<div class="rating"><i class="fas fa-star"></i>${rating}</div>` : ''}
+          <div class="play-btn"><i class="fas fa-play"></i></div>
+        </div>
+        <div class="info">
+          <div class="title">${title}</div>
+          <div class="meta">${year} ${type === 'series' ? '• Série' : '• Film'}</div>
+        </div>
+      </a>
+    `;
+  }).join('');
 }
 </script>
 </body>
-</html>
+                                                             </html>
