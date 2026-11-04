@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-/* Tout style ou a rete menm jan an — mwen pa chanje anyen */
+/* Tout style ou a rete menm jan an */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
 html { scroll-behavior: smooth; }
 :root {
@@ -464,8 +464,14 @@ body {
 
 <script>
 // ============================================================
-// 🎬 BLAST FLIX - Plizyè API + Cache
+// 🎬 BLAST FLIX - Sèvi ak TMDB (API ou a)
 // ============================================================
+const TMDB_CONFIG = {
+  apiKey: '0d52884a56cdb80bb562ba562d96642b',
+  baseUrl: 'https://api.themoviedb.org/3',
+  imageBase: 'https://image.tmdb.org/t/p/w500'
+};
+
 const API_SOURCES = [
   { name: 'Moviebox', url: 'https://moviebox-api-snrn.onrender.com' },
   { name: 'Aoneroom', url: 'https://h5.aoneroom.com' }
@@ -485,11 +491,25 @@ async function fetchWithTimeout(url, timeout = 10000) {
   }
 }
 
-const FALLBACK_MOVIES = [
-  { subjectId:"8221332401033825872", title:"The Last Testament", poster:"https://pbcdnw.aoneroom.com/image/2025/11/28/eb616974c3eb25c2c647c730b0288f45.jpeg", year:"2025", rating:7.1, genre:"Action" },
-  { subjectId:"8759851328492438440", title:"Train Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year:"2025", rating:7.7, genre:"Drama" }
-  // ... mete tout FALLBACK_MOVIES ou yo isit la ...
-];
+// ============================================================
+// 1. Chèche fim popilè sou TMDB
+// ============================================================
+async function getPopularTMDB(page = 1) {
+  const url = `${TMDB_CONFIG.baseUrl}/movie/popular?api_key=${TMDB_CONFIG.apiKey}&language=en-US&page=${page}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return data.results || [];
+}
+
+// ============================================================
+// 2. Chèche fim pa non sou TMDB
+// ============================================================
+async function searchTMDB(query, page = 1) {
+  const url = `${TMDB_CONFIG.baseUrl}/search/movie?api_key=${TMDB_CONFIG.apiKey}&query=${encodeURIComponent(query)}&language=en-US&page=${page}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return data.results || [];
+}
 
 const STATE = { heroMovies: [], heroIndex: 0, heroTimer: null, categories: {}, allMovies: [] };
 
@@ -546,96 +566,83 @@ function setupEvents() {
   });
 }
 
+// ============================================================
+// 3. Chaje paj la ak TMDB
+// ============================================================
 async function loadHomepage() {
-  // 1. Verify cache
-  const cached = localStorage.getItem('blastflix_movies');
-  const cacheTime = localStorage.getItem('blastflix_movies_time');
-  const now = Date.now();
-  
-  // Si cache a mwens pase 30 minit, itilize l
-  if (cached && cacheTime && (now - parseInt(cacheTime)) < 30 * 60 * 1000) {
-    try {
-      const movies = JSON.parse(cached);
-      if (movies.length > 0) {
-        STATE.allMovies = movies;
-        const genres = {};
-        movies.forEach(m => {
-          const g = m.genre || "Autres";
-          if (!genres[g]) genres[g] = [];
-          genres[g].push(m);
-        });
-        STATE.categories = genres;
-        STATE.categories["Tous les films"] = movies;
-        setupAndRender();
-        return;
-      }
-    } catch (e) {
-      console.warn('Cache pa valab');
-    }
-  }
-  
-  // 2. Chèche nan API yo
-  for (const api of API_SOURCES) {
-    try {
-      console.log(`🔍 Chèche nan ${api.name}:`, api.url);
-      
-      // Eseye chèche nan plizyè paj pou plis fim
-      const allMovies = [];
-      for (let page = 1; page <= 5; page++) {
-        try {
-          const res = await fetchWithTimeout(`${api.url}/movies?page=${page}`, 8000);
-          if (res.ok) {
-            const data = await res.json();
-            let movies = [];
-            if (data.results) movies = data.results;
-            else if (data.movies) movies = data.movies;
-            else if (Array.isArray(data)) movies = data;
-            
-            if (movies.length === 0) break;
-            allMovies.push(...movies);
-          }
-        } catch (e) {
-          console.warn(`❌ Page ${page} pa mache`);
-          break;
+  try {
+    // Verify cache
+    const cached = localStorage.getItem('blastflix_movies');
+    const cacheTime = localStorage.getItem('blastflix_movies_time');
+    const now = Date.now();
+    
+    if (cached && cacheTime && (now - parseInt(cacheTime)) < 30 * 60 * 1000) {
+      try {
+        const movies = JSON.parse(cached);
+        if (movies.length > 0) {
+          STATE.allMovies = movies;
+          const genres = {};
+          movies.forEach(m => {
+            const g = m.genre || "Autres";
+            if (!genres[g]) genres[g] = [];
+            genres[g].push(m);
+          });
+          STATE.categories = genres;
+          STATE.categories["Tous les films"] = movies;
+          setupAndRender();
+          return;
         }
-      }
-      
-      if (allMovies.length > 0) {
-        const mapped = allMovies.map(m => ({
-          subjectId: m.subject_id || m.subjectId || m.id,
-          title: m.title || m.name,
-          poster: m.cover?.url || m.poster || m.image,
-          year: (m.release_date || m.year || '').split('-')[0],
-          rating: m.imdb_rating || m.rating || 'N/A',
-          genre: m.genre || 'Movie'
-        }));
-        
-        // Sere nan cache
-        localStorage.setItem('blastflix_movies', JSON.stringify(mapped));
-        localStorage.setItem('blastflix_movies_time', String(now));
-        
-        STATE.allMovies = mapped;
-        const genres = {};
-        mapped.forEach(m => {
-          const g = m.genre || "Autres";
-          if (!genres[g]) genres[g] = [];
-          genres[g].push(m);
-        });
-        STATE.categories = genres;
-        STATE.categories["Tous les films"] = mapped;
-        
-        setupAndRender();
-        return;
-      }
-    } catch (e) {
-      console.warn(`❌ ${api.name} pa mache:`, e.message);
+      } catch (e) {}
     }
+
+    // Chèche nan TMDB - plizyè paj
+    console.log('🔍 Chèche fim nan TMDB...');
+    const allMovies = [];
+    for (let page = 1; page <= 3; page++) {
+      const movies = await getPopularTMDB(page);
+      allMovies.push(...movies);
+    }
+
+    if (allMovies.length === 0) {
+      throw new Error('TMDB pa retounen fim');
+    }
+
+    // Konvèti fim TMDB yo pou yo matche ak kòd la
+    const mapped = allMovies.map(m => ({
+      subjectId: String(m.id), // ID TMDB
+      title: m.title || m.original_title || 'Sans titre',
+      poster: m.poster_path ? TMDB_CONFIG.imageBase + m.poster_path : 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image',
+      background: m.backdrop_path ? TMDB_CONFIG.imageBase + m.backdrop_path : '',
+      year: (m.release_date || '').split('-')[0] || 'N/A',
+      rating: m.vote_average ? m.vote_average.toFixed(1) : 'N/A',
+      genre: 'Movie', // TMDB pa bay genre nan popular, men nou ka jwenn nan lòt kote
+      description: m.overview || ''
+    }));
+
+    // Sere nan cache
+    localStorage.setItem('blastflix_movies', JSON.stringify(mapped));
+    localStorage.setItem('blastflix_movies_time', String(now));
+
+    STATE.allMovies = mapped;
+    
+    // Gwoupe pa genre (depi TMDB pa bay genre nan popular, nou pral fè yon sèl gwoup "Tous")
+    STATE.categories = { "Tous les films": mapped };
+    
+    setupAndRender();
+
+  } catch (e) {
+    console.error('❌ Erè ak TMDB:', e);
+    useFallback();
   }
-  
-  // 3. Si tout API yo pa mache, itilize fallback
-  console.log('⚠️ Tout API yo pa mache, itilize fallback');
-  useFallback();
 }
+
+// ============================================================
+// 4. Fallback si TMDB pa mache
+// ============================================================
+const FALLBACK_MOVIES = [
+  { subjectId:"8221332401033825872", title:"The Last Testament", poster:"https://pbcdnw.aoneroom.com/image/2025/11/28/eb616974c3eb25c2c647c730b0288f45.jpeg", year:"2025", rating:7.1, genre:"Action" },
+  { subjectId:"8759851328492438440", title:"Train Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year:"2025", rating:7.7, genre:"Drama" }
+];
 
 function useFallback() {
   STATE.allMovies = FALLBACK_MOVIES;
@@ -731,6 +738,8 @@ function createCard(movie) {
   const year = (movie.releaseDate || movie.year || "").split("-")[0];
   const genre = (movie.genre || "").split(",")[0];
   const poster = movie.cover?.url || movie.poster || movie.thumbnail || "https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image";
+  
+  // Pase ID TMDB a nan player a
   const params = new URLSearchParams({
     subjectId: movie.subjectId || movie.id || "",
     title: movie.title || "Film",
@@ -761,19 +770,20 @@ function createCard(movie) {
 function updateHero() {
   if (!STATE.heroMovies.length) return;
   const m = STATE.heroMovies[STATE.heroIndex];
-  const poster = m.cover?.url || m.poster || m.thumbnail || "";
+  const poster = m.background || m.poster || m.thumbnail || "";
   document.getElementById("heroBg").style.backgroundImage = `url(${poster})`;
   document.getElementById("heroTitle").textContent = m.title || "Sans titre";
   document.getElementById("heroMeta").innerHTML = `
-    ${m.releaseDate || m.year ? `<span><i class="fas fa-calendar"></i> ${(m.releaseDate || m.year || "").split("-")[0]}</span>` : ""}
-    ${m.imdbRatingValue || m.rating ? `<span><i class="fas fa-star"></i> ${m.imdbRatingValue || m.rating}</span>` : ""}
-    ${m.genre ? `<span><i class="fas fa-tag"></i> ${m.genre.split(",")[0]}</span>` : ""}
+    ${m.year ? `<span><i class="fas fa-calendar"></i> ${m.year}</span>` : ""}
+    ${m.rating ? `<span><i class="fas fa-star"></i> ${m.rating}</span>` : ""}
+    <span><i class="fas fa-tag"></i> ${m.genre || "Movie"}</span>
   `;
   document.getElementById("heroDesc").textContent = m.description || "";
+  
   const params = new URLSearchParams({
     subjectId: m.subjectId || m.id || "", title: m.title || "",
-    poster: poster, year: (m.releaseDate || m.year || "").split("-")[0] || "",
-    rating: m.imdbRatingValue || m.rating || "", genre: m.genre || "", desc: m.description || ""
+    poster: m.poster || "", year: m.year || "",
+    rating: m.rating || "", genre: m.genre || "", desc: m.description || ""
   });
   const url = `player.html?${params.toString()}`;
   document.getElementById("playHero").href = url;
