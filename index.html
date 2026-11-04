@@ -4,40 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#000000" />
-  <title>BLAST FLIX - Films</title>
+  <title>BLAST FLIX - Accueil</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    /* Liquid Glass Design */
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
     :root {
       --black:#000; --charcoal:#121214; --slate:#1c1c1f;
-      --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2;
-      --glass-1:rgba(255,255,255,0.035); --glass-border:rgba(255,255,255,0.09);
-      --glass-border-bright:rgba(255,255,255,0.22);
+      --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --pink:#ff375f;
+      --glass-1:rgba(255,255,255,0.035); --glass-2:rgba(255,255,255,0.07);
+      --glass-border:rgba(255,255,255,0.09); --glass-border-bright:rgba(255,255,255,0.22);
+      --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.20);
       --text:#f5f5f7; --text-dim:rgba(245,245,247,0.55);
-      --r-lg:20px; --r-md:14px;
-      --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
+      --r-lg:24px; --r-xl:34px; --r-2xl:42px;
       --blur-glass:blur(40px) saturate(180%);
+      --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
     }
     body {
-      font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
+      font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif;
       background:var(--black); color:var(--text); min-height:100vh;
-      padding-bottom:80px;
+      padding-bottom:80px; overflow-x:hidden;
     }
     .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); }
     .bg-neo::before {
       content:''; position:absolute; inset:0;
       background:
         radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.22), transparent),
-        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.15), transparent);
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.15), transparent),
+        radial-gradient(ellipse 50% 30% at 0% 50%, rgba(191,90,242,0.1), transparent);
       filter:blur(80px);
     }
+    .noise {
+      position:fixed; inset:0; z-index:-1; opacity:0.05; pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode:overlay;
+    }
+    
+    /* HEADER */
     .header {
       position:sticky; top:0; z-index:100; padding:16px 20px;
-      background:rgba(10,10,12,0.55);
-      backdrop-filter:var(--blur-glass);
+      background:rgba(10,10,12,0.55); backdrop-filter:var(--blur-glass);
       border-bottom:1px solid var(--glass-border);
       display:flex; align-items:center; justify-content:space-between;
+      padding-top:calc(16px + env(safe-area-inset-top,0px));
+      box-shadow:var(--glass-highlight);
     }
     .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
     .logo-mark {
@@ -45,39 +56,142 @@
       background:linear-gradient(135deg, var(--cyan), var(--blue), var(--purple));
       display:flex; align-items:center; justify-content:center;
       color:var(--black); font-size:16px;
+      box-shadow:0 6px 20px rgba(100,210,255,0.5), inset 0 1px 0 rgba(255,255,255,0.5);
     }
     .logo-text { font-size:19px; font-weight:800; }
-    .search-bar { padding:0 20px 16px; }
-    .search-input {
-      width:100%; padding:12px 18px;
-      background:var(--glass-1); border:1px solid var(--glass-border);
-      border-radius:50px; color:var(--text);
-      font-size:14px; font-family:inherit; outline:none;
+    .search-icon {
+      width:42px; height:42px; border-radius:50%;
+      background:var(--glass-2); border:1px solid var(--glass-border);
+      color:var(--text); display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:all var(--spring);
     }
-    .search-input:focus { border-color:var(--cyan); }
-    .content { max-width:1200px; margin:0 auto; padding:20px; }
+    .search-icon:hover { border-color:var(--cyan); background:rgba(100,210,255,0.15); }
+    
+    /* HERO */
+    .hero {
+      position:relative; height:520px; overflow:hidden; margin-bottom:24px;
+    }
+    .hero-bg {
+      position:absolute; inset:0;
+      background-size:cover; background-position:center;
+      transition:opacity 0.8s;
+    }
+    .hero-bg::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.6) 40%, transparent 80%);
+    }
+    .hero-content {
+      position:absolute; bottom:0; left:0; right:0;
+      padding:28px 20px; z-index:2; max-width:1200px; margin:0 auto;
+    }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 12px; background:rgba(100,210,255,0.2);
+      border:1px solid rgba(100,210,255,0.5); border-radius:50px;
+      font-size:10px; font-weight:700; color:var(--cyan); margin-bottom:12px;
+      backdrop-filter:blur(20px);
+    }
+    .hero-title {
+      font-size:clamp(28px, 7vw, 44px); font-weight:900; line-height:1.1;
+      margin-bottom:10px; text-shadow:0 2px 20px rgba(0,0,0,0.8);
+    }
+    .hero-meta {
+      display:flex; gap:12px; flex-wrap:wrap;
+      font-size:13px; color:var(--text-dim); margin-bottom:18px; font-weight:600;
+    }
+    .hero-meta span { display:inline-flex; align-items:center; gap:4px; }
+    .hero-meta i { color:var(--cyan); font-size:10px; }
+    .hero-btns { display:flex; gap:10px; }
+    .btn-play {
+      padding:12px 24px; background:#fff; color:var(--black);
+      border:none; border-radius:50px; font-size:14px; font-weight:800;
+      cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:8px;
+      box-shadow:0 8px 24px rgba(255,255,255,0.2); text-decoration:none;
+    }
+    .btn-info {
+      padding:12px 24px; background:rgba(255,255,255,0.15); color:#fff;
+      border:1px solid rgba(255,255,255,0.3); border-radius:50px;
+      font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;
+      display:inline-flex; align-items:center; gap:8px; backdrop-filter:blur(20px);
+      text-decoration:none;
+    }
+    
+    /* CATEGORIES */
+    .categories {
+      display:flex; gap:8px; padding:0 20px 24px;
+      overflow-x:auto; scrollbar-width:none; max-width:1200px; margin:0 auto;
+    }
+    .categories::-webkit-scrollbar { display:none; }
+    .cat {
+      padding:10px 18px; background:var(--glass-1);
+      border:1px solid var(--glass-border); border-radius:50px;
+      color:var(--text-dim); font-size:13px; font-weight:600;
+      white-space:nowrap; cursor:pointer; font-family:inherit;
+      transition:all var(--spring);
+    }
+    .cat.active {
+      background:linear-gradient(135deg, rgba(100,210,255,0.25), rgba(191,90,242,0.2));
+      border-color:var(--cyan); color:var(--cyan);
+      box-shadow:0 4px 20px rgba(100,210,255,0.3);
+    }
+    
+    /* CONTENT */
+    .content { max-width:1200px; margin:0 auto; padding:0 20px; }
+    .section { margin-bottom:36px; }
+    .section-head {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:16px;
+    }
     .section-title {
-      font-size:21px; font-weight:800; margin-bottom:20px;
-      display:flex; align-items:center; gap:10px;
+      font-size:20px; font-weight:800; display:flex; align-items:center; gap:10px;
     }
-    .section-title i { color:var(--cyan); }
+    .section-title i { color:var(--cyan); font-size:16px; }
+    
+    /* GRID */
     .grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
       gap:16px;
     }
     .card {
       border-radius:var(--r-lg); overflow:hidden;
       background:var(--glass-1); border:1px solid var(--glass-border);
-      cursor:pointer; transition:all 0.45s var(--spring);
+      cursor:pointer; transition:all var(--spring);
       text-decoration:none; color:inherit; display:block;
+      box-shadow:var(--glass-highlight), 0 4px 12px rgba(0,0,0,0.3);
+      position:relative;
     }
-    .card:hover { transform:translateY(-6px); border-color:var(--glass-border-bright); }
-    .poster-wrap { width:100%; aspect-ratio:2/3; overflow:hidden; background:var(--charcoal); }
-    .poster { width:100%; height:100%; object-fit:cover; display:block; }
-    .info { padding:12px 14px; }
-    .title { font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px; }
-    .meta { font-size:11px; color:var(--text-dim); }
+    .card:hover {
+      transform:translateY(-6px) scale(1.02);
+      border-color:var(--glass-border-bright);
+      box-shadow:0 20px 40px rgba(0,0,0,0.6), 0 0 30px rgba(100,210,255,0.2);
+    }
+    .poster-wrap {
+      position:relative; width:100%; aspect-ratio:2/3;
+      overflow:hidden; background:var(--charcoal);
+    }
+    .poster {
+      width:100%; height:100%; object-fit:cover; display:block;
+      transition:transform 0.6s;
+    }
+    .card:hover .poster { transform:scale(1.1); }
+    .card-hd {
+      position:absolute; top:10px; right:10px;
+      padding:4px 8px; background:rgba(0,0,0,0.75);
+      border:1px solid rgba(255,255,255,0.2); border-radius:6px;
+      font-size:10px; font-weight:800; color:var(--cyan);
+    }
+    .card-info { padding:10px 12px; }
+    .card-title {
+      font-size:13px; font-weight:700;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      margin-bottom:4px;
+    }
+    .card-meta {
+      display:flex; gap:8px; font-size:11px; color:var(--text-dim);
+    }
+    .card-meta .rating { color:var(--cyan); font-weight:700; }
+    
+    /* FOOTER */
     .footer {
       position:fixed; bottom:0; left:0; right:0; z-index:90;
       padding:12px 20px; background:rgba(10,10,12,0.85);
@@ -91,61 +205,98 @@
       color:var(--text-dim); text-decoration:none;
       font-size:10px; font-weight:600;
       padding:8px 16px; border-radius:14px;
+      transition:all var(--spring);
     }
     .footer-btn i { font-size:20px; }
     .footer-btn.active { color:var(--cyan); }
-    .loader {
-      position:fixed; inset:0; background:var(--black); z-index:999;
-      display:flex; align-items:center; justify-content:center;
+    
+    /* SEARCH */
+    .search-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.6);
+      backdrop-filter:blur(40px); z-index:200; display:none;
+      align-items:flex-start; justify-content:center; padding:100px 20px 20px;
     }
-    .loader.hidden { display:none; }
-    .loader-mark {
-      width:80px; height:80px; border-radius:20px;
-      background:linear-gradient(135deg, var(--cyan), var(--blue), var(--purple));
-      display:flex; align-items:center; justify-content:center;
-      font-size:36px; color:var(--black);
-      animation:markPulse 2s infinite;
+    .search-overlay.active { display:flex; }
+    .search-box {
+      width:100%; max-width:560px; padding:12px 12px 12px 20px;
+      border-radius:50px; display:flex; align-items:center; gap:12px;
+      background:var(--glass-2); backdrop-filter:blur(60px);
+      border:1px solid var(--glass-border-bright);
     }
-    @keyframes markPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.05); } }
-    @media (max-width:768px) {
-      .grid { grid-template-columns:repeat(auto-fill, minmax(130px,1fr)); gap:12px; }
-      .content { padding:14px; }
+    .search-box i { color:var(--text-dim); font-size:18px; }
+    .search-box input {
+      flex:1; background:transparent; border:none; outline:none;
+      color:var(--text); font-size:16px; font-family:inherit;
+    }
+    .search-close {
+      width:38px; height:38px; border-radius:50%;
+      background:var(--glass-2); border:1px solid var(--glass-border);
+      color:var(--text); display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+    }
+    
+    @media (max-width: 768px) {
+      .grid { grid-template-columns:repeat(2, 1fr); gap:12px; }
+      .content { padding:0 14px; }
+      .hero { height:460px; }
     }
   </style>
 </head>
 <body>
 
 <div class="bg-neo"></div>
+<div class="noise"></div>
 
-<div class="loader" id="loader">
-  <div class="loader-mark"><i class="fas fa-play"></i></div>
-</div>
-
+<!-- HEADER -->
 <header class="header">
   <a href="index.html" class="logo">
     <div class="logo-mark"><i class="fas fa-play"></i></div>
     <span class="logo-text">BLAST FLIX</span>
   </a>
+  <div class="search-icon" id="searchBtn">
+    <i class="fas fa-search"></i>
+  </div>
 </header>
 
-<div class="search-bar">
-  <input type="text" class="search-input" id="searchInput" placeholder="Rechercher un film...">
+<!-- SEARCH -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" id="searchInput" placeholder="Rechercher un film...">
+    <div class="search-close" id="closeSearch"><i class="fas fa-times"></i></div>
+  </div>
 </div>
 
-<main class="content">
-  <h2 class="section-title"><i class="fas fa-fire"></i> Films <span id="movieCount"></span></h2>
-  <div class="grid" id="movieGrid"></div>
-</main>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><i class="fas fa-fire"></i> TOP TENDANCE</div>
+    <h1 class="hero-title" id="heroTitle">Chargement...</h1>
+    <div class="hero-meta" id="heroMeta"></div>
+    <div class="hero-btns">
+      <a href="#" class="btn-play" id="heroPlay"><i class="fas fa-play"></i> Regarder</a>
+      <a href="#" class="btn-info" id="heroInfo"><i class="fas fa-info-circle"></i> Infos</a>
+    </div>
+  </div>
+</div>
 
+<!-- CATEGORIES -->
+<div class="categories" id="categoryTabs"></div>
+
+<!-- CONTENT -->
+<div class="content" id="mainContent"></div>
+
+<!-- FOOTER -->
 <footer class="footer">
   <a href="index.html" class="footer-btn active">
     <i class="fas fa-home"></i><span>Accueil</span>
   </a>
-  <a href="#" class="footer-btn">
+  <a href="#" class="footer-btn" onclick="document.getElementById('searchBtn').click()">
     <i class="fas fa-search"></i><span>Recherche</span>
   </a>
-  <a href="#" class="footer-btn">
-    <i class="fas fa-film"></i><span>Films</span>
+  <a href="downloads.html" class="footer-btn">
+    <i class="fas fa-download"></i><span>Téléch.</span>
   </a>
   <a href="#" class="footer-btn" onclick="alert('Login pa disponib')">
     <i class="fas fa-user"></i><span>Login</span>
@@ -154,16 +305,14 @@
 
 <script>
 // ============================================================
-// ✅ TOUT FIM OU YO (Mete tout fim ou yo isit la)
+// ✅ TOUT FIM OU YO (Soti nan done ou te voye yo)
 // ============================================================
 const MOVIES = [
   {
     subjectId: "3725096513421442384",
     title: "Bugonia",
     poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/cbb960d2b8053e40398372b031d7c6af.jpg",
-    year: "2025",
-    rating: "7.2",
-    type: "movie",
+    year: "2025", rating: "7.2", type: "movie", genre: "Sci-Fi",
     detailPath: "bugonia-WTd7eaSmwY2",
     desc: "Bugonia is a sci-fi thriller about a conspiracy theorist who kidnaps a CEO."
   },
@@ -171,9 +320,7 @@ const MOVIES = [
     subjectId: "3854326812578922640",
     title: "After the Hunt",
     poster: "https://pbcdnw.aoneroom.com/image/2025/11/21/40a1b8238733d1169d079a5e7af0fc7f.jpg",
-    year: "2025",
-    rating: "6.2",
-    type: "movie",
+    year: "2025", rating: "6.2", type: "movie", genre: "Crime",
     detailPath: "after-the-hunt-G9uUgYaRIA4",
     desc: "A college professor finds herself at a personal and professional crossroads when a star pupil levels an accusation against one of her colleagues."
   },
@@ -181,9 +328,7 @@ const MOVIES = [
     subjectId: "8759851328492438440",
     title: "Train Dreams",
     poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg",
-    year: "2025",
-    rating: "7.7",
-    type: "movie",
+    year: "2025", rating: "7.7", type: "movie", genre: "Drama",
     detailPath: "train-dreams-OJyRf09d6ra",
     desc: "Based on Denis Johnson's beloved novella, Train Dreams is the moving portrait of Robert Grainier, a logger and railroad worker who leads a life of unexpected depth and beauty."
   },
@@ -191,9 +336,7 @@ const MOVIES = [
     subjectId: "407974060606504992",
     title: "The Family Plan 2",
     poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/873fd90dff1123846fe6cc34c1010f10.jpg",
-    year: "2025",
-    rating: "5.6",
-    type: "movie",
+    year: "2025", rating: "5.6", type: "movie", genre: "Action",
     detailPath: "the-family-plan-2-YctPw7Aw8u",
     desc: "Now that Dan's assassin days are behind him, all he wants for Christmas is quality time with his kids."
   },
@@ -201,9 +344,7 @@ const MOVIES = [
     subjectId: "1740329846154085032",
     title: "The Family Plan",
     poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/44b4bb2b8981eb13b9ce374e1d0f6df5.jpg",
-    year: "2023",
-    rating: "6.3",
-    type: "movie",
+    year: "2023", rating: "6.3", type: "movie", genre: "Action",
     detailPath: "the-family-plan-4KeFZScJy42",
     desc: "A former top assassin living incognito as a suburban dad must take his unsuspecting family on the run."
   },
@@ -211,9 +352,7 @@ const MOVIES = [
     subjectId: "3551015833440864784",
     title: "Resurrection Road",
     poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/4dbb392a0c402c393bd4459395a18150.jpg",
-    year: "2025",
-    rating: "5.9",
-    type: "movie",
+    year: "2025", rating: "5.9", type: "movie", genre: "Action",
     detailPath: "resurrection-road-2DPUL5NGje4",
     desc: "An elite squad of six Black soldiers, led by ex-slave Barabbas, have been sent on a suicide mission."
   },
@@ -221,9 +360,7 @@ const MOVIES = [
     subjectId: "8857965935064499248",
     title: "Playdate",
     poster: "https://pbcdnw.aoneroom.com/image/2025/10/28/edc4c3b20c646359da2ce17a49624c51.jpg",
-    year: "2025",
-    rating: "7.0",
-    type: "movie",
+    year: "2025", rating: "7.0", type: "movie", genre: "Comedy",
     detailPath: "playdate-mr2NLFPzlya",
     desc: "Brian has just been fired from his job. He becomes a stay-at-home dad."
   },
@@ -231,9 +368,7 @@ const MOVIES = [
     subjectId: "144265366439707640",
     title: "One Battle After Another",
     poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg",
-    year: "2025",
-    rating: "8.2",
-    type: "movie",
+    year: "2025", rating: "8.2", type: "movie", genre: "Action",
     detailPath: "one-battle-after-another-AorB0GGJEa",
     desc: "When their evil enemy resurfaces after 16 years, a group of ex-revolutionaries reunite to rescue the daughter of one of their own."
   },
@@ -241,71 +376,203 @@ const MOVIES = [
     subjectId: "488603172416769952",
     title: "Roofman",
     poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg",
-    year: "2025",
-    rating: "7.2",
-    type: "movie",
+    year: "2025", rating: "7.2", type: "movie", genre: "Crime",
     detailPath: "roofman-axKcIQ4O5A",
     desc: "A charismatic criminal, while on the run from the police, hides in a hidden space of a toy store."
+  },
+  {
+    subjectId: "4956801153355891744",
+    title: "Stranger Things",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg",
+    year: "2016", rating: "8.6", type: "series", genre: "Drama",
+    detailPath: "stranger-things-wsymkZvcaU5",
+    desc: "In 1980s Indiana, a group of young friends witness supernatural forces and secret government exploits."
   }
 ];
 
 // ============================================================
-// ✅ AFICHE FIM YO
+// ✅ STATE
 // ============================================================
-function renderMovies(movies) {
-  const grid = document.getElementById("movieGrid");
+const STATE = {
+  heroMovies: MOVIES.slice(0, 5),
+  heroIndex: 0,
+  heroTimer: null,
+  currentFilter: 'all',
+  searchQuery: ''
+};
+
+// ============================================================
+// ✅ INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  setupEvents();
+  updateHero();
+  startHeroRotation();
+  renderCategories();
+  renderAllSections();
+});
+
+// ============================================================
+// ✅ HERO ROTATION
+// ============================================================
+function updateHero() {
+  const m = STATE.heroMovies[STATE.heroIndex];
+  document.getElementById('heroBg').style.backgroundImage = `url(${m.poster})`;
+  document.getElementById('heroTitle').textContent = m.title;
+  document.getElementById('heroMeta').innerHTML = `
+    <span><i class="fas fa-calendar"></i> ${m.year}</span>
+    <span><i class="fas fa-star"></i> ${m.rating}</span>
+    <span><i class="fas fa-tag"></i> ${m.genre}</span>
+  `;
+  const params = new URLSearchParams({
+    subjectId: m.subjectId, title: m.title, poster: m.poster,
+    year: m.year, rating: m.rating, type: m.type,
+    detailPath: m.detailPath, desc: m.desc
+  });
+  const url = `player.html?${params.toString()}`;
+  document.getElementById('heroPlay').href = url;
+  document.getElementById('heroInfo').href = url;
+}
+
+function startHeroRotation() {
+  if (STATE.heroTimer) clearInterval(STATE.heroTimer);
+  STATE.heroTimer = setInterval(() => {
+    STATE.heroIndex = (STATE.heroIndex + 1) % STATE.heroMovies.length;
+    updateHero();
+  }, 5000);
+}
+
+// ============================================================
+// ✅ CATEGORIES
+// ============================================================
+function renderCategories() {
+  const container = document.getElementById('categoryTabs');
+  const categories = ['all', 'Action', 'Drama', 'Comedy', 'Crime', 'Sci-Fi', 'Series'];
+  const labels = { 'all': 'Tous', 'Action': 'Action', 'Drama': 'Drama', 'Comedy': 'Comédie', 'Crime': 'Crime', 'Sci-Fi': 'Sci-Fi', 'Series': 'Séries' };
   
-  if (movies.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-dim);">Aucun film</div>`;
+  container.innerHTML = categories.map(cat => `
+    <button class="cat ${cat === 'all' ? 'active' : ''}" data-cat="${cat}">
+      ${labels[cat]}
+    </button>
+  `).join('');
+  
+  container.querySelectorAll('.cat').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.cat').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      STATE.currentFilter = btn.dataset.cat;
+      renderAllSections();
+    });
+  });
+}
+
+// ============================================================
+// ✅ RENDER ALL SECTIONS
+// ============================================================
+function renderAllSections() {
+  const main = document.getElementById('mainContent');
+  
+  // Filter
+  let filtered = MOVIES;
+  if (STATE.currentFilter === 'Series') {
+    filtered = MOVIES.filter(m => m.type === 'series');
+  } else if (STATE.currentFilter !== 'all') {
+    filtered = MOVIES.filter(m => m.genre === STATE.currentFilter);
+  }
+  
+  // Search
+  if (STATE.searchQuery) {
+    const q = STATE.searchQuery.toLowerCase();
+    filtered = filtered.filter(m => 
+      m.title.toLowerCase().includes(q) || 
+      m.genre.toLowerCase().includes(q)
+    );
+  }
+  
+  if (filtered.length === 0) {
+    main.innerHTML = `<div style="text-align:center; padding:60px 20px; color:var(--text-dim);">Aucun film trouvé</div>`;
     return;
   }
   
-  grid.innerHTML = movies.map(m => {
-    const params = new URLSearchParams({
-      subjectId: m.subjectId,
-      title: m.title,
-      poster: m.poster || '',
-      year: m.year || '',
-      rating: m.rating || '',
-      type: m.type || 'movie',
-      detailPath: m.detailPath || '',
-      desc: m.desc || ''
-    });
-    
-    return `
-      <a href="player.html?${params.toString()}" class="card">
-        <div class="poster-wrap">
-          <img class="poster" src="${m.poster}" alt="${m.title}" loading="lazy"
-               onerror="this.src='https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image'">
+  // Group by genre
+  const grouped = {};
+  filtered.forEach(m => {
+    if (!grouped[m.genre]) grouped[m.genre] = [];
+    grouped[m.genre].push(m);
+  });
+  
+  main.innerHTML = Object.keys(grouped).map(genre => `
+    <div class="section">
+      <div class="section-head">
+        <h2 class="section-title"><i class="fas fa-film"></i> ${genre}</h2>
+      </div>
+      <div class="grid">
+        ${grouped[genre].map(m => createCard(m)).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function createCard(m) {
+  const params = new URLSearchParams({
+    subjectId: m.subjectId, title: m.title, poster: m.poster,
+    year: m.year, rating: m.rating, type: m.type,
+    detailPath: m.detailPath, desc: m.desc
+  });
+  
+  return `
+    <a href="player.html?${params.toString()}" class="card">
+      <div class="poster-wrap">
+        <img class="poster" src="${m.poster}" alt="${m.title}" loading="lazy"
+             onerror="this.src='https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image'">
+        <div class="card-hd">480p HD</div>
+      </div>
+      <div class="card-info">
+        <div class="card-title">${m.title}</div>
+        <div class="card-meta">
+          <span>${m.year}</span>
+          <span class="rating"><i class="fas fa-star"></i> ${m.rating}</span>
         </div>
-        <div class="info">
-          <div class="title">${m.title}</div>
-          <div class="meta">${m.year} • ${m.type === 'series' ? 'Série' : 'Film'}</div>
-        </div>
-      </a>
-    `;
-  }).join('');
+      </div>
+    </a>
+  `;
 }
 
 // ============================================================
 // ✅ SEARCH
 // ============================================================
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase().trim();
-  if (!q) {
-    renderMovies(MOVIES);
-    return;
-  }
-  const filtered = MOVIES.filter(m => m.title.toLowerCase().includes(q));
-  renderMovies(filtered);
-});
-
-// ============================================================
-// ✅ KÒMANSE
-// ============================================================
-document.getElementById("loader").classList.add("hidden");
-document.getElementById("movieCount").textContent = `(${MOVIES.length})`;
-renderMovies(MOVIES);
+function setupEvents() {
+  const searchBtn = document.getElementById('searchBtn');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const closeSearch = document.getElementById('closeSearch');
+  const searchInput = document.getElementById('searchInput');
+  
+  searchBtn.addEventListener('click', () => {
+    searchOverlay.classList.add('active');
+    setTimeout(() => searchInput.focus(), 100);
+  });
+  
+  closeSearch.addEventListener('click', () => {
+    searchOverlay.classList.remove('active');
+    searchInput.value = '';
+    STATE.searchQuery = '';
+    renderAllSections();
+  });
+  
+  searchOverlay.addEventListener('click', (e) => {
+    if (e.target === searchOverlay) {
+      searchOverlay.classList.remove('active');
+      searchInput.value = '';
+      STATE.searchQuery = '';
+      renderAllSections();
+    }
+  });
+  
+  searchInput.addEventListener('input', (e) => {
+    STATE.searchQuery = e.target.value;
+    renderAllSections();
+  });
+}
 </script>
 </body>
 </html>
