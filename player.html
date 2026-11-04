@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#000000">
     <title>Lecture - BLAST FLIX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
@@ -21,17 +20,24 @@
         }
         html, body {
             font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
-            background:var(--black); color:var(--text); min-height:100vh;
+            background:var(--black); color:var(--text);
+            min-height:100vh;
             overflow-x:hidden;
+            overflow-y:auto; /* PAJ LA GEN SCROLL */
         }
         .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); }
         .bg-neo::before {
             content:''; position:absolute; inset:0;
-            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.18), transparent);
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.18), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.12), transparent);
             filter:blur(80px);
         }
+        
+        /* HEADER */
         .header {
-            position:sticky; top:0; z-index:100; padding:10px 16px;
+            position:sticky; top:0; z-index:100;
+            padding:10px 16px;
             background:rgba(10,10,12,0.85);
             backdrop-filter:var(--blur-glass);
             border-bottom:1px solid var(--glass-border);
@@ -53,25 +59,47 @@
             flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
         }
         
-        /* IFRAME WRAPPER */
-        .iframe-wrap {
-            position:relative; width:100%; aspect-ratio:16/9;
-            background:#000; overflow:hidden;
+        /* IFRAME CONTAINER (PA GEN SCROLL) */
+        .iframe-container {
+            position:relative;
+            width:100%;
+            max-width:640px;
+            margin:16px auto;
+            aspect-ratio:16/9;
+            background:#000;
+            border-radius:12px;
+            overflow:hidden; /* BLOKE SCROLL NAN IFRAME A */
+            border:1px solid var(--glass-border-bright);
+            box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(100,210,255,0.15);
         }
-        .iframe-wrap iframe {
-            position:absolute; top:0; left:0;
-            width:100%; height:100%; border:none; display:block;
+        .iframe-container iframe {
+            width:100%;
+            height:100%;
+            border:none;
+            display:block;
+            overflow:hidden; /* BLOKE SCROLL */
+            scrollbar-width:none; /* Firefox */
         }
-        .iframe-loading {
-            position:absolute; inset:0;
+        .iframe-container iframe::-webkit-scrollbar {
+            display:none; /* Chrome/Safari */
+        }
+        
+        /* LOADING */
+        .loading {
+            position:absolute;
+            inset:0;
             background:rgba(0,0,0,0.9);
-            display:flex; flex-direction:column;
-            align-items:center; justify-content:center;
-            gap:16px; z-index:10;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:16px;
+            z-index:10;
         }
-        .iframe-loading.hidden { display:none; }
+        .loading.hidden { display:none; }
         .spinner {
-            width:50px; height:50px; border-radius:50%;
+            width:40px; height:40px;
+            border-radius:50%;
             border:3px solid rgba(255,255,255,0.08);
             border-top-color:var(--cyan);
             border-right-color:var(--purple);
@@ -79,36 +107,61 @@
         }
         @keyframes spin { to { transform:rotate(360deg); } }
         .loading-text {
-            font-size:12px; color:var(--text-dim);
-            letter-spacing:2px; text-transform:uppercase;
+            font-size:11px;
+            color:var(--text-dim);
+            letter-spacing:2px;
+            text-transform:uppercase;
         }
         
         /* KONTNI ANBA A */
-        .content { max-width:1000px; margin:0 auto; padding:16px; }
+        .content {
+            max-width:1000px;
+            margin:0 auto;
+            padding:0 16px 40px;
+        }
+        
+        /* INFO CARD */
         .info-card {
             background:var(--glass-1);
             backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border);
             border-radius:var(--r-lg);
-            padding:16px; margin-bottom:14px;
+            padding:16px;
+            margin-bottom:14px;
         }
-        .info-header { display:flex; gap:14px; align-items:flex-start; margin-bottom:14px; }
+        .info-header {
+            display:flex;
+            gap:14px;
+            align-items:flex-start;
+            margin-bottom:14px;
+        }
         .info-poster {
-            width:80px; aspect-ratio:2/3; object-fit:cover;
+            width:80px;
+            aspect-ratio:2/3;
+            object-fit:cover;
             border-radius:var(--r-md);
             border:1px solid var(--glass-border);
             flex-shrink:0;
         }
         .info-content { flex:1; min-width:0; }
-        .info-title { font-size:18px; font-weight:800; margin-bottom:8px; }
+        .info-title {
+            font-size:18px;
+            font-weight:800;
+            margin-bottom:8px;
+        }
         .info-meta {
-            display:flex; flex-wrap:wrap; gap:8px;
-            font-size:11px; color:var(--text-dim); font-weight:600;
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            font-size:11px;
+            color:var(--text-dim);
+            font-weight:600;
         }
         .info-meta span { display:inline-flex; align-items:center; gap:4px; }
         .info-meta i { color:var(--cyan); font-size:10px; }
         .info-desc {
-            font-size:13px; line-height:1.6;
+            font-size:13px;
+            line-height:1.6;
             color:var(--text-dim);
             padding-top:14px;
             border-top:1px solid var(--glass-border);
@@ -116,7 +169,9 @@
         
         /* WHATSAPP */
         .wa-card {
-            display:flex; align-items:center; gap:12px;
+            display:flex;
+            align-items:center;
+            gap:12px;
             padding:14px;
             background:linear-gradient(135deg, rgba(37,211,102,0.15), rgba(18,140,126,0.1));
             border:1px solid rgba(37,211,102,0.4);
@@ -136,16 +191,24 @@
         .wa-btn {
             padding:8px 14px;
             background:linear-gradient(135deg, #25D366, #128C7E);
-            color:#fff; border:none; border-radius:50px;
-            font-size:11px; font-weight:700;
-            cursor:pointer; text-decoration:none;
+            color:#fff;
+            border:none;
+            border-radius:50px;
+            font-size:11px;
+            font-weight:700;
+            cursor:pointer;
+            text-decoration:none;
             white-space:nowrap;
         }
         
         /* SIJESYON */
         .suggest-title {
-            font-size:15px; font-weight:800; margin-bottom:12px;
-            display:flex; align-items:center; gap:8px;
+            font-size:15px;
+            font-weight:800;
+            margin-bottom:12px;
+            display:flex;
+            align-items:center;
+            gap:8px;
         }
         .suggest-title i { color:var(--cyan); font-size:13px; }
         .suggest-grid {
@@ -154,19 +217,38 @@
             gap:10px;
         }
         .suggest-card {
-            border-radius:var(--r-md); overflow:hidden;
-            background:var(--glass-1); border:1px solid var(--glass-border);
-            text-decoration:none; color:inherit; display:block;
+            border-radius:var(--r-md);
+            overflow:hidden;
+            background:var(--glass-1);
+            border:1px solid var(--glass-border);
+            text-decoration:none;
+            color:inherit;
+            display:block;
             transition:all var(--spring);
         }
-        .suggest-card:hover { transform:translateY(-4px); border-color:var(--glass-border-bright); }
-        .suggest-card img { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; }
+        .suggest-card:hover {
+            transform:translateY(-4px);
+            border-color:var(--glass-border-bright);
+        }
+        .suggest-card img {
+            width:100%;
+            aspect-ratio:2/3;
+            object-fit:cover;
+            display:block;
+        }
         .suggest-info { padding:8px 10px; }
-        .suggest-name { font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+        .suggest-name {
+            font-size:12px;
+            font-weight:700;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            margin-bottom:2px;
+        }
         .suggest-meta { font-size:10px; color:var(--text-dim); }
         
         @media (max-width:768px) {
-            .content { padding:12px; }
+            .content { padding:0 12px 40px; }
             .info-title { font-size:16px; }
             .suggest-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:8px; }
         }
@@ -176,20 +258,30 @@
 
 <div class="bg-neo"></div>
 
+<!-- HEADER -->
 <header class="header">
     <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
     <div class="header-title" id="headerTitle">Chargement...</div>
 </header>
 
-<div class="iframe-wrap">
-    <iframe id="playerIframe" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>
-    <div class="iframe-loading" id="iframeLoading">
+<!-- IFRAME CONTAINER (PA GEN SCROLL NAN IFRAME A) -->
+<div class="iframe-container">
+    <iframe 
+        id="playerIframe" 
+        allowfullscreen 
+        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+        scrolling="no">
+    </iframe>
+    <div class="loading" id="loading">
         <div class="spinner"></div>
-        <div class="loading-text">Chargement du film...</div>
+        <div class="loading-text">Chargement...</div>
     </div>
 </div>
 
+<!-- KONTNI ANBA A -->
 <div class="content">
+
+    <!-- INFO CARD -->
     <div class="info-card">
         <div class="info-header">
             <img id="infoPoster" class="info-poster" src="" alt="Poster">
@@ -201,6 +293,7 @@
         <p id="infoDesc" class="info-desc">Chargement...</p>
     </div>
 
+    <!-- WHATSAPP -->
     <div class="wa-card">
         <div class="wa-icon"><i class="fab fa-whatsapp"></i></div>
         <div class="wa-content">
@@ -212,8 +305,10 @@
         </a>
     </div>
 
+    <!-- SIJESYON -->
     <div class="suggest-title"><i class="fas fa-film"></i> Films suggérés</div>
     <div class="suggest-grid" id="suggestGrid"></div>
+
 </div>
 
 <script>
@@ -245,19 +340,17 @@ document.getElementById('infoMeta').innerHTML = `
 document.getElementById('infoDesc').textContent = data.desc;
 
 // ============================================================
-// ✅ IFRAME AK BACKUP (3 API YO)
+// ✅ IFRAME (movieboxonline.net)
 // ============================================================
 const iframe = document.getElementById('playerIframe');
-const loadingEl = document.getElementById('iframeLoading');
+const loadingEl = document.getElementById('loading');
 
-// Bati URL la pou premye API a (mzfi.me)
 let iframeUrl = '';
+
 if (data.detailPath) {
-    const se = data.season || '0';
-    const ep = data.episode || '0';
-    iframeUrl = `https://mzfi.me/spa/videoPlayPage/movies/${data.detailPath}?id=${data.subjectId}&detailSe=${se}&detailEp=${ep}&lang=en&type=%2Fmovie%2Fdetail`;
+    iframeUrl = `https://movieboxonline.net/play/${data.detailPath}?id=${data.subjectId}&page_from=home&type=/movie/detail`;
 } else {
-    iframeUrl = `https://mzfi.me/spa/videoPlayPage/movies/play?id=${data.subjectId}&lang=en&type=%2Fmovie%2Fdetail`;
+    iframeUrl = `https://movieboxonline.net/play?id=${data.subjectId}&type=/movie/detail`;
 }
 
 console.log('🔗 Iframe URL:', iframeUrl);
@@ -274,7 +367,7 @@ setTimeout(() => {
 }, 3000);
 
 // ============================================================
-// ✅ SIJESYON FIM YO (Ak fim ou te voye yo)
+// ✅ SIJESYON FIM YO
 // ============================================================
 const SUGGESTIONS = [
     { subjectId: "3725096513421442384", title: "Bugonia", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/cbb960d2b8053e40398372b031d7c6af.jpg", year: "2025", detailPath: "bugonia-WTd7eaSmwY2" },
