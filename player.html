@@ -20,10 +20,9 @@
         }
         html, body {
             font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
-            background:var(--black); color:var(--text);
-            min-height:100vh;
+            background:var(--black); color:var(--text); min-height:100vh;
             overflow-x:hidden;
-            overflow-y:auto; /* PAJ LA GEN SCROLL */
+            overflow-y:auto;
         }
         .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); }
         .bg-neo::before {
@@ -59,58 +58,46 @@
             flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
         }
         
-        /* IFRAME CONTAINER (PA GEN SCROLL) */
-        .iframe-container {
+        /* IFRAME CONTAINER (WOTÈ FIKS 450px) */
+        .iframe-wrap {
             position:relative;
             width:100%;
-            max-width:640px;
-            margin:16px auto;
-            aspect-ratio:16/9;
+            height:450px; /* WOTÈ FIKS */
             background:#000;
-            border-radius:12px;
-            overflow:hidden; /* BLOKE SCROLL NAN IFRAME A */
-            border:1px solid var(--glass-border-bright);
-            box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(100,210,255,0.15);
+            overflow:hidden; /* BLOKE SCROLL */
+            margin-bottom:16px;
         }
-        .iframe-container iframe {
-            width:100%;
-            height:100%;
+        .iframe-wrap iframe {
+            position:absolute;
+            top:0; left:0;
+            width:100%; height:100%;
             border:none;
             display:block;
-            overflow:hidden; /* BLOKE SCROLL */
+            overflow:hidden; /* BLOKE SCROLL ANDEDAN IFRAME A */
             scrollbar-width:none; /* Firefox */
         }
-        .iframe-container iframe::-webkit-scrollbar {
+        .iframe-wrap iframe::-webkit-scrollbar {
             display:none; /* Chrome/Safari */
         }
         
-        /* LOADING */
-        .loading {
+        /* MASK ANWO A (KACHE BAR RECHÈCH LA) */
+        .iframe-wrap .mask-top {
             position:absolute;
-            inset:0;
-            background:rgba(0,0,0,0.9);
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            justify-content:center;
-            gap:16px;
+            top:0; left:0; right:0;
+            height:70px;
+            background:linear-gradient(to bottom, #000 85%, transparent 100%);
             z-index:10;
+            pointer-events:none;
         }
-        .loading.hidden { display:none; }
-        .spinner {
-            width:40px; height:40px;
-            border-radius:50%;
-            border:3px solid rgba(255,255,255,0.08);
-            border-top-color:var(--cyan);
-            border-right-color:var(--purple);
-            animation:spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        .loading-text {
-            font-size:11px;
-            color:var(--text-dim);
-            letter-spacing:2px;
-            text-transform:uppercase;
+        
+        /* MASK ANBA A */
+        .iframe-wrap .mask-bottom {
+            position:absolute;
+            bottom:0; left:0; right:0;
+            height:50px;
+            background:linear-gradient(to top, #000 85%, transparent 100%);
+            z-index:10;
+            pointer-events:none;
         }
         
         /* KONTNI ANBA A */
@@ -248,6 +235,7 @@
         .suggest-meta { font-size:10px; color:var(--text-dim); }
         
         @media (max-width:768px) {
+            .iframe-wrap { height: 450px; }
             .content { padding:0 12px 40px; }
             .info-title { font-size:16px; }
             .suggest-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:8px; }
@@ -264,24 +252,22 @@
     <div class="header-title" id="headerTitle">Chargement...</div>
 </header>
 
-<!-- IFRAME CONTAINER (PA GEN SCROLL NAN IFRAME A) -->
-<div class="iframe-container">
+<!-- IFRAME WRAPPER AK WOTÈ 450px AK MASK -->
+<div class="iframe-wrap">
     <iframe 
         id="playerIframe" 
         allowfullscreen 
         allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
         scrolling="no">
     </iframe>
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">Chargement...</div>
-    </div>
+    <!-- MASK ANWO -->
+    <div class="mask-top"></div>
+    <!-- MASK ANBA -->
+    <div class="mask-bottom"></div>
 </div>
 
 <!-- KONTNI ANBA A -->
 <div class="content">
-
-    <!-- INFO CARD -->
     <div class="info-card">
         <div class="info-header">
             <img id="infoPoster" class="info-poster" src="" alt="Poster">
@@ -293,7 +279,6 @@
         <p id="infoDesc" class="info-desc">Chargement...</p>
     </div>
 
-    <!-- WHATSAPP -->
     <div class="wa-card">
         <div class="wa-icon"><i class="fab fa-whatsapp"></i></div>
         <div class="wa-content">
@@ -305,10 +290,8 @@
         </a>
     </div>
 
-    <!-- SIJESYON -->
     <div class="suggest-title"><i class="fas fa-film"></i> Films suggérés</div>
     <div class="suggest-grid" id="suggestGrid"></div>
-
 </div>
 
 <script>
@@ -343,7 +326,6 @@ document.getElementById('infoDesc').textContent = data.desc;
 // ✅ IFRAME (movieboxonline.net)
 // ============================================================
 const iframe = document.getElementById('playerIframe');
-const loadingEl = document.getElementById('loading');
 
 let iframeUrl = '';
 
@@ -356,15 +338,10 @@ if (data.detailPath) {
 console.log('🔗 Iframe URL:', iframeUrl);
 iframe.src = iframeUrl;
 
-// Kache loading a lè iframe a chaje
-iframe.onload = () => {
-    loadingEl.classList.add('hidden');
-};
-
-// Fallback: kache loading a apre 3 segonn
-setTimeout(() => {
-    loadingEl.classList.add('hidden');
-}, 3000);
+// ============================================================
+// ✅ BLOKE SCROLL NAN IFRAME A
+// ============================================================
+// scrolling="no" deja la, menm si.
 
 // ============================================================
 // ✅ SIJESYON FIM YO
@@ -405,4 +382,4 @@ suggestGrid.innerHTML = filtered.map(s => {
 }).join('');
 </script>
 </body>
-            </html>
+</html>
