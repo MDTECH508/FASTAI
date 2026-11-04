@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     
     <style>
+        /* Menm style "Liquid Glass" ou a */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
         :root {
             --black:#000; --charcoal:#121214; --slate:#1c1c1f; --graphite:#26262a;
@@ -84,7 +85,6 @@
         }
         @keyframes spin { to { transform:rotate(360deg); } }
         .loading-text { font-size:12px; font-weight:600; color:var(--text-dim); letter-spacing:2px; text-transform:uppercase; }
-        
         .info-card {
             background:var(--glass-1); backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border); border-radius:var(--r-lg);
@@ -106,7 +106,6 @@
         .info-meta span { display:inline-flex; align-items:center; gap:4px; }
         .info-meta i { color:var(--cyan); font-size:10px; }
         .info-genres { font-size:10px; color:var(--text-mute); text-transform:uppercase; letter-spacing:0.5px; }
-        
         .play-btn-small {
             width:100%; padding:13px 18px;
             background:#fff; color:var(--black);
@@ -119,7 +118,6 @@
         }
         .play-btn-small:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5); }
         .play-btn-small i { font-size:13px; }
-        
         .action-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
         .action-btn-mini {
             padding:10px 8px; background:var(--glass-2);
@@ -137,7 +135,6 @@
         }
         .action-btn-mini.active svg { stroke:var(--gold); fill:var(--gold); }
         .action-btn-mini span { font-size:10px; font-weight:600; }
-        
         .glass-card {
             background:var(--glass-1); backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border); border-radius:var(--r-lg);
@@ -149,7 +146,6 @@
             display:flex; align-items:center; gap:8px;
         }
         .glass-card-title i { color:var(--cyan); font-size:13px; }
-        
         .quality-row { display:flex; gap:8px; flex-wrap:wrap; }
         .quality-pill {
             padding:10px 16px; background:var(--glass-2);
@@ -174,7 +170,6 @@
             box-shadow:0 2px 8px rgba(255,215,0,0.5);
             letter-spacing:0.5px;
         }
-        
         .lang-row { display:flex; gap:8px; flex-wrap:wrap; }
         .lang-pill {
             padding:8px 14px; background:var(--glass-2);
@@ -186,9 +181,7 @@
         .lang-pill:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
         .lang-pill.active { border-color:var(--cyan); background:rgba(100,210,255,0.15); color:var(--cyan); }
         .lang-pill i { font-size:11px; }
-        
         .story-text { font-size:13px; line-height:1.6; color:var(--text-dim); }
-        
         .cast-scroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
         .cast-scroll::-webkit-scrollbar { display:none; }
         .cast-item { flex-shrink:0; text-align:center; width:70px; }
@@ -199,7 +192,6 @@
         }
         .cast-name { font-size:10px; font-weight:700; line-height:1.2; margin-bottom:2px; }
         .cast-char { font-size:9px; color:var(--text-mute); }
-        
         .episodes-list { display:flex; flex-direction:column; gap:8px; }
         .episode-item {
             display:flex; align-items:center; gap:12px;
@@ -246,7 +238,6 @@
         }
         .episode-play:hover { transform:scale(1.08); box-shadow:0 6px 20px rgba(255,255,255,0.3); }
         .episode-play i { margin-left:3px; }
-        
         .related-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; }
         .related-card {
             background:var(--glass-1); border:1px solid var(--glass-border);
@@ -258,7 +249,6 @@
         .related-info { padding:8px; }
         .related-title-text { font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
         .related-meta { font-size:9px; color:var(--text-dim); }
-        
         .whatsapp-ads {
             background:var(--glass-1); backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border); border-radius:var(--r-lg);
@@ -282,7 +272,6 @@
             cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px;
             transition:all var(--spring); white-space:nowrap;
         }
-        
         .toast {
             position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
             background:rgba(20,20,22,0.95); backdrop-filter:var(--blur-glass);
@@ -292,7 +281,6 @@
             box-shadow:var(--glass-highlight), var(--shadow-2);
         }
         .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-        
         @media (max-width:768px) {
             .container { padding:12px; }
             .info-card { padding:16px; }
@@ -331,40 +319,21 @@
                 <div class="info-genres" id="infoGenres"></div>
             </div>
         </div>
-        
         <button class="play-btn-small" id="playMainBtn">
             <i class="fas fa-play"></i>
             <span id="playBtnText">Play</span>
         </button>
-        
         <div class="action-row">
-            <!-- BOUTON 1: TÉLÉCHARGER (SVG) -->
             <button class="action-btn-mini" id="saveBtn" title="Télécharger">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Save</span>
             </button>
-            
-            <!-- BOUTON 2: FAVORI (SVG) -->
-            <button class="action-btn-mini" id="listBtn" title="Ajouter à ma liste">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
+            <button class="action-btn-mini" id="listBtn" title="Favori">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 <span>Favori</span>
             </button>
-            
-            <!-- BOUTON 3: PARTAGER -->
             <button class="action-btn-mini" id="shareBtn" title="Partager">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="18" cy="5" r="3"/>
-                    <circle cx="6" cy="12" r="3"/>
-                    <circle cx="18" cy="19" r="3"/>
-                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                </svg>
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 <span>Partager</span>
             </button>
         </div>
@@ -373,32 +342,18 @@
     <div class="glass-card">
         <div class="glass-card-title"><i class="fas fa-tv"></i> Qualité</div>
         <div class="quality-row" id="qualityRow">
-            <button class="quality-pill active" data-quality="360" onclick="changeQuality('360', this)">
-                <span class="quality-label">360p</span>
-            </button>
-            <button class="quality-pill" data-quality="480" onclick="changeQuality('480', this)">
-                <span class="quality-label">480p</span>
-            </button>
-            <button class="quality-pill premium" data-quality="1080" onclick="changeQuality('1080', this)">
-                <i class="fas fa-crown quality-crown"></i>
-                <span class="quality-label">1080p</span>
-                <span class="quality-badge">PRO</span>
-            </button>
+            <button class="quality-pill active" data-quality="360" onclick="changeQuality('360', this)"><span class="quality-label">360p</span></button>
+            <button class="quality-pill" data-quality="480" onclick="changeQuality('480', this)"><span class="quality-label">480p</span></button>
+            <button class="quality-pill premium" data-quality="1080" onclick="changeQuality('1080', this)"><i class="fas fa-crown quality-crown"></i><span class="quality-label">1080p</span><span class="quality-badge">PRO</span></button>
         </div>
     </div>
 
     <div class="glass-card">
         <div class="glass-card-title"><i class="fas fa-language"></i> Language</div>
         <div class="lang-row">
-            <button class="lang-pill active" onclick="changeLanguage('French', this)">
-                <i class="fas fa-check"></i> French (Dubbed)
-            </button>
-            <button class="lang-pill" onclick="changeLanguage('Original', this)">
-                <i class="fas fa-globe"></i> Original Audio
-            </button>
-            <button class="lang-pill" onclick="changeLanguage('Arabic', this)">
-                <i class="fas fa-globe"></i> Arabic dub
-            </button>
+            <button class="lang-pill active" onclick="changeLanguage('French', this)"><i class="fas fa-check"></i> French (Dubbed)</button>
+            <button class="lang-pill" onclick="changeLanguage('Original', this)"><i class="fas fa-globe"></i> Original Audio</button>
+            <button class="lang-pill" onclick="changeLanguage('Arabic', this)"><i class="fas fa-globe"></i> Arabic dub</button>
         </div>
     </div>
 
@@ -423,9 +378,7 @@
             <div class="whatsapp-title">Rejoignez notre chaîne</div>
             <div class="whatsapp-desc">Nouveautés + liens directs</div>
         </div>
-        <a href="https://whatsapp.com/channel/0029Vb6tw1G42Dcja42wiY3R" target="_blank" class="whatsapp-btn">
-            <i class="fab fa-whatsapp"></i> Suivre
-        </a>
+        <a href="https://whatsapp.com/channel/0029Vb6tw1G42Dcja42wiY3R" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> Suivre</a>
     </div>
 
     <div class="glass-card">
@@ -439,6 +392,11 @@
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
 <script>
+// ============================================================
+// ✅ URL RENDER OU A
+// ============================================================
+const API_BASE_URL = 'https://moviebox-api-snrn.onrender.com';
+
 const params = new URLSearchParams(window.location.search);
 const data = {
     subjectId: params.get('subjectId') || '',
@@ -459,52 +417,34 @@ const isSeries = data.type === 'series' || parseInt(data.totalEpisodes) > 1;
 document.getElementById('headerTitle').textContent = data.title;
 document.getElementById('infoPoster').src = data.poster || 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image';
 document.getElementById('infoTitle').textContent = data.title;
-document.getElementById('infoMeta').innerHTML = `
-    <span><i class="fas fa-calendar"></i> ${data.year}</span>
-    <span><i class="fas fa-star"></i> ${data.rating}</span>
-    <span>1080p</span>
-`;
+document.getElementById('infoMeta').innerHTML = `<span><i class="fas fa-calendar"></i> ${data.year}</span><span><i class="fas fa-star"></i> ${data.rating}</span><span>1080p</span>`;
 document.getElementById('infoGenres').textContent = data.genre.split(',').join(' · ');
 document.getElementById('storyText').textContent = data.desc;
 document.getElementById('playBtnText').textContent = isSeries ? `Play S${data.season}:E${data.episode}` : 'Play';
 
-// === FAVORI (localStorage) ===
+// === FAVORI ===
 const favoriteBtn = document.getElementById('listBtn');
 const FAVORITES_KEY = 'blastflix_favorites';
 let favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
-
 function updateFavoriteBtn() {
     const isFav = favorites.includes(data.subjectId);
     favoriteBtn.classList.toggle('active', isFav);
     favoriteBtn.querySelector('span').textContent = isFav ? 'Favori ✓' : 'Favori';
 }
-
 favoriteBtn.addEventListener('click', () => {
     const idx = favorites.indexOf(data.subjectId);
-    if (idx > -1) {
-        favorites.splice(idx, 1);
-        showToast('💔 Retiré des favoris');
-    } else {
-        favorites.push(data.subjectId);
-        showToast('❤️ Ajouté aux favoris');
-    }
+    if (idx > -1) { favorites.splice(idx, 1); showToast('💔 Retiré des favoris'); }
+    else { favorites.push(data.subjectId); showToast('❤️ Ajouté aux favoris'); }
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
     updateFavoriteBtn();
 });
-
 updateFavoriteBtn();
 
-// Video
+// === VIDEO ===
 const videoEl = document.getElementById('player-video');
 const loadingOverlay = document.getElementById('plyr-loading-overlay');
 let player = null;
-let currentQuality = '360';
-
-const QUALITY_SOURCES = {
-    '360': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    '480': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    '1080': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
-};
+let currentStreams = [];
 
 window.addEventListener('load', () => {
     if (typeof Plyr !== 'undefined') {
@@ -519,50 +459,86 @@ window.addEventListener('load', () => {
         player.on('canplay', () => loadingOverlay.classList.remove('active'));
         player.on('error', () => loadingOverlay.classList.remove('active'));
     }
-    loadVideo('360');
+    loadVideo();
     loadCast();
     loadRelated();
     if (isSeries) loadEpisodes();
 });
 
-async function loadVideo(quality = '360') {
+// ============================================================
+// ✅ CHAJE VIDEO A SOTI NAN API A
+// ============================================================
+async function loadVideo() {
     loadingOverlay.classList.add('active');
+    
     try {
-        let streams = null;
         let streamUrl = null;
+        let streamType = 'video/mp4';
         
-        try {
-            const res = await fetch('streams.json', { cache: 'no-store' });
-            if (res.ok) {
-                const sources = await res.json();
-                const entry = sources[data.subjectId] || sources['default'];
-                if (entry && entry.streams && entry.streams.length > 0) {
-                    streams = entry.streams;
-                }
-            }
-        } catch (e) { console.warn('Pas de streams.json'); }
-        
-        if (streams) {
-            const match = streams.find(s => (s.quality || '').toString().includes(quality));
-            streamUrl = match ? match.url : streams[0].url;
-        } else {
-            streamUrl = QUALITY_SOURCES[quality] || QUALITY_SOURCES['360'];
+        // Bati URL API a dapre dokimantasyon walterwhite-69/Moviebox-API
+        // Pou fim: /api/stream/{subject_id}
+        // Pou seri: /api/stream/{subject_id}?se={season}&ep={episode}
+        let apiUrl = `${API_BASE_URL}/api/stream/${data.subjectId}`;
+        if (isSeries) {
+            apiUrl += `?se=${data.season}&ep=${data.episode}`;
         }
         
-        const isHls = streamUrl.endsWith('.m3u8');
+        console.log('🔍 Chèche nan API:', apiUrl);
+        const res = await fetch(apiUrl);
         
+        if (!res.ok) {
+            throw new Error(`API error: ${res.status}`);
+        }
+        
+        const json = await res.json();
+        console.log('📦 API Response:', json);
+        
+        // API a retounen yon objè ak "streams" (dapre dokimantasyon an)
+        if (json.streams && json.streams.length > 0) {
+            currentStreams = json.streams;
+            // Chwazi pi bon kalite a (1080p si genyen, sinon premye a)
+            const best = json.streams.find(s => s.quality === '1080p') 
+                      || json.streams.find(s => s.quality === '720p') 
+                      || json.streams[0];
+            streamUrl = best.url || best.src;
+            streamType = best.type || 'video/mp4';
+            console.log('✅ Stream jwenn:', streamUrl, streamType);
+        } 
+        // Si API a retounen yon lòt fòma
+        else if (json.url) {
+            streamUrl = json.url;
+            streamType = json.type || 'video/mp4';
+        }
+        
+        // Si pa gen stream, jwe yon demo
+        if (!streamUrl) {
+            streamUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+            streamType = 'video/mp4';
+            console.log('⚠️ Pa gen stream nan API a, demo ap jwe.');
+        }
+        
+        // Chaje videyo a
         if (player) {
             player.source = {
                 type: 'video',
-                sources: [{ src: streamUrl, type: isHls ? 'application/x-mpegURL' : 'video/mp4' }],
+                sources: [{ src: streamUrl, type: streamType }],
                 poster: data.poster
             };
         } else {
             videoEl.src = streamUrl;
         }
-        currentQuality = quality;
+        
     } catch (err) {
-        console.error('Erreur vidéo:', err);
+        console.error('❌ Erè:', err);
+        // Si API a pa mache, jwe yon demo
+        const demoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+        if (player) {
+            player.source = { type: 'video', sources: [{ src: demoUrl, type: 'video/mp4' }] };
+        } else {
+            videoEl.src = demoUrl;
+        }
+        showToast('⚠️ API pa disponib, demo ap jwe');
+    } finally {
         loadingOverlay.classList.remove('active');
     }
 }
@@ -570,21 +546,24 @@ async function loadVideo(quality = '360') {
 function changeQuality(quality, btn) {
     document.querySelectorAll('.quality-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const currentTime = player ? player.currentTime : videoEl.currentTime;
-    const wasPlaying = player ? !player.paused : !videoEl.paused;
-    loadVideo(quality).then(() => {
-        setTimeout(() => {
+    
+    if (currentStreams.length > 0) {
+        const target = currentStreams.find(s => (s.quality || '').includes(quality));
+        if (target) {
+            const url = target.url || target.src;
+            const type = target.type || 'video/mp4';
             if (player) {
+                const currentTime = player.currentTime;
+                const wasPlaying = !player.paused;
+                player.source = { type: 'video', sources: [{ src: url, type }] };
                 player.currentTime = currentTime;
                 if (wasPlaying) player.play();
-            } else {
-                videoEl.currentTime = currentTime;
-                if (wasPlaying) videoEl.play();
             }
-        }, 500);
-    });
-    const qualityLabel = quality === '1080' ? '1080p (Premium) 👑' : quality + 'p';
-    showToast(`Qualité: ${qualityLabel}`);
+            showToast(`Qualité: ${quality}p`);
+            return;
+        }
+    }
+    showToast(`Qualité: ${quality === '1080' ? '1080p (Premium) 👑' : quality + 'p'}`);
 }
 
 function loadCast() {
@@ -598,8 +577,7 @@ function loadCast() {
     const grid = document.getElementById('castGrid');
     grid.innerHTML = cast.map(c => `
         <div class="cast-item">
-            <img class="cast-avatar" src="${c.avatar}" alt="${c.name}" loading="lazy"
-                onerror="this.src='https://via.placeholder.com/60x60/333/666?text=${c.name.charAt(0)}'">
+            <img class="cast-avatar" src="${c.avatar}" alt="${c.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/60x60/333/666?text=${c.name.charAt(0)}'">
             <div class="cast-name">${c.name}</div>
             <div class="cast-char">${c.character}</div>
         </div>
@@ -620,21 +598,8 @@ function loadRelated() {
     const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 6);
     const grid = document.getElementById('relatedGrid');
     grid.innerHTML = shuffled.map(m => {
-        const p = new URLSearchParams({
-            subjectId: m.id, title: m.title, poster: m.poster,
-            year: m.year, rating: String(m.rating), genre: 'Drama', desc: '',
-            type: 'movie', totalEpisodes: '0'
-        });
-        return `
-            <a href="player.html?${p.toString()}" class="related-card">
-                <img class="related-poster" src="${m.poster}" alt="${m.title}" loading="lazy"
-                    onerror="this.style.background='#1c1c1f';this.src=''">
-                <div class="related-info">
-                    <div class="related-title-text">${m.title}</div>
-                    <div class="related-meta">${m.year} • ⭐ ${m.rating}</div>
-                </div>
-            </a>
-        `;
+        const p = new URLSearchParams({ subjectId: m.id, title: m.title, poster: m.poster, year: m.year, rating: String(m.rating), genre: 'Drama', desc: '', type: 'movie', totalEpisodes: '0' });
+        return `<a href="player.html?${p.toString()}" class="related-card"><img class="related-poster" src="${m.poster}" alt="${m.title}" loading="lazy" onerror="this.style.background='#1c1c1f';this.src=''"><div class="related-info"><div class="related-title-text">${m.title}</div><div class="related-meta">${m.year} • ⭐ ${m.rating}</div></div></a>`;
     }).join('');
 }
 
@@ -646,69 +611,29 @@ function loadEpisodes() {
     let html = '';
     for (let i = 1; i <= totalEps; i++) {
         const active = i === currentEp;
-        html += `
-            <button class="episode-item ${active ? 'active' : ''}" onclick="playEpisode(${i})">
-                <div class="episode-num-circle">${i}</div>
-                <div class="episode-details">
-                    <div class="episode-title">Épisode ${i}</div>
-                    <div class="episode-sub">Episode ${i}</div>
-                </div>
-                <div class="episode-actions">
-                    <button class="episode-download" onclick="event.stopPropagation(); downloadEpisode(${i})">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button class="episode-play" onclick="event.stopPropagation(); playEpisode(${i})">
-                        <i class="fas fa-play"></i>
-                    </button>
-                </div>
-            </button>
-        `;
+        html += `<button class="episode-item ${active ? 'active' : ''}" onclick="playEpisode(${i})"><div class="episode-num-circle">${i}</div><div class="episode-details"><div class="episode-title">Épisode ${i}</div><div class="episode-sub">Episode ${i}</div></div><div class="episode-actions"><button class="episode-download" onclick="event.stopPropagation(); downloadEpisode(${i})"><i class="fas fa-download"></i></button><button class="episode-play" onclick="event.stopPropagation(); playEpisode(${i})"><i class="fas fa-play"></i></button></div></button>`;
     }
     list.innerHTML = html;
 }
 
 function playEpisode(ep) {
-    const p = new URLSearchParams({
-        subjectId: data.subjectId, title: data.title, poster: data.poster,
-        year: data.year, rating: data.rating, genre: data.genre, desc: data.desc,
-        type: data.type, season: data.season, episode: String(ep),
-        totalEpisodes: data.totalEpisodes
-    });
+    const p = new URLSearchParams({ subjectId: data.subjectId, title: data.title, poster: data.poster, year: data.year, rating: data.rating, genre: data.genre, desc: data.desc, type: data.type, season: data.season, episode: String(ep), totalEpisodes: data.totalEpisodes });
     window.location.href = `player.html?${p.toString()}`;
 }
 
-function downloadEpisode(ep) {
-    showToast(`📥 Téléchargement de l'épisode ${ep}...`);
-}
+function downloadEpisode(ep) { showToast(`📥 Téléchargement de l'épisode ${ep}...`); }
 
 document.getElementById('playMainBtn').addEventListener('click', () => {
-    if (player) {
-        player.play();
-        document.querySelector('.video-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    if (player) { player.play(); document.querySelector('.video-container').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 });
 
 document.getElementById('saveBtn').addEventListener('click', () => showToast('💾 Sauvegardé'));
 document.getElementById('shareBtn').addEventListener('click', async () => {
-    const shareData = {
-        title: data.title + ' - BLAST FLIX',
-        text: `Regarde ${data.title} !`,
-        url: window.location.href
-    };
+    const shareData = { title: data.title + ' - BLAST FLIX', text: `Regarde ${data.title} !`, url: window.location.href };
     try {
         if (navigator.share) await navigator.share(shareData);
-        else {
-            await navigator.clipboard.writeText(shareData.url);
-            showToast('🔗 Lien copié !');
-        }
-    } catch (err) {
-        if (err.name !== 'AbortError') {
-            try {
-                await navigator.clipboard.writeText(shareData.url);
-                showToast('🔗 Lien copié !');
-            } catch {}
-        }
-    }
+        else { await navigator.clipboard.writeText(shareData.url); showToast('🔗 Lien copié !'); }
+    } catch (err) { if (err.name !== 'AbortError') { try { await navigator.clipboard.writeText(shareData.url); showToast('🔗 Lien copié !'); } catch {} } }
 });
 
 function changeLanguage(lang, btn) {
@@ -725,4 +650,4 @@ function showToast(msg) {
 }
 </script>
 </body>
-                </html>
+    </html>
