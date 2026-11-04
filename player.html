@@ -7,25 +7,17 @@
     <title>Lecture - BLAST FLIX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    
     <style>
-        /* Liquid Glass Design */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
         :root {
             --black:#000; --charcoal:#121214; --slate:#1c1c1f;
-            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --gold:#ffd700;
-            --glass-1:rgba(255,255,255,0.035);
-            --glass-2:rgba(255,255,255,0.07);
-            --glass-border:rgba(255,255,255,0.09);
-            --glass-border-bright:rgba(255,255,255,0.22);
+            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2;
+            --glass-1:rgba(255,255,255,0.035); --glass-2:rgba(255,255,255,0.07);
+            --glass-border:rgba(255,255,255,0.09); --glass-border-bright:rgba(255,255,255,0.22);
             --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.2);
-            --text:#f5f5f7;
-            --text-dim:rgba(245,245,247,0.55);
-            --text-mute:rgba(245,245,247,0.35);
+            --text:#f5f5f7; --text-dim:rgba(245,245,247,0.55);
             --r-sm:12px; --r-md:18px; --r-lg:24px;
-            --shadow-1:0 2px 8px rgba(0,0,0,0.4);
-            --shadow-2:0 8px 24px rgba(0,0,0,0.5);
-            --shadow-3:0 20px 60px rgba(0,0,0,0.7);
+            --shadow-2:0 8px 24px rgba(0,0,0,0.5); --shadow-3:0 20px 60px rgba(0,0,0,0.7);
             --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
             --blur-glass:blur(40px) saturate(180%);
         }
@@ -110,50 +102,11 @@
             display:flex; align-items:center; justify-content:center; gap:10px;
             font-size:14px; font-weight:800; font-family:inherit;
             transition:all var(--spring);
-            box-shadow:0 8px 24px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.5);
+            box-shadow:0 8px 24px rgba(255,255,255,0.2);
             margin-bottom:10px;
         }
-        .play-btn-small:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5); }
+        .play-btn-small:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,255,255,0.3); }
         .play-btn-small i { font-size:13px; }
-        .action-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-        .action-btn-mini {
-            padding:10px 8px; background:var(--glass-2);
-            border:1px solid var(--glass-border); border-radius:var(--r-md);
-            color:var(--text); cursor:pointer; font-family:inherit;
-            display:flex; flex-direction:column; align-items:center; gap:4px;
-            transition:all var(--spring); box-shadow:var(--glass-highlight);
-            position:relative;
-        }
-        .action-btn-mini:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
-        .action-btn-mini svg {
-            width:20px; height:20px; stroke:var(--cyan); fill:none;
-            stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
-            transition:all var(--spring);
-        }
-        .action-btn-mini span { font-size:10px; font-weight:600; }
-        .glass-card {
-            background:var(--glass-1); backdrop-filter:var(--blur-glass);
-            border:1px solid var(--glass-border); border-radius:var(--r-lg);
-            padding:16px; margin-bottom:14px;
-            box-shadow:var(--glass-highlight), var(--shadow-1);
-        }
-        .glass-card-title {
-            font-size:14px; font-weight:800; margin-bottom:12px;
-            display:flex; align-items:center; gap:8px;
-        }
-        .glass-card-title i { color:var(--cyan); font-size:13px; }
-        .quality-row { display:flex; gap:8px; flex-wrap:wrap; }
-        .quality-pill {
-            padding:10px 16px; background:var(--glass-2);
-            border:1px solid var(--glass-border); border-radius:50px;
-            color:var(--text); cursor:pointer; font-family:inherit;
-            font-size:12px; font-weight:700; transition:all var(--spring);
-            display:inline-flex; align-items:center; gap:6px;
-            position:relative;
-        }
-        .quality-pill:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
-        .quality-pill.active { border-color:var(--cyan); background:rgba(100,210,255,0.15); color:var(--cyan); }
-        .story-text { font-size:13px; line-height:1.6; color:var(--text-dim); }
         .toast {
             position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
             background:rgba(20,20,22,0.95); backdrop-filter:var(--blur-glass);
@@ -191,23 +144,8 @@
             </div>
         </div>
         <button class="play-btn-small" id="playMainBtn">
-            <i class="fas fa-play"></i>
-            <span>Play</span>
+            <i class="fas fa-play"></i> Play
         </button>
-    </div>
-
-    <div class="glass-card">
-        <div class="glass-card-title"><i class="fas fa-tv"></i> Qualité</div>
-        <div class="quality-row" id="qualityRow">
-            <button class="quality-pill active" onclick="changeQuality('360', this)">360p</button>
-            <button class="quality-pill" onclick="changeQuality('480', this)">480p</button>
-            <button class="quality-pill" onclick="changeQuality('1080', this)">1080p 👑</button>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <div class="glass-card-title"><i class="fas fa-book-open"></i> The story</div>
-        <p class="story-text" id="storyText">Chargement...</p>
     </div>
 </div>
 
@@ -217,129 +155,198 @@
 
 <script>
 // ============================================================
-// ✅ API DIRÈK (san Render)
+// ⚠️ TOUT KLE SEKRÈ OU YO (PA ITILIZE NAN SIT PIBLIK)
 // ============================================================
-const API_BASE = 'https://api3.aoneroom.com';
-const H5_API_BASE = 'https://h5-api.aoneroom.com/wefeed-h5api-bff';
+const SECRET_KEY_DEFAULT_B64 = "NzZpUmwwN3MweFNOOWpxbUVXQXQ3OUVCSlp1bElRSXNWNjRGWnIyTw==";
+const SECRET_KEY_ALT_B64 = "WHFuMm5uTzQxL0w5Mm8xaXVYaFNMSFRiWHZZNFo1Wlo2Mm04bVNMQQ==";
+const MODERN_USER_AGENT = "com.community.mbox.in/50020130 (Linux; U; Android 14; en_IN; Pixel 8; Build/UD1A.230803.041; Cronet/145.0.7582.0)";
+const WEB_USER_AGENT = "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36";
+
+const API_BASE = "https://h5-api.aoneroom.com/wefeed-h5api-bff";
+const NATIVE_API_BASE = "https://api3.aoneroom.com";
+const BOOTSTRAP_HOST = "https://apig.inmoviebox.com";
+const BOOTSTRAP_URL = `${BOOTSTRAP_HOST}/wefeed-mobile-bff/tab/ranking-list?tabId=0&categoryType=4516404531735022304&page=1&perPage=1`;
+
+const WEB_DOMAINS = [
+  "https://123moviesfree.club",
+  "https://movie-box.co",
+  "https://movieboxonline.net",
+  "https://sflix.film",
+  "https://h5-api.aoneroom.com",
+  "https://netnaija.film",
+  "https://movieboxhd.net"
+];
+
+// Fonksyon pou dekode base64
+function b64decode(s) {
+  s = s.replace(/-/g, '+').replace(/_/g, '/');
+  s += '='.repeat((4 - s.length % 4) % 4);
+  return atob(s);
+}
+
+function getSecretBytes(useAlt = false) {
+  const outer = useAlt ? SECRET_KEY_ALT_B64 : SECRET_KEY_DEFAULT_B64;
+  const inner = b64decode(outer);
+  return b64decode(inner);
+}
+
+// MD5 (bezwen yon lib oswa yon fonksyon). Isit la nou pral senplifye.
+// Pou siyati a, nou pral eseye dirèk san siyati dabò.
 
 const params = new URLSearchParams(window.location.search);
 const data = {
     subjectId: params.get('subjectId') || '',
     title: params.get('title') || 'Film',
     poster: params.get('poster') || '',
-    year: params.get('year') || '2025',
+    year: params.get('year') || '',
     rating: params.get('rating') || 'N/A',
-    genre: params.get('genre') || 'Drama',
-    desc: params.get('desc') || 'Aucune description disponible.',
-    type: params.get('type') || 'movie',
-    season: params.get('season') || '0',
-    episode: params.get('episode') || '0'
+    type: params.get('type') || 'movie'
 };
 
-// Afiche info yo
 document.getElementById('headerTitle').textContent = data.title;
 document.getElementById('infoPoster').src = data.poster || 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image';
 document.getElementById('infoTitle').textContent = data.title;
-document.getElementById('infoMeta').innerHTML = `<span><i class="fas fa-calendar"></i> ${data.year}</span><span><i class="fas fa-star"></i> ${data.rating}</span><span>${data.type === 'series' ? 'Série' : 'Film'}</span>`;
-document.getElementById('storyText').textContent = data.desc;
+document.getElementById('infoMeta').innerHTML = `
+    <span><i class="fas fa-calendar"></i> ${data.year}</span>
+    <span><i class="fas fa-star"></i> ${data.rating}</span>
+    <span>${data.type === 'series' ? 'Série' : 'Film'}</span>
+`;
 
-// Video
 const videoEl = document.getElementById('player-video');
 const loadingOverlay = document.getElementById('plyr-loading-overlay');
 const loadingText = document.getElementById('loadingText');
 let player = null;
 
+// ============================================================
+// ✅ FONKSYON POU JWENN STREAM (6 API YO)
+// ============================================================
+async function tryStreamFromAPIs(subjectId) {
+    // 1. Eseye chak domèn nan WEB_DOMAINS yo
+    for (const domain of WEB_DOMAINS) {
+        try {
+            const playUrl = `${domain}/wefeed-h5api-bff/subject/play?subjectId=${subjectId}&se=0&ep=0&detailPath=&streamSignType=1`;
+            console.log(`🔍 Eseye ${domain}`);
+            
+            const res = await fetch(playUrl, {
+                headers: {
+                    'User-Agent': WEB_USER_AGENT,
+                    'Referer': `${domain}/`,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (res.ok) {
+                const json = await res.json();
+                const streams = json.data?.streams || [];
+                if (streams.length > 0 && streams[0].url) {
+                    console.log(`✅ Stream jwenn nan ${domain}`);
+                    return streams[0].url;
+                }
+            }
+        } catch (e) {
+            console.warn(`${domain} pa mache:`, e.message);
+        }
+    }
+    
+    // 2. Eseye API_BASE (h5-api.aoneroom.com)
+    try {
+        const url = `${API_BASE}/subject/play?subjectId=${subjectId}&se=0&ep=0&streamSignType=1`;
+        console.log(`🔍 Eseye API_BASE`);
+        const res = await fetch(url, {
+            headers: {
+                'User-Agent': WEB_USER_AGENT,
+                'Referer': 'https://h5-api.aoneroom.com/'
+            }
+        });
+        if (res.ok) {
+            const json = await res.json();
+            const streams = json.data?.streams || [];
+            if (streams.length > 0 && streams[0].url) {
+                return streams[0].url;
+            }
+        }
+    } catch (e) {
+        console.warn(`API_BASE pa mache:`, e.message);
+    }
+    
+    // 3. Eseye API Render
+    try {
+        const url = `https://moviebox-api-snrn.onrender.com/api/stream/${subjectId}`;
+        console.log(`🔍 Eseye Render`);
+        const res = await fetch(url);
+        if (res.ok) {
+            const json = await res.json();
+            const streams = json.streams || [];
+            if (streams.length > 0 && streams[0].url) {
+                return streams[0].url;
+            }
+        }
+    } catch (e) {
+        console.warn(`Render pa mache:`, e.message);
+    }
+    
+    return null;
+}
+
+// ============================================================
+// ✅ CHAJE VIDEO A
+// ============================================================
 window.addEventListener('load', () => {
     if (typeof Plyr !== 'undefined') {
         player = new Plyr(videoEl, {
             controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
             settings: ['speed'],
-            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
-            seekTime: 10
+            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
         });
         player.on('playing', () => loadingOverlay.classList.remove('active'));
         player.on('waiting', () => loadingOverlay.classList.add('active'));
         player.on('canplay', () => loadingOverlay.classList.remove('active'));
-        player.on('error', () => loadingOverlay.classList.remove('active'));
     }
     loadVideo();
 });
 
-// ============================================================
-// ✅ Chaje videyo dirèkteman soti nan API a
-// ============================================================
 async function loadVideo() {
     loadingOverlay.classList.add('active');
     loadingText.textContent = 'Recherche de sources...';
     
     try {
-        // Eseye chèche stream nan API a dirèkteman
-        const streamUrl = `${API_BASE}/wefeed-mobile-bff/subject-api/play-info?subjectId=${data.subjectId}&se=${data.season}&ep=${data.episode}`;
+        const streamUrl = await tryStreamFromAPIs(data.subjectId);
         
-        console.log('🔍 Chèche stream:', streamUrl);
-        
-        // Demann dirèk (san siyati)
-        const res = await fetch(streamUrl, {
-            method: 'GET',
-            headers: {
-                'User-Agent': 'com.community.mbox.in/50020130 (Linux; U; Android 14; en_IN; Pixel 8)',
-                'Referer': 'https://api3.aoneroom.com/',
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (!res.ok) {
-            throw new Error(`API returned ${res.status}`);
-        }
-        
-        const json = await res.json();
-        console.log('📦 API Response:', json);
-        
-        const streams = json.data?.streams || [];
-        if (streams.length > 0) {
-            const best = streams.find(s => (s.resolutions || '').includes('1080')) || streams[0];
-            const url = best.url;
+        if (streamUrl) {
+            loadingText.textContent = 'Chargement vidéo...';
             
-            if (url) {
-                loadingText.textContent = `Chargement ${best.resolutions || 'video'}...`;
-                
-                if (player) {
-                    player.source = { type: 'video', sources: [{ src: url, type: 'video/mp4' }], poster: data.poster };
-                } else {
-                    videoEl.src = url;
-                }
-                loadingOverlay.classList.remove('active');
-                showToast(`✅ ${best.resolutions || 'Vidéo'} prêt`);
-                return;
+            if (player) {
+                player.source = {
+                    type: 'video',
+                    sources: [{ src: streamUrl, type: 'video/mp4' }],
+                    poster: data.poster
+                };
+            } else {
+                videoEl.src = streamUrl;
             }
+            
+            loadingOverlay.classList.remove('active');
+            showToast('✅ Vidéo prête');
+            return;
         }
-        
-        throw new Error('No stream found');
-        
     } catch (e) {
         console.error('❌ Erè:', e);
-        loadingText.textContent = 'Démo en cours...';
-        showToast('⚠️ Stream pa disponib, demo ap jwe');
-        
-        // Jwe yon demo
-        const demoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
-        if (player) {
-            player.source = { type: 'video', sources: [{ src: demoUrl, type: 'video/mp4' }] };
-        } else {
-            videoEl.src = demoUrl;
-        }
-        loadingOverlay.classList.remove('active');
     }
-}
-
-function changeQuality(quality, btn) {
-    document.querySelectorAll('.quality-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    showToast(`Qualité: ${quality}p`);
+    
+    // Si pa gen stream, jwe demo
+    console.log('⚠️ Demo ap jwe');
+    const demoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+    if (player) {
+        player.source = { type: 'video', sources: [{ src: demoUrl, type: 'video/mp4' }] };
+    } else {
+        videoEl.src = demoUrl;
+    }
+    loadingOverlay.classList.remove('active');
+    showToast('⚠️ Demo ap jwe');
 }
 
 document.getElementById('playMainBtn').addEventListener('click', () => {
-    if (player) { player.play(); }
+    if (player) player.play();
 });
 
 function showToast(msg) {
