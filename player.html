@@ -6,41 +6,37 @@
     <meta name="theme-color" content="#000000">
     <title>Lecture - BLAST FLIX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
-            --black:#000;
-            --charcoal:#121214;
-            --slate:#1c1c1f;
-            --cyan:#64d2ff;
-            --blue:#0a84ff;
-            --purple:#bf5af2;
-            --glass-1:rgba(255,255,255,0.035);
-            --glass-2:rgba(255,255,255,0.07);
-            --glass-border:rgba(255,255,255,0.09);
-            --glass-border-bright:rgba(255,255,255,0.22);
-            --text:#f5f5f7;
-            --text-dim:rgba(245,245,247,0.55);
-            --r-lg:20px;
-            --r-md:14px;
+            --black:#000; --charcoal:#121214; --slate:#1c1c1f;
+            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2;
+            --glass-1:rgba(255,255,255,0.035); --glass-2:rgba(255,255,255,0.07);
+            --glass-border:rgba(255,255,255,0.09); --glass-border-bright:rgba(255,255,255,0.22);
+            --text:#f5f5f7; --text-dim:rgba(245,245,247,0.55);
+            --r-lg:20px; --r-md:14px;
             --blur-glass:blur(40px) saturate(180%);
             --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
         }
         html, body {
             font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
-            background:var(--black); color:var(--text);
-            min-height:100vh;
+            background:var(--black); color:var(--text); min-height:100vh;
+            overflow-x:hidden;
         }
-        
-        /* HEADER */
+        .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); }
+        .bg-neo::before {
+            content:''; position:absolute; inset:0;
+            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.18), transparent);
+            filter:blur(80px);
+        }
         .header {
-            position:sticky; top:0; z-index:100;
-            padding:10px 16px;
+            position:sticky; top:0; z-index:100; padding:10px 16px;
             background:rgba(10,10,12,0.85);
             backdrop-filter:var(--blur-glass);
             border-bottom:1px solid var(--glass-border);
             display:flex; align-items:center; gap:12px;
-            padding-top:calc(10px + env(safe-area-inset-top, 0px));
+            padding-top:calc(10px + env(safe-area-inset-top,0px));
         }
         .back-btn {
             width:38px; height:38px; border-radius:50%;
@@ -57,78 +53,62 @@
             flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
         }
         
-        /* IFRAME WRAPPER (16:9) */
+        /* IFRAME WRAPPER */
         .iframe-wrap {
-            position:relative;
-            width:100%;
-            aspect-ratio:16/9;
-            background:#000;
-            overflow:hidden;
+            position:relative; width:100%; aspect-ratio:16/9;
+            background:#000; overflow:hidden;
         }
         .iframe-wrap iframe {
-            position:absolute;
-            top:0; left:0;
-            width:100%; height:100%;
-            border:none;
-            display:block;
+            position:absolute; top:0; left:0;
+            width:100%; height:100%; border:none; display:block;
+        }
+        .iframe-loading {
+            position:absolute; inset:0;
+            background:rgba(0,0,0,0.9);
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            gap:16px; z-index:10;
+        }
+        .iframe-loading.hidden { display:none; }
+        .spinner {
+            width:50px; height:50px; border-radius:50%;
+            border:3px solid rgba(255,255,255,0.08);
+            border-top-color:var(--cyan);
+            border-right-color:var(--purple);
+            animation:spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .loading-text {
+            font-size:12px; color:var(--text-dim);
+            letter-spacing:2px; text-transform:uppercase;
         }
         
         /* KONTNI ANBA A */
-        .content {
-            max-width:1000px;
-            margin:0 auto;
-            padding:16px;
-        }
-        
-        /* INFO CARD */
+        .content { max-width:1000px; margin:0 auto; padding:16px; }
         .info-card {
             background:var(--glass-1);
             backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border);
             border-radius:var(--r-lg);
-            padding:16px;
-            margin-bottom:14px;
+            padding:16px; margin-bottom:14px;
         }
-        
-        .info-header {
-            display:flex;
-            gap:14px;
-            align-items:flex-start;
-            margin-bottom:14px;
-        }
+        .info-header { display:flex; gap:14px; align-items:flex-start; margin-bottom:14px; }
         .info-poster {
-            width:80px;
-            aspect-ratio:2/3;
-            object-fit:cover;
+            width:80px; aspect-ratio:2/3; object-fit:cover;
             border-radius:var(--r-md);
             border:1px solid var(--glass-border);
             flex-shrink:0;
         }
         .info-content { flex:1; min-width:0; }
-        .info-title {
-            font-size:18px;
-            font-weight:800;
-            margin-bottom:8px;
-            line-height:1.2;
-        }
+        .info-title { font-size:18px; font-weight:800; margin-bottom:8px; }
         .info-meta {
-            display:flex;
-            flex-wrap:wrap;
-            gap:8px;
-            font-size:11px;
-            color:var(--text-dim);
-            font-weight:600;
+            display:flex; flex-wrap:wrap; gap:8px;
+            font-size:11px; color:var(--text-dim); font-weight:600;
         }
-        .info-meta span {
-            display:inline-flex;
-            align-items:center;
-            gap:4px;
-        }
+        .info-meta span { display:inline-flex; align-items:center; gap:4px; }
         .info-meta i { color:var(--cyan); font-size:10px; }
-        
         .info-desc {
-            font-size:13px;
-            line-height:1.6;
+            font-size:13px; line-height:1.6;
             color:var(--text-dim);
             padding-top:14px;
             border-top:1px solid var(--glass-border);
@@ -136,9 +116,7 @@
         
         /* WHATSAPP */
         .wa-card {
-            display:flex;
-            align-items:center;
-            gap:12px;
+            display:flex; align-items:center; gap:12px;
             padding:14px;
             background:linear-gradient(135deg, rgba(37,211,102,0.15), rgba(18,140,126,0.1));
             border:1px solid rgba(37,211,102,0.4);
@@ -149,12 +127,8 @@
             width:40px; height:40px;
             border-radius:12px;
             background:linear-gradient(135deg, #25D366, #128C7E);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:#fff;
-            font-size:20px;
-            flex-shrink:0;
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:20px; flex-shrink:0;
         }
         .wa-content { flex:1; min-width:0; }
         .wa-title { font-size:13px; font-weight:800; margin-bottom:3px; }
@@ -162,27 +136,16 @@
         .wa-btn {
             padding:8px 14px;
             background:linear-gradient(135deg, #25D366, #128C7E);
-            color:#fff;
-            border:none;
-            border-radius:50px;
-            font-size:11px;
-            font-weight:700;
-            cursor:pointer;
-            text-decoration:none;
+            color:#fff; border:none; border-radius:50px;
+            font-size:11px; font-weight:700;
+            cursor:pointer; text-decoration:none;
             white-space:nowrap;
         }
         
         /* SIJESYON */
-        .suggest-section {
-            margin-bottom:14px;
-        }
         .suggest-title {
-            font-size:15px;
-            font-weight:800;
-            margin-bottom:12px;
-            display:flex;
-            align-items:center;
-            gap:8px;
+            font-size:15px; font-weight:800; margin-bottom:12px;
+            display:flex; align-items:center; gap:8px;
         }
         .suggest-title i { color:var(--cyan); font-size:13px; }
         .suggest-grid {
@@ -191,37 +154,18 @@
             gap:10px;
         }
         .suggest-card {
-            border-radius:var(--r-md);
-            overflow:hidden;
-            background:var(--glass-1);
-            border:1px solid var(--glass-border);
-            text-decoration:none;
-            color:inherit;
-            display:block;
+            border-radius:var(--r-md); overflow:hidden;
+            background:var(--glass-1); border:1px solid var(--glass-border);
+            text-decoration:none; color:inherit; display:block;
             transition:all var(--spring);
         }
-        .suggest-card:hover {
-            transform:translateY(-4px);
-            border-color:var(--glass-border-bright);
-        }
-        .suggest-card img {
-            width:100%;
-            aspect-ratio:2/3;
-            object-fit:cover;
-            display:block;
-        }
+        .suggest-card:hover { transform:translateY(-4px); border-color:var(--glass-border-bright); }
+        .suggest-card img { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; }
         .suggest-info { padding:8px 10px; }
-        .suggest-name {
-            font-size:12px;
-            font-weight:700;
-            white-space:nowrap;
-            overflow:hidden;
-            text-overflow:ellipsis;
-            margin-bottom:2px;
-        }
+        .suggest-name { font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
         .suggest-meta { font-size:10px; color:var(--text-dim); }
         
-        @media (max-width: 768px) {
+        @media (max-width:768px) {
             .content { padding:12px; }
             .info-title { font-size:16px; }
             .suggest-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:8px; }
@@ -230,27 +174,22 @@
 </head>
 <body>
 
-<!-- HEADER AK BACK BUTTON -->
+<div class="bg-neo"></div>
+
 <header class="header">
-    <a href="index.html" class="back-btn">
-        <i class="fas fa-arrow-left"></i>
-    </a>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
     <div class="header-title" id="headerTitle">Chargement...</div>
 </header>
 
-<!-- IFRAME (16:9) -->
 <div class="iframe-wrap">
-    <iframe 
-        id="playerIframe" 
-        allowfullscreen 
-        allow="autoplay; fullscreen; encrypted-media; picture-in-picture">
-    </iframe>
+    <iframe id="playerIframe" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>
+    <div class="iframe-loading" id="iframeLoading">
+        <div class="spinner"></div>
+        <div class="loading-text">Chargement du film...</div>
+    </div>
 </div>
 
-<!-- KONTNI ANBA A -->
 <div class="content">
-
-    <!-- INFO CARD -->
     <div class="info-card">
         <div class="info-header">
             <img id="infoPoster" class="info-poster" src="" alt="Poster">
@@ -262,7 +201,6 @@
         <p id="infoDesc" class="info-desc">Chargement...</p>
     </div>
 
-    <!-- WHATSAPP -->
     <div class="wa-card">
         <div class="wa-icon"><i class="fab fa-whatsapp"></i></div>
         <div class="wa-content">
@@ -274,12 +212,8 @@
         </a>
     </div>
 
-    <!-- SIJESYON -->
-    <div class="suggest-section">
-        <div class="suggest-title"><i class="fas fa-film"></i> Films suggérés</div>
-        <div class="suggest-grid" id="suggestGrid"></div>
-    </div>
-
+    <div class="suggest-title"><i class="fas fa-film"></i> Films suggérés</div>
+    <div class="suggest-grid" id="suggestGrid"></div>
 </div>
 
 <script>
@@ -311,11 +245,13 @@ document.getElementById('infoMeta').innerHTML = `
 document.getElementById('infoDesc').textContent = data.desc;
 
 // ============================================================
-// ✅ IFRAME
+// ✅ IFRAME AK BACKUP (3 API YO)
 // ============================================================
 const iframe = document.getElementById('playerIframe');
-let iframeUrl = '';
+const loadingEl = document.getElementById('iframeLoading');
 
+// Bati URL la pou premye API a (mzfi.me)
+let iframeUrl = '';
 if (data.detailPath) {
     const se = data.season || '0';
     const ep = data.episode || '0';
@@ -327,16 +263,26 @@ if (data.detailPath) {
 console.log('🔗 Iframe URL:', iframeUrl);
 iframe.src = iframeUrl;
 
+// Kache loading a lè iframe a chaje
+iframe.onload = () => {
+    loadingEl.classList.add('hidden');
+};
+
+// Fallback: kache loading a apre 3 segonn
+setTimeout(() => {
+    loadingEl.classList.add('hidden');
+}, 3000);
+
 // ============================================================
-// ✅ SIJESYON FIM YO
+// ✅ SIJESYON FIM YO (Ak fim ou te voye yo)
 // ============================================================
 const SUGGESTIONS = [
+    { subjectId: "3725096513421442384", title: "Bugonia", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/cbb960d2b8053e40398372b031d7c6af.jpg", year: "2025", detailPath: "bugonia-WTd7eaSmwY2" },
+    { subjectId: "3854326812578922640", title: "After the Hunt", poster: "https://pbcdnw.aoneroom.com/image/2025/11/21/40a1b8238733d1169d079a5e7af0fc7f.jpg", year: "2025", detailPath: "after-the-hunt-G9uUgYaRIA4" },
     { subjectId: "8759851328492438440", title: "Train Dreams", poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year: "2025", detailPath: "train-dreams-OJyRf09d6ra" },
-    { subjectId: "4956801153355891744", title: "Stranger Things", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year: "2016", detailPath: "stranger-things-wsymkZvcaU5" },
-    { subjectId: "6938790327474438416", title: "Sinners", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/dc68b1ba52dbab48c07486f1ec8c7e59.jpg", year: "2025", detailPath: "sinners-Mc81wRsJzg8" },
-    { subjectId: "144265366439707640", title: "One Battle After Another", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year: "2025", detailPath: "one-battle-after-another" },
-    { subjectId: "488603172416769952", title: "Roofman", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year: "2025", detailPath: "roofman" },
-    { subjectId: "5821547884994614176", title: "Now You See Me", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg", year: "2025", detailPath: "now-you-see-me" }
+    { subjectId: "407974060606504992", title: "The Family Plan 2", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/873fd90dff1123846fe6cc34c1010f10.jpg", year: "2025", detailPath: "the-family-plan-2-YctPw7Aw8u" },
+    { subjectId: "144265366439707640", title: "One Battle After Another", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year: "2025", detailPath: "one-battle-after-another-AorB0GGJEa" },
+    { subjectId: "488603172416769952", title: "Roofman", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year: "2025", detailPath: "roofman-axKcIQ4O5A" }
 ];
 
 const suggestGrid = document.getElementById('suggestGrid');
@@ -366,4 +312,4 @@ suggestGrid.innerHTML = filtered.map(s => {
 }).join('');
 </script>
 </body>
-</html>
+            </html>
