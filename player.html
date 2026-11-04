@@ -9,85 +9,198 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
-            --black:#000; --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2;
+            --black:#000; --charcoal:#121214; --slate:#1c1c1f;
+            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2;
             --glass-1:rgba(255,255,255,0.035); --glass-border:rgba(255,255,255,0.09);
             --text:#f5f5f7; --text-dim:rgba(245,245,247,0.55);
-            --r-lg:24px; --blur-glass:blur(40px) saturate(180%);
+            --r-lg:20px; --r-md:14px;
+            --blur-glass:blur(40px) saturate(180%);
         }
         html, body {
             font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
-            background:var(--black); color:var(--text); min-height:100vh;
+            background:var(--black); color:var(--text);
+            min-height:100vh;
+            overflow-x:hidden;
         }
         .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); }
         .bg-neo::before {
             content:''; position:absolute; inset:0;
-            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.18), transparent);
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.18), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.12), transparent);
             filter:blur(80px);
         }
+        
+        /* HEADER */
         .header {
             position:sticky; top:0; z-index:100; padding:12px 16px;
-            background:rgba(10,10,12,0.55); backdrop-filter:var(--blur-glass);
+            background:rgba(10,10,12,0.85);
+            backdrop-filter:var(--blur-glass);
             border-bottom:1px solid var(--glass-border);
             display:flex; align-items:center; gap:12px;
+            padding-top:calc(12px + env(safe-area-inset-top,0px));
         }
         .back-btn {
-            width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.07);
-            border:1px solid var(--glass-border); color:var(--text);
+            width:36px; height:36px; border-radius:50%;
+            background:rgba(255,255,255,0.07);
+            border:1px solid var(--glass-border);
+            color:var(--text);
             display:flex; align-items:center; justify-content:center;
             text-decoration:none; font-size:14px;
+            flex-shrink:0;
         }
-        .header-title { font-size:15px; font-weight:700; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .container { max-width:1000px; margin:0 auto; padding:16px; }
-        .iframe-container {
-            position:relative; width:100%; aspect-ratio:16/9; background:#000;
-            border-radius:var(--r-lg); overflow:hidden;
-            border:1px solid rgba(255,255,255,0.22);
-            box-shadow:0 0 40px rgba(100,210,255,0.15), 0 20px 60px rgba(0,0,0,0.7);
-            margin-bottom:16px;
+        .back-btn:hover { border-color:var(--cyan); background:rgba(100,210,255,0.15); }
+        .header-title { font-size:14px; font-weight:700; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .fs-btn {
+            width:36px; height:36px; border-radius:50%;
+            background:rgba(255,255,255,0.07);
+            border:1px solid var(--glass-border);
+            color:var(--text);
+            display:flex; align-items:center; justify-content:center;
+            font-size:14px; cursor:pointer;
         }
-        .iframe-container iframe {
-            width:100%; height:100%; border:none; display:block;
+        .fs-btn:hover { border-color:var(--cyan); background:rgba(100,210,255,0.15); }
+        
+        /* IFRAME */
+        .iframe-wrap {
+            position:relative;
+            width:100%;
+            aspect-ratio:16/9;
+            background:#000;
+            overflow:hidden;
+            border-bottom:1px solid var(--glass-border);
         }
+        .iframe-wrap iframe {
+            width:100%;
+            height:100%;
+            border:none;
+            display:block;
+        }
+        
+        /* KONTNI ANBA A */
+        .container {
+            max-width:1000px;
+            margin:0 auto;
+            padding:16px;
+        }
+        
+        /* INFO CARD */
         .info-card {
-            background:var(--glass-1); backdrop-filter:var(--blur-glass);
-            border:1px solid var(--glass-border); border-radius:var(--r-lg);
-            padding:18px; margin-bottom:14px;
+            background:var(--glass-1);
+            backdrop-filter:var(--blur-glass);
+            border:1px solid var(--glass-border);
+            border-radius:var(--r-lg);
+            padding:16px;
+            margin-bottom:14px;
         }
-        .info-header { display:flex; gap:14px; align-items:flex-start; }
+        .info-header {
+            display:flex;
+            gap:14px;
+            align-items:flex-start;
+            margin-bottom:12px;
+        }
         .info-poster {
-            width:75px; aspect-ratio:2/3; object-fit:cover;
-            border-radius:12px; border:1px solid rgba(255,255,255,0.22);
+            width:80px;
+            aspect-ratio:2/3;
+            object-fit:cover;
+            border-radius:var(--r-md);
+            border:1px solid var(--glass-border);
             flex-shrink:0;
         }
         .info-content { flex:1; min-width:0; }
-        .info-title { font-size:18px; font-weight:800; margin-bottom:6px; }
-        .info-meta { display:flex; flex-wrap:wrap; gap:8px; font-size:11px; color:var(--text-dim); font-weight:600; }
-        .info-meta span { display:inline-flex; align-items:center; gap:4px; }
-        .info-meta i { color:var(--cyan); font-size:10px; }
-        .toast {
-            position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
-            background:rgba(20,20,22,0.95); border:1px solid rgba(255,255,255,0.22);
-            color:var(--text); padding:10px 20px; border-radius:50px; font-size:12px; font-weight:600;
-            z-index:10000; opacity:0; transition:all 0.3s; pointer-events:none;
+        .info-title {
+            font-size:18px;
+            font-weight:800;
+            margin-bottom:8px;
+            line-height:1.2;
         }
-        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .info-meta {
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            font-size:11px;
+            color:var(--text-dim);
+            font-weight:600;
+            margin-bottom:10px;
+        }
+        .info-meta span {
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+        }
+        .info-meta i { color:var(--cyan); font-size:10px; }
+        .info-desc {
+            font-size:13px;
+            line-height:1.6;
+            color:var(--text-dim);
+        }
+        
+        /* WHATSAPP */
+        .whatsapp-card {
+            background:linear-gradient(135deg, rgba(37,211,102,0.15), rgba(18,140,126,0.1));
+            border:1px solid rgba(37,211,102,0.4);
+            border-radius:var(--r-lg);
+            padding:16px;
+            margin-bottom:14px;
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+        .wa-icon {
+            width:48px;
+            height:48px;
+            border-radius:14px;
+            background:linear-gradient(135deg, #25D366, #128C7E);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#fff;
+            font-size:24px;
+            flex-shrink:0;
+        }
+        .wa-content { flex:1; min-width:0; }
+        .wa-title { font-size:14px; font-weight:800; margin-bottom:4px; }
+        .wa-desc { font-size:11px; color:var(--text-dim); line-height:1.4; }
+        .wa-btn {
+            padding:10px 18px;
+            background:linear-gradient(135deg, #25D366, #128C7E);
+            color:#fff;
+            border:none;
+            border-radius:50px;
+            font-size:12px;
+            font-weight:700;
+            cursor:pointer;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            white-space:nowrap;
+        }
     </style>
 </head>
 <body>
 
 <div class="bg-neo"></div>
 
-<div class="header">
+<!-- HEADER -->
+<header class="header">
     <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
     <div class="header-title" id="headerTitle">Chargement...</div>
+    <button class="fs-btn" onclick="toggleFullscreen()"><i class="fas fa-expand"></i></button>
+</header>
+
+<!-- IFRAME -->
+<div class="iframe-wrap" id="iframeWrap">
+    <iframe 
+        id="playerIframe" 
+        allowfullscreen 
+        allow="autoplay; fullscreen; encrypted-media; picture-in-picture">
+    </iframe>
 </div>
 
+<!-- KONTNI ANBA A -->
 <div class="container">
-    <!-- IFRAME POU JWE FIM NAN -->
-    <div class="iframe-container">
-        <iframe id="playerIframe" allowfullscreen allow="autoplay; fullscreen"></iframe>
-    </div>
-
+    <!-- INFO CARD -->
     <div class="info-card">
         <div class="info-header">
             <img id="infoPoster" class="info-poster" src="" alt="Poster">
@@ -96,10 +209,21 @@
                 <div class="info-meta" id="infoMeta"></div>
             </div>
         </div>
+        <p id="infoDesc" class="info-desc">Chargement...</p>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="whatsapp-card">
+        <div class="wa-icon"><i class="fab fa-whatsapp"></i></div>
+        <div class="wa-content">
+            <div class="wa-title">Rejoignez notre chaîne WhatsApp</div>
+            <div class="wa-desc">Nouveautés, liens directs, et plus encore.</div>
+        </div>
+        <a href="https://whatsapp.com/channel/0029Vb6tw1G42Dcja42wiY3R" target="_blank" class="wa-btn">
+            <i class="fab fa-whatsapp"></i> Suivre
+        </a>
     </div>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 // ============================================================
@@ -113,7 +237,10 @@ const data = {
     year: params.get('year') || '',
     rating: params.get('rating') || 'N/A',
     type: params.get('type') || 'movie',
-    detailPath: params.get('detailPath') || ''
+    detailPath: params.get('detailPath') || '',
+    season: params.get('season') || '0',
+    episode: params.get('episode') || '0',
+    desc: params.get('desc') || 'Aucune description disponible.'
 };
 
 document.getElementById('headerTitle').textContent = data.title;
@@ -124,54 +251,60 @@ document.getElementById('infoMeta').innerHTML = `
     <span><i class="fas fa-star"></i> ${data.rating}</span>
     <span>${data.type === 'series' ? 'Série' : 'Film'}</span>
 `;
+document.getElementById('infoDesc').textContent = data.desc;
 
 // ============================================================
-// ✅ IFRAME: Louvri paj la dirèkteman
+// ✅ IFRAME
 // ============================================================
 const iframe = document.getElementById('playerIframe');
 
-// Bati URL la egzakteman jan w te bay la:
-// https://movieboxhd.net/moviedetail/{detailPath}?id={subjectId}&page_from=home_Action%26Thriller&type=/movie/detail
-
-// Si w pa gen detailPath, nou ka eseye kreye yon URL jis ak subjectId a
 let iframeUrl = '';
-
 if (data.detailPath) {
-    // Gen detailPath (pi bon)
-    iframeUrl = `https://movieboxhd.net/moviedetail/${data.detailPath}?id=${data.subjectId}&page_from=home&type=/movie/detail`;
+    const se = data.season || '0';
+    const ep = data.episode || '0';
+    iframeUrl = `https://mzfi.me/spa/videoPlayPage/movies/${data.detailPath}?id=${data.subjectId}&detailSe=${se}&detailEp=${ep}&lang=en&type=%2Fmovie%2Fdetail`;
 } else {
-    // Pa gen detailPath, eseye jis ak subjectId a
-    iframeUrl = `https://movieboxhd.net/moviedetail/play?id=${data.subjectId}`;
+    iframeUrl = `https://mzfi.me/spa/videoPlayPage/movies/play?id=${data.subjectId}&lang=en&type=%2Fmovie%2Fdetail`;
 }
 
 console.log('🔗 Iframe URL:', iframeUrl);
-
-// Chaje URL la nan iframe a
 iframe.src = iframeUrl;
 
-// Si iframe a pa chaje, montre yon mesaj
-iframe.onerror = () => {
-    showToast('⚠️ Iframe pa chaje. Eseye louvri l nan yon nouvo tab.');
-};
-
-// Montre yon mesaj si iframe a bloke
-setTimeout(() => {
-    try {
-        // Eseye wè si iframe a chaje (sa ka bay erè CORS)
-        if (iframe.contentDocument && iframe.contentDocument.body.innerHTML === '') {
-            showToast('⚠️ Iframe vid. Sit la ka bloke l.');
+// ============================================================
+// ✅ FULLSCREEN
+// ============================================================
+function toggleFullscreen() {
+    const elem = document.getElementById('iframeWrap');
+    
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(() => {});
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
         }
-    } catch (e) {
-        // Sa nòmal (CORS bloke aksè)
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
     }
-}, 3000);
-
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 4000);
 }
+
+// Chanje ikòn lè w antre/soti nan fullscreen
+document.addEventListener('fullscreenchange', () => {
+    const btn = document.querySelector('.fs-btn');
+    if (document.fullscreenElement) {
+        btn.innerHTML = '<i class="fas fa-compress"></i>';
+    } else {
+        btn.innerHTML = '<i class="fas fa-expand"></i>';
+    }
+});
+
+// ============================================================
+// ✅ BLOKE SCROLL (SÈLMAN SOU BODY A)
+// ============================================================
+document.body.style.overflowX = 'hidden';
 </script>
 </body>
-</html>
+            </html>
