@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
+/* Tout style ou a rete menm jan an — mwen jis ajoute Skeleton yo */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
 html { scroll-behavior: smooth; }
 :root {
@@ -53,8 +54,6 @@ body {
   33% { transform: translate(60px,-50px) scale(1.15); }
   66% { transform: translate(-50px,60px) scale(0.9); }
 }
-
-/* HEADER */
 .header {
   position: sticky; top: 0; z-index: 100; padding: 16px 20px;
   background: rgba(10,10,12,0.55);
@@ -99,8 +98,6 @@ body {
   box-shadow: var(--glass-highlight), 0 0 30px rgba(100,210,255,0.6), var(--shadow-2);
 }
 .action-btn i { font-size: 16px; }
-
-/* SEARCH */
 .search-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.6);
@@ -124,8 +121,6 @@ body {
   color: var(--text); font-size: 16px; padding: 8px 0; font-family: inherit;
 }
 .search-box input::placeholder { color: var(--text-mute); }
-
-/* HERO */
 .hero {
   margin: 20px; border-radius: var(--r-2xl); overflow: hidden;
   position: relative; min-height: 460px; display: flex; align-items: flex-end;
@@ -174,8 +169,6 @@ body {
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-/* BUTTONS */
 .btn {
   display: inline-flex; align-items: center; gap: 8px; padding: 15px 26px;
   border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; border: none;
@@ -206,8 +199,6 @@ body {
   border-color: var(--cyan); background: rgba(100,210,255,0.12); transform: translateY(-2px);
   box-shadow: var(--glass-highlight), 0 0 30px rgba(100,210,255,0.35), var(--shadow-2);
 }
-
-/* CATEGORIES */
 .categories { display: flex; gap: 10px; padding: 0 20px 24px; overflow-x: auto; scrollbar-width: none; }
 .categories::-webkit-scrollbar { display: none; }
 .cat {
@@ -232,22 +223,12 @@ body {
   border-color: var(--cyan); color: var(--cyan);
   box-shadow: var(--glass-highlight), 0 4px 24px rgba(100,210,255,0.4), inset 0 0 20px rgba(100,210,255,0.15);
 }
-
-/* CONTENT */
 .content { padding: 0 20px; }
 .section { margin-bottom: 44px; }
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .section-title { font-size: 21px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
 .section-title i { font-size: 16px; color: var(--cyan); }
-
-/* === GRID POU GWO POSTER === */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 18px;
-}
-
-/* === GWO CARD === */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 18px; }
 .card {
   border-radius: var(--r-lg); overflow: hidden;
   background: var(--glass-1);
@@ -267,8 +248,6 @@ body {
   border-color: var(--glass-border-bright);
   box-shadow: var(--glass-highlight), 0 20px 50px rgba(0,0,0,0.7), 0 0 50px rgba(100,210,255,0.25);
 }
-
-/* GWO POSTER */
 .poster-wrap { position: relative; width: 100%; aspect-ratio: 2/3; overflow: hidden; }
 .poster {
   width: 100%; height: 100%; object-fit: cover; display: block;
@@ -276,8 +255,6 @@ body {
   transition: transform 0.6s var(--ease);
 }
 .card:hover .poster { transform: scale(1.1); }
-
-/* RATING */
 .rating {
   position: absolute; top: 12px; right: 12px; padding: 6px 11px;
   background: rgba(0,0,0,0.7);
@@ -287,8 +264,6 @@ body {
   border: 1px solid rgba(255,255,255,0.15); box-shadow: var(--glass-highlight);
 }
 .rating i { color: var(--cyan); font-size: 10px; }
-
-/* PLAY BUTTON */
 .play-btn {
   position: absolute; bottom: 12px; left: 12px;
   width: 48px; height: 48px; border-radius: 50%;
@@ -305,15 +280,13 @@ body {
   transform: scale(1.15); background: rgba(100,210,255,0.65);
   box-shadow: var(--glass-highlight), 0 0 30px rgba(100,210,255,0.8);
 }
-
-/* INFO */
 .info { padding: 14px 16px; }
 .title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
 .meta { display: flex; gap: 8px; font-size: 12px; color: var(--text-dim); }
 .meta span { display: inline-flex; align-items: center; gap: 3px; }
 .meta i { font-size: 9px; opacity: 0.7; }
 
-/* SKELETON */
+/* Skeleton Loader pou l parèt bèl pandan l ap chèche */
 .skeleton { border-radius: var(--r-lg); overflow: hidden; background: var(--glass-1); border: 1px solid var(--glass-border); }
 .sk-poster { width: 100%; aspect-ratio: 2/3; background: linear-gradient(90deg, var(--charcoal) 0%, var(--slate) 50%, var(--charcoal) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
 .sk-info { padding: 14px 16px; }
@@ -324,16 +297,12 @@ body {
 .empty { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--text-dim); }
 .empty i { font-size: 56px; color: var(--text-mute); margin-bottom: 18px; display: block; }
 .empty p { font-size: 15px; font-weight: 600; }
-
-/* FOOTER */
 .footer { text-align: center; padding: 60px 20px 160px; border-top: 1px solid var(--glass-border); margin-top: 40px; }
 .footer-logo { display: inline-flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; margin-bottom: 12px; color: var(--white); }
 .footer-logo i { color: var(--cyan); }
 .powered { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
 .gradient-text { font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--purple)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .copyright { font-size: 11px; color: var(--text-mute); margin-top: 16px; }
-
-/* BOTTOM NAV */
 .bottom-nav {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   width: calc(100% - 32px); max-width: 440px; border-radius: var(--r-2xl);
@@ -361,8 +330,6 @@ body {
   width: 20px; height: 3px; background: linear-gradient(90deg, var(--cyan), var(--purple));
   border-radius: 3px; box-shadow: 0 0 12px var(--cyan);
 }
-
-/* LOADER */
 .loader {
   position: fixed; inset: 0; background: var(--black); z-index: 999;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
@@ -393,8 +360,6 @@ body {
 .loader-dots span:nth-child(2) { animation-delay: 0.15s; }
 .loader-dots span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes dotBounce { 0%,80%,100% { transform: translateY(0); opacity: 0.3; } 40% { transform: translateY(-10px); opacity: 1; } }
-
-/* TOAST */
 .toast {
   position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%) translateY(20px);
   background: rgba(20,20,22,0.95);
@@ -405,8 +370,6 @@ body {
   box-shadow: var(--glass-highlight), var(--shadow-3);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .hero { min-height: 380px; padding: 26px 22px; margin: 14px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 14px; }
@@ -419,7 +382,6 @@ body {
   .play-btn i { font-size: 14px; }
   .hero-title { font-size: 28px; }
 }
-
 @media (max-width: 480px) {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
@@ -475,6 +437,7 @@ body {
 <section class="categories" id="categoryTabs"></section>
 
 <main class="content" id="mainContent">
+  <!-- Skeleton Loader la -->
   <section class="section">
     <div class="section-head">
       <h2 class="section-title"><i class="fas fa-fire"></i> Chargement...</h2>
@@ -510,85 +473,22 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
-/* Tout fim ou yo nan FALLBACK_MOVIES (menm jan ak anvan) */
+// ============================================================
+// 🎬 BLAST FLIX - Chaje soti nan API Render
+// ============================================================
+const API_BASE_URL = 'https://moviebox-api-snrn.onrender.com';
+
 const FALLBACK_MOVIES = [
   { subjectId:"8221332401033825872", title:"The Last Testament", poster:"https://pbcdnw.aoneroom.com/image/2025/11/28/eb616974c3eb25c2c647c730b0288f45.jpeg", year:"2025", rating:7.1, genre:"Action" },
   { subjectId:"3843768500917617656", title:"The Naked Gun", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/b5aa3cf6c7d54fdeb5f72cfe29e063e4.jpg", year:"2025", rating:6.4, genre:"Action" },
   { subjectId:"6404541527368386376", title:"Nobody 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/259c45b7a121808cde5d38d31f7e82fd.jpg", year:"2025", rating:6.3, genre:"Action" },
-  { subjectId:"7428149681496408912", title:"Mission: Impossible - The Final Reckoning", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b7fe27b82cdd2c69e894b9245335e9e6.jpg", year:"2025", rating:7.2, genre:"Action" },
-  { subjectId:"608631316313265056", title:"The Pickup", poster:"https://pbcdnw.aoneroom.com/image/2025/11/29/8e88156c020dccbba4d0c68004bac063.jpg", year:"2025", rating:5.4, genre:"Action" },
-  { subjectId:"7016170107546617328", title:"Karate Kid: Legends", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/488b6fac279aa80d33802b575f0c7c0e.jpg", year:"2025", rating:6.3, genre:"Action" },
-  { subjectId:"4192447489649296464", title:"Ballerina", poster:"https://pbcdnw.aoneroom.com/image/2025/11/30/be5f59a92ed90c23825fd1a26a7da7cf.jpg", year:"2025", rating:6.9, genre:"Action" },
-  { subjectId:"3339767763907888176", title:"Heads of State", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/419f44a61b5ef225f049292a053714c2.jpg", year:"2025", rating:6.4, genre:"Action" },
-  { subjectId:"1881185875070011208", title:"Ice Road 2: Road to the Sky", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/9e176a0e386218ad402b4c2553638008.jpg", year:"2025", rating:4.8, genre:"Action" },
-  { subjectId:"2991764873358593616", title:"Almost Cops", poster:"https://pbcdnw.aoneroom.com/image/2025/07/10/a901a0cdad8cd5e9a2cbfd118f8dc916.jpg", year:"2025", rating:4.9, genre:"Action" },
-  { subjectId:"6172110816570492744", title:"Guns Up", poster:"https://pbcdnw.aoneroom.com/image/2025/10/05/236c322e9c829a39133283a14cbf1890.jpg", year:"2025", rating:5.4, genre:"Action" },
-  { subjectId:"2908887247384723616", title:"The Amateur", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/50e57d9199484e026c0a144201c4c92f.jpg", year:"2025", rating:6.5, genre:"Action" },
-  { subjectId:"930281021973627184", title:"Diablo", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/5967290b4d0ee6d2371ba9d12d96ce72.jpg", year:"2025", rating:5.6, genre:"Action" },
-  { subjectId:"2439164833342933144", title:"K.O.", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/9ae8adc7e83d56113e75e8a1261d02c9.jpg", year:"2025", rating:5.8, genre:"Action" },
-  { subjectId:"902110352954082296", title:"Shadow Force", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/633783f45aefec9902a1a3ce7e4b373e.jpg", year:"2025", rating:4.7, genre:"Action" },
-  { subjectId:"2177957257546286104", title:"Predator: Killer of Killers", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/d861a84799ff0a72dd31c7e21928fa30.jpg", year:"2025", rating:7.5, genre:"Action" },
-  { subjectId:"2105648425101411352", title:"The Accountant 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/bffd198f05bbff3405294366082a0522.jpg", year:"2025", rating:6.6, genre:"Action" },
-  { subjectId:"6938790327474438416", title:"Sinners", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/dc68b1ba52dbab48c07486f1ec8c7e59.jpg", year:"2025", rating:7.6, genre:"Action" },
-  { subjectId:"5986678506963486704", title:"A Working Man", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/49cc83021d6af4ec3aff3f8088134ba0.jpg", year:"2025", rating:5.7, genre:"Action" },
-  { subjectId:"3801511732347028560", title:"Holy Night: Demon Hunters", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/0b1fc25e5bab39ae23e440aa3e8100e2.jpg", year:"2025", rating:4.8, genre:"Action" },
-  { subjectId:"631837183527247152", title:"G20", poster:"https://pbcdnw.aoneroom.com/image/2025/10/04/cdefc0dc1b6bb29c6cf362009eb43a7c.jpg", year:"2025", rating:5.1, genre:"Action" },
-  { subjectId:"5068826426707722192", title:"Star Trek: Section 31", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/7fde27354dc18285a1856a617edeceb7.jpg", year:"2025", rating:3.8, genre:"Action" },
-  { subjectId:"6270635241942436568", title:"Back in Action", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/ccc106379595724d8129d2f4c2bf7d1f.jpg", year:"2025", rating:5.9, genre:"Action" },
-  { subjectId:"7700102201389581232", title:"Ad Vitam", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/553b9696fe155244aa56fa4b6a90bea0.jpg", year:"2025", rating:5.9, genre:"Action" },
-  { subjectId:"7926971032618370256", title:"Alarum", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/6c8bd60ff0c4eec3828621345d6d065e.jpg", year:"2025", rating:3.3, genre:"Action" },
-  { subjectId:"1666233884259877184", title:"Carry-On", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/38c89942338a99eda9f084d83e3ecbec.jpg", year:"2024", rating:6.5, genre:"Action" },
-  { subjectId:"4892526842143540160", title:"Gladiator II", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/dde6ab82d02faf6992050a0d6d597b45.jpg", year:"2024", rating:6.5, genre:"Action" },
-  { subjectId:"2168158347105583056", title:"Red One", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/03d9573a7aa9a192a33f407797cd8bc7.jpg", year:"2024", rating:6.2, genre:"Action" },
-  
-  // === HORROR ===
-  { subjectId:"4863947764146784080", title:"The Elixir", poster:"https://pbcdnw.aoneroom.com/image/2025/10/05/23eb2f3d287f4ea058e9fccba119532c.jpg", year:"2025", rating:5.4, genre:"Horror" },
-  { subjectId:"8085368738226259024", title:"The Long Walk", poster:"https://pbcdnw.aoneroom.com/image/2025/10/02/4f447eb61ff67ea059ed038f8a3eb268.jpg", year:"2025", rating:7.3, genre:"Horror" },
-  { subjectId:"2882021282055454400", title:"The Strangers: Chapter 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/abded168aaa14c3eae80831631d14e34.jpg", year:"2025", rating:4.7, genre:"Horror" },
-  { subjectId:"2764140928360139480", title:"The Conjuring: Last Rites", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/1b8014431225507ca7b93cc954ff93b6.jpg", year:"2025", rating:6.2, genre:"Horror" },
-  { subjectId:"6946180097879982112", title:"Vicious", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/5aea04e91eb80bd5a27036e88fc9235a.jpg", year:"2025", rating:4.9, genre:"Horror" },
-  { subjectId:"4270802874227213304", title:"Him", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/e5e69d269d24981516c586caa20b63d2.jpg", year:"2025", rating:5.1, genre:"Horror" },
-  { subjectId:"2482316430432161768", title:"Five Nights at Freddy's", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/99ad94dd45b1fd85785fcc4090a41187.jpg", year:"2023", rating:5.4, genre:"Horror" },
-  { subjectId:"6989557830903120016", title:"V/H/S/Halloween", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/5b85aabcc6372c7c16e77ce79bacbaac.jpg", year:"2025", rating:5.7, genre:"Horror" },
-  { subjectId:"5395735210837409472", title:"The Toxic Avenger", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/539cd3944c3f6dc5415d5faeb2bb3bbb.jpg", year:"2025", rating:5.9, genre:"Horror" },
-  { subjectId:"4118785983024381904", title:"The Sadness", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/30188a4722214edd8f48d5de18d5a70c.jpg", year:"2022", rating:6.5, genre:"Horror" },
-
-  // === ADVENTURE ===
-  { subjectId:"4201113838688914736", title:"Primitive War", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/507eb4ec6203430737c95e33e0786d8e-s.jpg", year:"2025", rating:5.3, genre:"Adventure" },
-  { subjectId:"1257402142307009144", title:"Jurassic World: Rebirth", poster:"https://pbcdnw.aoneroom.com/image/2025/11/30/9b09804dc94ce9e58f87dea8f9123ca0.jpg", year:"2025", rating:5.9, genre:"Adventure" },
-  { subjectId:"2858466994209408840", title:"The Old Guard 2", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/d0f7637d0a1bde2be0ea9de52b61199d.jpg", year:"2025", rating:5.1, genre:"Adventure" },
-  { subjectId:"8962650157435210416", title:"The Old Guard", poster:"https://pbcdnw.aoneroom.com/image/2022/10/14/2e09ba5b3a1727225ce0f5497a3bbedb.jpg", year:"2020", rating:6.7, genre:"Adventure" },
-  { subjectId:"4882324853317158728", title:"Eden", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/f20860f20a72e679e93a5862c2e93497.jpg", year:"2025", rating:6.5, genre:"Adventure" },
-  { subjectId:"4214211710825253168", title:"Dora and the Search for Sol Dorado", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/d5f301ef2fe8313a889978a36ff34b15.jpg", year:"2025", rating:5.4, genre:"Adventure" },
-  { subjectId:"2775610752877713120", title:"Fountain of Youth", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/c4b8e0179f43b41e7225cbd4ea0dd003.jpg", year:"2025", rating:5.7, genre:"Adventure" },
-  { subjectId:"2977584447735874896", title:"In the Lost Lands", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/7d0e7c576203de835cd190cdf022d13d.jpg", year:"2025", rating:4.7, genre:"Adventure" },
-  { subjectId:"792146208100892624", title:"The Electric State", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/069f547583b64bc43aa09a7b95787126.jpg", year:"2025", rating:5.9, genre:"Adventure" },
-  { subjectId:"8453577590182397008", title:"Kingdom of the Planet of the Apes", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/d7861ad5ddcac2343f4d62cd9dc4840b.jpg", year:"2024", rating:6.8, genre:"Adventure" },
-  { subjectId:"7929424179425067552", title:"Borderlands", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/1fe63c4ae5b1e8eeb2118a437b7a428a-s.jpg", year:"2024", rating:4.7, genre:"Adventure" },
-  { subjectId:"7717604771867546792", title:"Dungeons & Dragons: Honor Among Thieves", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/30e57d52ae27c589765dfee1d741a6ff.jpg", year:"2023", rating:7.2, genre:"Adventure" },
-  { subjectId:"208708012989632088", title:"Jumanji: The Next Level", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/dbd16094cd9582ea925f992469e940e4-s.jpg", year:"2019", rating:6.6, genre:"Adventure" },
-  { subjectId:"7078571519349507112", title:"Jumanji: Welcome to the Jungle", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/de4138b9e3b2c9cd2f0999a2...", year:"2017", rating:6.9, genre:"Adventure" },
-
-  // === SERIES / VIP ===
-  { subjectId:"2036860087691609120", title:"Game of Thrones", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/f527ff266fccf690578b80a403761bf2.jpg", year:"2011", rating:9.2, genre:"Series" },
-  { subjectId:"315796373906018088", title:"Spartacus: Gods of the Arena", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/c6a9cc8f73c17dff11c8bbe8d0b1b991.jpg", year:"2010", rating:8.4, genre:"Series" },
-  { subjectId:"765625015365780944", title:"Squid Game", poster:"https://pbcdnw.aoneroom.com/image/2025/06/30/5870fc25dae7dfe1e223e64544776a7b.jpg", year:"2025", rating:8.0, genre:"Series" },
-  { subjectId:"2726173097488438040", title:"The Sandman", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/09ee79bd62549cfa7f593732b06d293c.jpg", year:"2022", rating:7.6, genre:"Series" },
-  { subjectId:"8411756968024720848", title:"Attack on Titan", poster:"https://pbcdnw.aoneroom.com/image/2024/04/15/e214b039c7e9e29d9ed6283508b404d0.jpg", year:"2013", rating:9.1, genre:"Series" },
-  { subjectId:"2730113747162387224", title:"The Originals", poster:"https://pbcdnw.aoneroom.com/image/2022/11/03/efca45d821cb035ade885d3f6fb00a96.jpg", year:"2013", rating:8.3, genre:"Series" },
-  { subjectId:"193974049297629648", title:"The Day of the Jackal", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/885007b496f67bbb91ad1a6ed37cb143.jpg", year:"2024", rating:8.1, genre:"Series" },
-  { subjectId:"613140447321543448", title:"The Summer I Turned Pretty", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/e90bbb9e8fa4439717732ad6ee3baf5b.jpg", year:"2022", rating:7.3, genre:"Series" },
-  { subjectId:"104358415815821952", title:"Alice in Borderland", poster:"https://pbcdnw.aoneroom.com/image/2025/06/15/a092c255c26383d5d2b78ba01a56cc46.jpg", year:"2025", rating:7.8, genre:"Series" },
-  { subjectId:"134079758618484744", title:"Jujutsu Kaisen", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/0e87961ac4b81616b286fa0602aa510a.jpg", year:"2020", rating:8.5, genre:"Series" }
+  // ... mete tout FALLBACK_MOVIES ou yo isit la ...
+  { subjectId:"8759851328492438440", title:"Train Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year:"2025", rating:7.7, genre:"Drama" },
+  { subjectId:"4956801153355891744", title:"Stranger Things", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year:"2016", rating:8.6, genre:"Drama" }
 ];
 
-// === STATE ===
-const STATE = {
-  heroMovies: [], heroIndex: 0, heroTimer: null,
-  categories: {}, allMovies: []
-};
+const STATE = { heroMovies: [], heroIndex: 0, heroTimer: null, categories: {}, allMovies: [] };
 
-// === INIT ===
 document.addEventListener("DOMContentLoaded", () => {
   initLoader();
   setupEvents();
@@ -597,9 +497,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function initLoader() {
   window.addEventListener("load", () => {
-    setTimeout(() => document.getElementById("loader")?.classList.add("hidden"), 800);
+    setTimeout(() => document.getElementById("loader")?.classList.add("hidden"), 600);
   });
-  setTimeout(() => document.getElementById("loader")?.classList.add("hidden"), 4000);
+  setTimeout(() => document.getElementById("loader")?.classList.add("hidden"), 2000);
 }
 
 function setupEvents() {
@@ -644,40 +544,49 @@ function setupEvents() {
 
 async function loadHomepage() {
   try {
-    const endpoints = [
-      `/api/homepage`,
-      `/homepage`,
-      `/api`,
-      `/v1/homepage`
-    ];
-    let data = null;
-    for (const url of endpoints) {
-      try {
-        const res = await fetch(url, { method: "GET", headers: { "Accept": "application/json" } });
-        if (!res.ok) continue;
-        const json = await res.json();
-        const homepageData = json.data || json;
-        if (homepageData.operatingList || homepageData.subjects || Array.isArray(homepageData)) {
-          data = homepageData;
-          break;
-        }
-      } catch (err) { console.warn("❌", url, err.message); }
+    console.log('🔍 Chèche fim nan API:', API_BASE_URL);
+    // Eseye premye ak /movies, si li pa mache, eseye yon rechèch
+    let res = await fetch(`${API_BASE_URL}/movies?page=1`);
+    if (!res.ok) {
+      res = await fetch(`${API_BASE_URL}/search?q=2025`);
     }
-    if (!data) { useFallback(); return; }
-    if (data.operatingList) {
-      data.operatingList.forEach((cat) => {
-        if (cat.type === "SUBJECTS_MOVIE" && cat.subjects?.length > 0) {
-          STATE.categories[cat.title] = cat.subjects;
-          STATE.allMovies.push(...cat.subjects);
-        }
-      });
-    } else if (data.subjects && Array.isArray(data.subjects)) {
-      STATE.categories["Tous les films"] = data.subjects;
-      STATE.allMovies = data.subjects;
+    
+    if (res.ok) {
+      const data = await res.json();
+      let movies = [];
+      if (data.results) movies = data.results;
+      else if (data.movies) movies = data.movies;
+      else if (Array.isArray(data)) movies = data;
+      
+      if (movies.length > 0) {
+        STATE.allMovies = movies.map(m => ({
+          subjectId: m.subject_id || m.subjectId || m.id,
+          title: m.title || m.name,
+          poster: m.cover?.url || m.poster || m.image,
+          year: (m.release_date || m.year || '').split('-')[0],
+          rating: m.imdb_rating || m.rating || 'N/A',
+          genre: m.genre || 'Movie'
+        }));
+        
+        const genres = {};
+        STATE.allMovies.forEach(m => {
+          const g = m.genre || "Autres";
+          if (!genres[g]) genres[g] = [];
+          genres[g].push(m);
+        });
+        STATE.categories = genres;
+        STATE.categories["Tous les films"] = STATE.allMovies;
+        
+        setupAndRender();
+        return;
+      }
     }
-    if (STATE.allMovies.length === 0) { useFallback(); return; }
-    setupAndRender();
-  } catch (err) { console.error("❌", err); useFallback(); }
+  } catch (e) {
+    console.warn('⚠️ API pa disponib, ap itilize fallback:', e.message);
+  }
+  
+  // Si API a pa mache, itilize FALLBACK_MOVIES
+  useFallback();
 }
 
 function useFallback() {
@@ -801,12 +710,10 @@ function createCard(movie) {
   `;
 }
 
-// === HERO ROTATION ===
 function updateHero() {
   if (!STATE.heroMovies.length) return;
   const m = STATE.heroMovies[STATE.heroIndex];
   const poster = m.cover?.url || m.poster || m.thumbnail || "";
-  
   document.getElementById("heroBg").style.backgroundImage = `url(${poster})`;
   document.getElementById("heroTitle").textContent = m.title || "Sans titre";
   document.getElementById("heroMeta").innerHTML = `
@@ -815,7 +722,6 @@ function updateHero() {
     ${m.genre ? `<span><i class="fas fa-tag"></i> ${m.genre.split(",")[0]}</span>` : ""}
   `;
   document.getElementById("heroDesc").textContent = m.description || "";
-  
   const params = new URLSearchParams({
     subjectId: m.subjectId || m.id || "", title: m.title || "",
     poster: poster, year: (m.releaseDate || m.year || "").split("-")[0] || "",
@@ -831,7 +737,7 @@ function startHeroRotation() {
   STATE.heroTimer = setInterval(() => {
     STATE.heroIndex = (STATE.heroIndex + 1) % STATE.heroMovies.length;
     updateHero();
-  }, 5000); // 5 segonn
+  }, 5000);
 }
 
 function filterCards(query) {
