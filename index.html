@@ -464,18 +464,31 @@ body {
 
 <script>
 // ============================================================
-// 🎬 BLAST FLIX - Plizyè API (Render + Aoneroom)
+// 🎬 BLAST FLIX - Plizyè API + Cache
 // ============================================================
 const API_SOURCES = [
   { name: 'Moviebox', url: 'https://moviebox-api-snrn.onrender.com' },
-  { name: 'Aoneroom', url: 'https://h5.aoneroom.com' },
-  // Ou ka ajoute lòt API isit la
+  { name: 'Aoneroom', url: 'https://h5.aoneroom.com' }
 ];
+
+// Fonksyon pou fè demann ak timeout
+async function fetchWithTimeout(url, timeout = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    return res;
+  } catch (e) {
+    clearTimeout(timer);
+    throw e;
+  }
+}
 
 const FALLBACK_MOVIES = [
   { subjectId:"8221332401033825872", title:"The Last Testament", poster:"https://pbcdnw.aoneroom.com/image/2025/11/28/eb616974c3eb25c2c647c730b0288f45.jpeg", year:"2025", rating:7.1, genre:"Action" },
-  // ... mete tout FALLBACK_MOVIES ou yo isit la ...
   { subjectId:"8759851328492438440", title:"Train Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year:"2025", rating:7.7, genre:"Drama" }
+  // ... mete tout FALLBACK_MOVIES ou yo isit la ...
 ];
 
 const STATE = { heroMovies: [], heroIndex: 0, heroTimer: null, categories: {}, allMovies: [] };
@@ -534,53 +547,92 @@ function setupEvents() {
 }
 
 async function loadHomepage() {
-  // Eseye chak API youn pa youn
+  // 1. Verify cache
+  const cached = localStorage.getItem('blastflix_movies');
+  const cacheTime = localStorage.getItem('blastflix_movies_time');
+  const now = Date.now();
+  
+  // Si cache a mwens pase 30 minit, itilize l
+  if (cached && cacheTime && (now - parseInt(cacheTime)) < 30 * 60 * 1000) {
+    try {
+      const movies = JSON.parse(cached);
+      if (movies.length > 0) {
+        STATE.allMovies = movies;
+        const genres = {};
+        movies.forEach(m => {
+          const g = m.genre || "Autres";
+          if (!genres[g]) genres[g] = [];
+          genres[g].push(m);
+        });
+        STATE.categories = genres;
+        STATE.categories["Tous les films"] = movies;
+        setupAndRender();
+        return;
+      }
+    } catch (e) {
+      console.warn('Cache pa valab');
+    }
+  }
+  
+  // 2. Chèche nan API yo
   for (const api of API_SOURCES) {
     try {
       console.log(`🔍 Chèche nan ${api.name}:`, api.url);
       
-      // Pou Moviebox API
-      let res = await fetch(`${api.url}/movies?page=1`);
-      if (!res.ok) {
-        res = await fetch(`${api.url}/search?q=2025`);
+      // Eseye chèche nan plizyè paj pou plis fim
+      const allMovies = [];
+      for (let page = 1; page <= 5; page++) {
+        try {
+          const res = await fetchWithTimeout(`${api.url}/movies?page=${page}`, 8000);
+          if (res.ok) {
+            const data = await res.json();
+            let movies = [];
+            if (data.results) movies = data.results;
+            else if (data.movies) movies = data.movies;
+            else if (Array.isArray(data)) movies = data;
+            
+            if (movies.length === 0) break;
+            allMovies.push(...movies);
+          }
+        } catch (e) {
+          console.warn(`❌ Page ${page} pa mache`);
+          break;
+        }
       }
       
-      if (res.ok) {
-        const data = await res.json();
-        let movies = [];
-        if (data.results) movies = data.results;
-        else if (data.movies) movies = data.movies;
-        else if (Array.isArray(data)) movies = data;
+      if (allMovies.length > 0) {
+        const mapped = allMovies.map(m => ({
+          subjectId: m.subject_id || m.subjectId || m.id,
+          title: m.title || m.name,
+          poster: m.cover?.url || m.poster || m.image,
+          year: (m.release_date || m.year || '').split('-')[0],
+          rating: m.imdb_rating || m.rating || 'N/A',
+          genre: m.genre || 'Movie'
+        }));
         
-        if (movies.length > 0) {
-          STATE.allMovies = movies.map(m => ({
-            subjectId: m.subject_id || m.subjectId || m.id,
-            title: m.title || m.name,
-            poster: m.cover?.url || m.poster || m.image,
-            year: (m.release_date || m.year || '').split('-')[0],
-            rating: m.imdb_rating || m.rating || 'N/A',
-            genre: m.genre || 'Movie'
-          }));
-          
-          const genres = {};
-          STATE.allMovies.forEach(m => {
-            const g = m.genre || "Autres";
-            if (!genres[g]) genres[g] = [];
-            genres[g].push(m);
-          });
-          STATE.categories = genres;
-          STATE.categories["Tous les films"] = STATE.allMovies;
-          
-          setupAndRender();
-          return;
-        }
+        // Sere nan cache
+        localStorage.setItem('blastflix_movies', JSON.stringify(mapped));
+        localStorage.setItem('blastflix_movies_time', String(now));
+        
+        STATE.allMovies = mapped;
+        const genres = {};
+        mapped.forEach(m => {
+          const g = m.genre || "Autres";
+          if (!genres[g]) genres[g] = [];
+          genres[g].push(m);
+        });
+        STATE.categories = genres;
+        STATE.categories["Tous les films"] = mapped;
+        
+        setupAndRender();
+        return;
       }
     } catch (e) {
       console.warn(`❌ ${api.name} pa mache:`, e.message);
     }
   }
   
-  // Si tout API yo pa mache, itilize FALLBACK_MOVIES
+  // 3. Si tout API yo pa mache, itilize fallback
   console.log('⚠️ Tout API yo pa mache, itilize fallback');
   useFallback();
 }
@@ -746,4 +798,4 @@ function filterCards(query) {
 }
 </script>
 </body>
-    </html>
+  </html>
