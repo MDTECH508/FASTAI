@@ -9,22 +9,20 @@
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     
     <style>
-        /* Menm style "Liquid Glass" ou a */
+        /* Liquid Glass Design */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
         :root {
-            --black:#000; --charcoal:#121214; --slate:#1c1c1f; --graphite:#26262a;
-            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --pink:#ff375f;
-            --gold:#ffd700;
+            --black:#000; --charcoal:#121214; --slate:#1c1c1f;
+            --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --gold:#ffd700;
             --glass-1:rgba(255,255,255,0.035);
             --glass-2:rgba(255,255,255,0.07);
             --glass-border:rgba(255,255,255,0.09);
             --glass-border-bright:rgba(255,255,255,0.22);
             --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.2);
-            --glass-inner-shadow:inset 0 -1px 0 rgba(0,0,0,0.2);
             --text:#f5f5f7;
             --text-dim:rgba(245,245,247,0.55);
             --text-mute:rgba(245,245,247,0.35);
-            --r-sm:12px; --r-md:18px; --r-lg:24px; --r-xl:30px;
+            --r-sm:12px; --r-md:18px; --r-lg:24px;
             --shadow-1:0 2px 8px rgba(0,0,0,0.4);
             --shadow-2:0 8px 24px rgba(0,0,0,0.5);
             --shadow-3:0 20px 60px rgba(0,0,0,0.7);
@@ -105,7 +103,6 @@
         }
         .info-meta span { display:inline-flex; align-items:center; gap:4px; }
         .info-meta i { color:var(--cyan); font-size:10px; }
-        .info-genres { font-size:10px; color:var(--text-mute); text-transform:uppercase; letter-spacing:0.5px; }
         .play-btn-small {
             width:100%; padding:13px 18px;
             background:#fff; color:var(--black);
@@ -133,7 +130,6 @@
             stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
             transition:all var(--spring);
         }
-        .action-btn-mini.active svg { stroke:var(--gold); fill:var(--gold); }
         .action-btn-mini span { font-size:10px; font-weight:600; }
         .glass-card {
             background:var(--glass-1); backdrop-filter:var(--blur-glass);
@@ -157,139 +153,15 @@
         }
         .quality-pill:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
         .quality-pill.active { border-color:var(--cyan); background:rgba(100,210,255,0.15); color:var(--cyan); }
-        .quality-pill.premium { border-color:rgba(255,215,0,0.4); }
-        .quality-pill.premium .quality-label { color:var(--gold); }
-        .quality-pill.premium.active { border-color:var(--gold); background:rgba(255,215,0,0.15); }
-        .quality-pill.premium.active .quality-label { color:var(--gold); }
-        .quality-crown { font-size:9px; color:var(--gold); filter:drop-shadow(0 0 4px rgba(255,215,0,0.6)); }
-        .quality-badge {
-            position:absolute; top:-6px; right:-6px;
-            background:linear-gradient(135deg, var(--gold), #ffaa00);
-            color:var(--black); font-size:8px; font-weight:900;
-            padding:2px 6px; border-radius:50px;
-            box-shadow:0 2px 8px rgba(255,215,0,0.5);
-            letter-spacing:0.5px;
-        }
-        .lang-row { display:flex; gap:8px; flex-wrap:wrap; }
-        .lang-pill {
-            padding:8px 14px; background:var(--glass-2);
-            border:1px solid var(--glass-border); border-radius:50px;
-            color:var(--text); cursor:pointer; font-family:inherit;
-            font-size:12px; font-weight:600; transition:all var(--spring);
-            display:inline-flex; align-items:center; gap:6px;
-        }
-        .lang-pill:hover { border-color:var(--cyan); background:rgba(100,210,255,0.1); }
-        .lang-pill.active { border-color:var(--cyan); background:rgba(100,210,255,0.15); color:var(--cyan); }
-        .lang-pill i { font-size:11px; }
         .story-text { font-size:13px; line-height:1.6; color:var(--text-dim); }
-        .cast-scroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
-        .cast-scroll::-webkit-scrollbar { display:none; }
-        .cast-item { flex-shrink:0; text-align:center; width:70px; }
-        .cast-avatar {
-            width:56px; height:56px; border-radius:50%; object-fit:cover;
-            border:2px solid var(--glass-border-bright);
-            margin-bottom:6px; box-shadow:0 4px 12px rgba(0,0,0,0.5);
-        }
-        .cast-name { font-size:10px; font-weight:700; line-height:1.2; margin-bottom:2px; }
-        .cast-char { font-size:9px; color:var(--text-mute); }
-        .episodes-list { display:flex; flex-direction:column; gap:8px; }
-        .episode-item {
-            display:flex; align-items:center; gap:12px;
-            padding:10px 12px; background:rgba(255,255,255,0.04);
-            border:1px solid rgba(255,255,255,0.06);
-            border-radius:var(--r-md);
-            cursor:pointer; font-family:inherit;
-            color:var(--text); transition:all var(--spring);
-            text-align:left; width:100%;
-        }
-        .episode-item:hover { background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.12); }
-        .episode-item.active { background:rgba(100,210,255,0.1); border-color:var(--cyan); }
-        .episode-num-circle {
-            width:52px; height:52px; border-radius:50%;
-            background:rgba(255,255,255,0.06);
-            display:flex; align-items:center; justify-content:center;
-            color:var(--text); font-size:18px; font-weight:900;
-            flex-shrink:0;
-        }
-        .episode-item.active .episode-num-circle {
-            background:rgba(100,210,255,0.2);
-            color:var(--cyan);
-        }
-        .episode-details { flex:1; min-width:0; }
-        .episode-title { font-size:15px; font-weight:800; margin-bottom:3px; }
-        .episode-sub { font-size:12px; color:var(--text-mute); font-weight:500; }
-        .episode-actions { display:flex; gap:6px; align-items:center; flex-shrink:0; }
-        .episode-download {
-            width:40px; height:40px; border-radius:50%;
-            background:rgba(255,255,255,0.06);
-            display:flex; align-items:center; justify-content:center;
-            color:var(--text-dim); font-size:14px;
-            border:none; cursor:pointer; font-family:inherit;
-            transition:all var(--spring);
-        }
-        .episode-download:hover { background:rgba(100,210,255,0.15); color:var(--cyan); }
-        .episode-play {
-            width:52px; height:52px; border-radius:50%;
-            background:#fff; color:var(--black);
-            display:flex; align-items:center; justify-content:center;
-            font-size:18px; border:none; cursor:pointer; font-family:inherit;
-            transition:all var(--spring);
-            box-shadow:0 4px 16px rgba(255,255,255,0.2);
-        }
-        .episode-play:hover { transform:scale(1.08); box-shadow:0 6px 20px rgba(255,255,255,0.3); }
-        .episode-play i { margin-left:3px; }
-        .related-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; }
-        .related-card {
-            background:var(--glass-1); border:1px solid var(--glass-border);
-            border-radius:var(--r-md); overflow:hidden; text-decoration:none; color:inherit;
-            transition:all var(--spring); box-shadow:var(--glass-highlight), var(--shadow-1);
-        }
-        .related-card:hover { transform:translateY(-3px); border-color:var(--glass-border-bright); }
-        .related-poster { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; background:var(--charcoal); }
-        .related-info { padding:8px; }
-        .related-title-text { font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
-        .related-meta { font-size:9px; color:var(--text-dim); }
-        .whatsapp-ads {
-            background:var(--glass-1); backdrop-filter:var(--blur-glass);
-            border:1px solid var(--glass-border); border-radius:var(--r-lg);
-            padding:14px; margin-bottom:16px;
-            box-shadow:var(--glass-highlight), var(--shadow-1);
-            display:flex; align-items:center; gap:12px;
-        }
-        .whatsapp-icon {
-            width:42px; height:42px; border-radius:12px;
-            background:linear-gradient(135deg, #25D366, #128C7E);
-            display:flex; align-items:center; justify-content:center;
-            color:#fff; font-size:20px; flex-shrink:0;
-            box-shadow:0 4px 12px rgba(37,211,102,0.4);
-        }
-        .whatsapp-content { flex:1; min-width:0; }
-        .whatsapp-title { font-size:12px; font-weight:800; margin-bottom:2px; }
-        .whatsapp-desc { font-size:10px; color:var(--text-dim); line-height:1.3; }
-        .whatsapp-btn {
-            padding:8px 14px; background:linear-gradient(135deg, #25D366, #128C7E);
-            color:#fff; border:none; border-radius:50px; font-size:11px; font-weight:700;
-            cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px;
-            transition:all var(--spring); white-space:nowrap;
-        }
         .toast {
             position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
             background:rgba(20,20,22,0.95); backdrop-filter:var(--blur-glass);
             border:1px solid var(--glass-border-bright); color:var(--text);
             padding:10px 20px; border-radius:50px; font-size:12px; font-weight:600;
             z-index:10000; opacity:0; transition:all 0.3s var(--spring); pointer-events:none;
-            box-shadow:var(--glass-highlight), var(--shadow-2);
         }
         .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-        @media (max-width:768px) {
-            .container { padding:12px; }
-            .info-card { padding:16px; }
-            .info-poster { width:65px; }
-            .info-title { font-size:16px; }
-            .episode-num-circle { width:46px; height:46px; font-size:16px; }
-            .episode-play { width:46px; height:46px; font-size:16px; }
-            .episode-download { width:36px; height:36px; font-size:13px; }
-        }
     </style>
 </head>
 <body>
@@ -306,7 +178,7 @@
         <video id="player-video" playsinline webkit-playsinline crossorigin controls></video>
         <div class="plyr-loading-overlay" id="plyr-loading-overlay">
             <div class="spinner-circle"></div>
-            <div class="loading-text">Chargement...</div>
+            <div class="loading-text" id="loadingText">Chargement...</div>
         </div>
     </div>
 
@@ -316,74 +188,26 @@
             <div class="info-content">
                 <h1 id="infoTitle" class="info-title">Chargement...</h1>
                 <div class="info-meta" id="infoMeta"></div>
-                <div class="info-genres" id="infoGenres"></div>
             </div>
         </div>
         <button class="play-btn-small" id="playMainBtn">
             <i class="fas fa-play"></i>
-            <span id="playBtnText">Play</span>
+            <span>Play</span>
         </button>
-        <div class="action-row">
-            <button class="action-btn-mini" id="saveBtn" title="Télécharger">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Save</span>
-            </button>
-            <button class="action-btn-mini" id="listBtn" title="Favori">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                <span>Favori</span>
-            </button>
-            <button class="action-btn-mini" id="shareBtn" title="Partager">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                <span>Partager</span>
-            </button>
-        </div>
     </div>
 
     <div class="glass-card">
         <div class="glass-card-title"><i class="fas fa-tv"></i> Qualité</div>
         <div class="quality-row" id="qualityRow">
-            <button class="quality-pill active" data-quality="360" onclick="changeQuality('360', this)"><span class="quality-label">360p</span></button>
-            <button class="quality-pill" data-quality="480" onclick="changeQuality('480', this)"><span class="quality-label">480p</span></button>
-            <button class="quality-pill premium" data-quality="1080" onclick="changeQuality('1080', this)"><i class="fas fa-crown quality-crown"></i><span class="quality-label">1080p</span><span class="quality-badge">PRO</span></button>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <div class="glass-card-title"><i class="fas fa-language"></i> Language</div>
-        <div class="lang-row">
-            <button class="lang-pill active" onclick="changeLanguage('French', this)"><i class="fas fa-check"></i> French (Dubbed)</button>
-            <button class="lang-pill" onclick="changeLanguage('Original', this)"><i class="fas fa-globe"></i> Original Audio</button>
-            <button class="lang-pill" onclick="changeLanguage('Arabic', this)"><i class="fas fa-globe"></i> Arabic dub</button>
+            <button class="quality-pill active" onclick="changeQuality('360', this)">360p</button>
+            <button class="quality-pill" onclick="changeQuality('480', this)">480p</button>
+            <button class="quality-pill" onclick="changeQuality('1080', this)">1080p 👑</button>
         </div>
     </div>
 
     <div class="glass-card">
         <div class="glass-card-title"><i class="fas fa-book-open"></i> The story</div>
         <p class="story-text" id="storyText">Chargement...</p>
-    </div>
-
-    <div class="glass-card" id="episodesCard" style="display:none;">
-        <div class="glass-card-title"><i class="fas fa-list-ol"></i> Episodes</div>
-        <div class="episodes-list" id="episodesList"></div>
-    </div>
-
-    <div class="glass-card">
-        <div class="glass-card-title"><i class="fas fa-users"></i> Acteurs</div>
-        <div class="cast-scroll" id="castGrid"></div>
-    </div>
-
-    <div class="whatsapp-ads">
-        <div class="whatsapp-icon"><i class="fab fa-whatsapp"></i></div>
-        <div class="whatsapp-content">
-            <div class="whatsapp-title">Rejoignez notre chaîne</div>
-            <div class="whatsapp-desc">Nouveautés + liens directs</div>
-        </div>
-        <a href="https://whatsapp.com/channel/0029Vb6tw1G42Dcja42wiY3R" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> Suivre</a>
-    </div>
-
-    <div class="glass-card">
-        <div class="glass-card-title"><i class="fas fa-film"></i> Vous pourriez aimer</div>
-        <div class="related-grid" id="relatedGrid"></div>
     </div>
 </div>
 
@@ -393,9 +217,10 @@
 
 <script>
 // ============================================================
-// ✅ URL RENDER OU A
+// ✅ API DIRÈK (san Render)
 // ============================================================
-const API_BASE_URL = 'https://moviebox-api-snrn.onrender.com';
+const API_BASE = 'https://api3.aoneroom.com';
+const H5_API_BASE = 'https://h5-api.aoneroom.com/wefeed-h5api-bff';
 
 const params = new URLSearchParams(window.location.search);
 const data = {
@@ -407,44 +232,22 @@ const data = {
     genre: params.get('genre') || 'Drama',
     desc: params.get('desc') || 'Aucune description disponible.',
     type: params.get('type') || 'movie',
-    season: params.get('season') || '1',
-    episode: params.get('episode') || '1',
-    totalEpisodes: params.get('totalEpisodes') || '0'
+    season: params.get('season') || '0',
+    episode: params.get('episode') || '0'
 };
 
-const isSeries = data.type === 'series' || parseInt(data.totalEpisodes) > 1;
-
+// Afiche info yo
 document.getElementById('headerTitle').textContent = data.title;
 document.getElementById('infoPoster').src = data.poster || 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image';
 document.getElementById('infoTitle').textContent = data.title;
-document.getElementById('infoMeta').innerHTML = `<span><i class="fas fa-calendar"></i> ${data.year}</span><span><i class="fas fa-star"></i> ${data.rating}</span><span>1080p</span>`;
-document.getElementById('infoGenres').textContent = data.genre.split(',').join(' · ');
+document.getElementById('infoMeta').innerHTML = `<span><i class="fas fa-calendar"></i> ${data.year}</span><span><i class="fas fa-star"></i> ${data.rating}</span><span>${data.type === 'series' ? 'Série' : 'Film'}</span>`;
 document.getElementById('storyText').textContent = data.desc;
-document.getElementById('playBtnText').textContent = isSeries ? `Play S${data.season}:E${data.episode}` : 'Play';
 
-// === FAVORI ===
-const favoriteBtn = document.getElementById('listBtn');
-const FAVORITES_KEY = 'blastflix_favorites';
-let favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
-function updateFavoriteBtn() {
-    const isFav = favorites.includes(data.subjectId);
-    favoriteBtn.classList.toggle('active', isFav);
-    favoriteBtn.querySelector('span').textContent = isFav ? 'Favori ✓' : 'Favori';
-}
-favoriteBtn.addEventListener('click', () => {
-    const idx = favorites.indexOf(data.subjectId);
-    if (idx > -1) { favorites.splice(idx, 1); showToast('💔 Retiré des favoris'); }
-    else { favorites.push(data.subjectId); showToast('❤️ Ajouté aux favoris'); }
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-    updateFavoriteBtn();
-});
-updateFavoriteBtn();
-
-// === VIDEO ===
+// Video
 const videoEl = document.getElementById('player-video');
 const loadingOverlay = document.getElementById('plyr-loading-overlay');
+const loadingText = document.getElementById('loadingText');
 let player = null;
-let currentStreams = [];
 
 window.addEventListener('load', () => {
     if (typeof Plyr !== 'undefined') {
@@ -460,85 +263,71 @@ window.addEventListener('load', () => {
         player.on('error', () => loadingOverlay.classList.remove('active'));
     }
     loadVideo();
-    loadCast();
-    loadRelated();
-    if (isSeries) loadEpisodes();
 });
 
 // ============================================================
-// ✅ CHAJE VIDEO A SOTI NAN API A
+// ✅ Chaje videyo dirèkteman soti nan API a
 // ============================================================
 async function loadVideo() {
     loadingOverlay.classList.add('active');
+    loadingText.textContent = 'Recherche de sources...';
     
     try {
-        let streamUrl = null;
-        let streamType = 'video/mp4';
+        // Eseye chèche stream nan API a dirèkteman
+        const streamUrl = `${API_BASE}/wefeed-mobile-bff/subject-api/play-info?subjectId=${data.subjectId}&se=${data.season}&ep=${data.episode}`;
         
-        // Bati URL API a dapre dokimantasyon walterwhite-69/Moviebox-API
-        // Pou fim: /api/stream/{subject_id}
-        // Pou seri: /api/stream/{subject_id}?se={season}&ep={episode}
-        let apiUrl = `${API_BASE_URL}/api/stream/${data.subjectId}`;
-        if (isSeries) {
-            apiUrl += `?se=${data.season}&ep=${data.episode}`;
-        }
+        console.log('🔍 Chèche stream:', streamUrl);
         
-        console.log('🔍 Chèche nan API:', apiUrl);
-        const res = await fetch(apiUrl);
+        // Demann dirèk (san siyati)
+        const res = await fetch(streamUrl, {
+            method: 'GET',
+            headers: {
+                'User-Agent': 'com.community.mbox.in/50020130 (Linux; U; Android 14; en_IN; Pixel 8)',
+                'Referer': 'https://api3.aoneroom.com/',
+                'Accept': 'application/json'
+            }
+        });
         
         if (!res.ok) {
-            throw new Error(`API error: ${res.status}`);
+            throw new Error(`API returned ${res.status}`);
         }
         
         const json = await res.json();
         console.log('📦 API Response:', json);
         
-        // API a retounen yon objè ak "streams" (dapre dokimantasyon an)
-        if (json.streams && json.streams.length > 0) {
-            currentStreams = json.streams;
-            // Chwazi pi bon kalite a (1080p si genyen, sinon premye a)
-            const best = json.streams.find(s => s.quality === '1080p') 
-                      || json.streams.find(s => s.quality === '720p') 
-                      || json.streams[0];
-            streamUrl = best.url || best.src;
-            streamType = best.type || 'video/mp4';
-            console.log('✅ Stream jwenn:', streamUrl, streamType);
-        } 
-        // Si API a retounen yon lòt fòma
-        else if (json.url) {
-            streamUrl = json.url;
-            streamType = json.type || 'video/mp4';
+        const streams = json.data?.streams || [];
+        if (streams.length > 0) {
+            const best = streams.find(s => (s.resolutions || '').includes('1080')) || streams[0];
+            const url = best.url;
+            
+            if (url) {
+                loadingText.textContent = `Chargement ${best.resolutions || 'video'}...`;
+                
+                if (player) {
+                    player.source = { type: 'video', sources: [{ src: url, type: 'video/mp4' }], poster: data.poster };
+                } else {
+                    videoEl.src = url;
+                }
+                loadingOverlay.classList.remove('active');
+                showToast(`✅ ${best.resolutions || 'Vidéo'} prêt`);
+                return;
+            }
         }
         
-        // Si pa gen stream, jwe yon demo
-        if (!streamUrl) {
-            streamUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
-            streamType = 'video/mp4';
-            console.log('⚠️ Pa gen stream nan API a, demo ap jwe.');
-        }
+        throw new Error('No stream found');
         
-        // Chaje videyo a
-        if (player) {
-            player.source = {
-                type: 'video',
-                sources: [{ src: streamUrl, type: streamType }],
-                poster: data.poster
-            };
-        } else {
-            videoEl.src = streamUrl;
-        }
+    } catch (e) {
+        console.error('❌ Erè:', e);
+        loadingText.textContent = 'Démo en cours...';
+        showToast('⚠️ Stream pa disponib, demo ap jwe');
         
-    } catch (err) {
-        console.error('❌ Erè:', err);
-        // Si API a pa mache, jwe yon demo
+        // Jwe yon demo
         const demoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
         if (player) {
             player.source = { type: 'video', sources: [{ src: demoUrl, type: 'video/mp4' }] };
         } else {
             videoEl.src = demoUrl;
         }
-        showToast('⚠️ API pa disponib, demo ap jwe');
-    } finally {
         loadingOverlay.classList.remove('active');
     }
 }
@@ -546,101 +335,12 @@ async function loadVideo() {
 function changeQuality(quality, btn) {
     document.querySelectorAll('.quality-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    
-    if (currentStreams.length > 0) {
-        const target = currentStreams.find(s => (s.quality || '').includes(quality));
-        if (target) {
-            const url = target.url || target.src;
-            const type = target.type || 'video/mp4';
-            if (player) {
-                const currentTime = player.currentTime;
-                const wasPlaying = !player.paused;
-                player.source = { type: 'video', sources: [{ src: url, type }] };
-                player.currentTime = currentTime;
-                if (wasPlaying) player.play();
-            }
-            showToast(`Qualité: ${quality}p`);
-            return;
-        }
-    }
-    showToast(`Qualité: ${quality === '1080' ? '1080p (Premium) 👑' : quality + 'p'}`);
+    showToast(`Qualité: ${quality}p`);
 }
-
-function loadCast() {
-    const cast = [
-        { name: 'Omar Sy', character: 'Assane Diop', avatar: 'https://pbcdnw.aoneroom.com/image/2025/11/02/f80f926a679b2bdea660df61c596379b.jpg' },
-        { name: 'Ludivine Sagnier', character: 'Claire', avatar: 'https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg' },
-        { name: 'Clotilde Hesme', character: 'Juliette', avatar: 'https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg' },
-        { name: 'Hervé Pierre', character: 'Hubert', avatar: 'https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg' },
-        { name: 'Soufiane Guerrab', character: 'Youssef', avatar: 'https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg' }
-    ];
-    const grid = document.getElementById('castGrid');
-    grid.innerHTML = cast.map(c => `
-        <div class="cast-item">
-            <img class="cast-avatar" src="${c.avatar}" alt="${c.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/60x60/333/666?text=${c.name.charAt(0)}'">
-            <div class="cast-name">${c.name}</div>
-            <div class="cast-char">${c.character}</div>
-        </div>
-    `).join('');
-}
-
-const RELATED = [
-    { id: '8759851328492438440', title: 'Train Dreams', poster: 'https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg', year: '2025', rating: 7.7 },
-    { id: '4956801153355891744', title: 'Stranger Things', poster: 'https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg', year: '2016', rating: 8.6 },
-    { id: '144265366439707640', title: 'One Battle After Another', poster: 'https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg', year: '2025', rating: 8.2 },
-    { id: '488603172416769952', title: 'Roofman', poster: 'https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg', year: '2025', rating: 7.2 },
-    { id: '5821547884994614176', title: 'Now You See Me', poster: 'https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg', year: '2025', rating: 6.3 },
-    { id: '3646928918696838480', title: 'IT: Welcome to Derry', poster: 'https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg', year: '2025', rating: 7.7 }
-];
-
-function loadRelated() {
-    const pool = RELATED.filter(m => m.id !== data.subjectId);
-    const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 6);
-    const grid = document.getElementById('relatedGrid');
-    grid.innerHTML = shuffled.map(m => {
-        const p = new URLSearchParams({ subjectId: m.id, title: m.title, poster: m.poster, year: m.year, rating: String(m.rating), genre: 'Drama', desc: '', type: 'movie', totalEpisodes: '0' });
-        return `<a href="player.html?${p.toString()}" class="related-card"><img class="related-poster" src="${m.poster}" alt="${m.title}" loading="lazy" onerror="this.style.background='#1c1c1f';this.src=''"><div class="related-info"><div class="related-title-text">${m.title}</div><div class="related-meta">${m.year} • ⭐ ${m.rating}</div></div></a>`;
-    }).join('');
-}
-
-function loadEpisodes() {
-    document.getElementById('episodesCard').style.display = 'block';
-    const list = document.getElementById('episodesList');
-    const totalEps = parseInt(data.totalEpisodes) || 10;
-    const currentEp = parseInt(data.episode);
-    let html = '';
-    for (let i = 1; i <= totalEps; i++) {
-        const active = i === currentEp;
-        html += `<button class="episode-item ${active ? 'active' : ''}" onclick="playEpisode(${i})"><div class="episode-num-circle">${i}</div><div class="episode-details"><div class="episode-title">Épisode ${i}</div><div class="episode-sub">Episode ${i}</div></div><div class="episode-actions"><button class="episode-download" onclick="event.stopPropagation(); downloadEpisode(${i})"><i class="fas fa-download"></i></button><button class="episode-play" onclick="event.stopPropagation(); playEpisode(${i})"><i class="fas fa-play"></i></button></div></button>`;
-    }
-    list.innerHTML = html;
-}
-
-function playEpisode(ep) {
-    const p = new URLSearchParams({ subjectId: data.subjectId, title: data.title, poster: data.poster, year: data.year, rating: data.rating, genre: data.genre, desc: data.desc, type: data.type, season: data.season, episode: String(ep), totalEpisodes: data.totalEpisodes });
-    window.location.href = `player.html?${p.toString()}`;
-}
-
-function downloadEpisode(ep) { showToast(`📥 Téléchargement de l'épisode ${ep}...`); }
 
 document.getElementById('playMainBtn').addEventListener('click', () => {
-    if (player) { player.play(); document.querySelector('.video-container').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    if (player) { player.play(); }
 });
-
-document.getElementById('saveBtn').addEventListener('click', () => showToast('💾 Sauvegardé'));
-document.getElementById('shareBtn').addEventListener('click', async () => {
-    const shareData = { title: data.title + ' - BLAST FLIX', text: `Regarde ${data.title} !`, url: window.location.href };
-    try {
-        if (navigator.share) await navigator.share(shareData);
-        else { await navigator.clipboard.writeText(shareData.url); showToast('🔗 Lien copié !'); }
-    } catch (err) { if (err.name !== 'AbortError') { try { await navigator.clipboard.writeText(shareData.url); showToast('🔗 Lien copié !'); } catch {} } }
-});
-
-function changeLanguage(lang, btn) {
-    document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    showToast(`🌐 ${lang}`);
-}
 
 function showToast(msg) {
     const t = document.getElementById('toast');
@@ -650,4 +350,4 @@ function showToast(msg) {
 }
 </script>
 </body>
-    </html>
+</html>
