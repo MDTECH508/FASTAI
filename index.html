@@ -8,7 +8,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
+    /* Liquid Glass Design */
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
     :root {
       --black: #000; --charcoal: #121214; --slate: #1c1c1f;
@@ -17,23 +18,27 @@
       --glass-border: rgba(255,255,255,0.09); --glass-border-bright: rgba(255,255,255,0.22);
       --glass-highlight: inset 0 1px 0 rgba(255,255,255,0.2);
       --text: #f5f5f7; --text-dim: rgba(245,245,247,0.55);
-      --r-sm: 12px; --r-md: 18px; --r-lg: 24px; --r-xl: 34px;
+      --r-lg: 24px; --r-xl: 34px;
       --shadow-2: 0 8px 24px rgba(0,0,0,0.5); --shadow-3: 0 20px 60px rgba(0,0,0,0.7);
       --spring: 0.4s cubic-bezier(0.34,1.56,0.64,1);
       --blur-glass: blur(40px) saturate(180%);
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
-      background: var(--black); color: var(--text); min-height: 100vh; overflow-x: hidden;
-      letter-spacing: -0.01em;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+      background: var(--black); color: var(--text); min-height: 100vh;
     }
     .bg-neo { position: fixed; inset: 0; z-index: -3; background: var(--black); overflow: hidden; }
     .bg-neo::before {
       content: ''; position: absolute; inset: 0;
       background:
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.18), transparent),
-        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.12), transparent);
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.22), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.15), transparent);
       filter: blur(80px);
+    }
+    .noise {
+      position: fixed; inset: 0; z-index: -1; opacity: 0.05; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
     }
     .header {
       position: sticky; top: 0; z-index: 100; padding: 16px 20px;
@@ -97,14 +102,6 @@
     }
     @keyframes markPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     
-    .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: rgba(20,20,22,0.95); border: 1px solid var(--glass-border-bright);
-      color: var(--text); padding: 10px 20px; border-radius: 50px; font-size: 12px; font-weight: 600;
-      z-index: 10000; opacity: 0; transition: all 0.3s; pointer-events: none;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
     @media (max-width: 768px) {
       .grid { grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 12px; }
       .content { padding: 14px; }
@@ -114,6 +111,7 @@
 <body>
 
 <div class="bg-neo"></div>
+<div class="noise"></div>
 
 <div class="loader" id="loader">
   <div class="loader-mark"><i class="fas fa-play"></i></div>
@@ -127,150 +125,217 @@
 </header>
 
 <main class="content">
-  <h2 class="section-title"><i class="fas fa-fire"></i> Chargement...</h2>
+  <h2 class="section-title"><i class="fas fa-fire"></i> Films <span id="movieCount"></span></h2>
   <div class="grid" id="movieGrid"></div>
 </main>
 
-<div class="toast" id="toast"></div>
-
 <script>
 // ============================================================
-// ⚠️ TOUT KLE SEKRÈ OU YO (PA ITILIZE NAN SIT PIBLIK)
+// ✅ FIM OU YO (Mete tout fim ou yo isit la)
 // ============================================================
-const SECRET_KEY_DEFAULT_B64 = "NzZpUmwwN3MweFNOOWpxbUVXQXQ3OUVCSlp1bElRSXNWNjRGWnIyTw==";
-const SECRET_KEY_ALT_B64 = "WHFuMm5uTzQxL0w5Mm8xaXVYaFNMSFRiWHZZNFo1Wlo2Mm04bVNMQQ==";
-const MODERN_USER_AGENT = "com.community.mbox.in/50020130 (Linux; U; Android 14; en_IN; Pixel 8; Build/UD1A.230803.041; Cronet/145.0.7582.0)";
-const WEB_USER_AGENT = "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36";
-
-const API_BASE = "https://h5-api.aoneroom.com/wefeed-h5api-bff";
-const NATIVE_API_BASE = "https://api3.aoneroom.com";
-const BOOTSTRAP_HOST = "https://apig.inmoviebox.com";
-const BOOTSTRAP_URL = `${BOOTSTRAP_HOST}/wefeed-mobile-bff/tab/ranking-list?tabId=0&categoryType=4516404531735022304&page=1&perPage=1`;
-
-const WEB_DOMAINS = [
-  "https://123moviesfree.club",
-  "https://movie-box.co",
-  "https://movieboxonline.net",
-  "https://sflix.film",
-  "https://h5-api.aoneroom.com",
-  "https://netnaija.film",
-  "https://movieboxhd.net"
+const MOVIES = [
+  {
+    subjectId: "82258967610676552",
+    title: "Neagley",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/20/6c65483160d5d9a943bbc1fcc7449df6.jpg",
+    year: "2025",
+    rating: "7.0",
+    type: "movie",
+    detailPath: "neagley-kgfRKfjK46"
+  },
+  {
+    subjectId: "8759851328492438440",
+    title: "Train Dreams",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg",
+    year: "2025",
+    rating: "7.7",
+    type: "movie",
+    detailPath: "train-dreams-OJyRf09d6ra"
+  },
+  {
+    subjectId: "4956801153355891744",
+    title: "Stranger Things",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg",
+    year: "2016",
+    rating: "8.6",
+    type: "series",
+    detailPath: "stranger-things-wsymkZvcaU5"
+  },
+  {
+    subjectId: "144265366439707640",
+    title: "One Battle After Another",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg",
+    year: "2025",
+    rating: "8.2",
+    type: "movie",
+    detailPath: "one-battle-after-another"
+  },
+  {
+    subjectId: "488603172416769952",
+    title: "Roofman",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg",
+    year: "2025",
+    rating: "7.2",
+    type: "movie",
+    detailPath: "roofman"
+  },
+  {
+    subjectId: "5821547884994614176",
+    title: "Now You See Me",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/aec3f8fb67dbc4ae8bf1888a6688ebed.jpg",
+    year: "2025",
+    rating: "6.3",
+    type: "movie",
+    detailPath: "now-you-see-me"
+  },
+  {
+    subjectId: "3646928918696838480",
+    title: "IT: Welcome to Derry",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg",
+    year: "2025",
+    rating: "7.7",
+    type: "series",
+    detailPath: "it-welcome-to-derry"
+  },
+  {
+    subjectId: "6938790327474438416",
+    title: "Sinners",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/dc68b1ba52dbab48c07486f1ec8c7e59.jpg",
+    year: "2025",
+    rating: "7.6",
+    type: "movie",
+    detailPath: "sinners-Mc81wRsJzg8"
+  },
+  {
+    subjectId: "2105648425101411352",
+    title: "The Accountant 2",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/bffd198f05bbff3405294366082a0522.jpg",
+    year: "2025",
+    rating: "6.6",
+    type: "movie",
+    detailPath: "the-accountant-2-UOLFFkjTxv2"
+  },
+  {
+    subjectId: "631837183527247152",
+    title: "G20",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/10/04/cdefc0dc1b6bb29c6cf362009eb43a7c.jpg",
+    year: "2025",
+    rating: "5.1",
+    type: "movie",
+    detailPath: "g20-en8WcWTOFK"
+  },
+  {
+    subjectId: "7016170107546617328",
+    title: "Karate Kid: Legends",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/488b6fac279aa80d33802b575f0c7c0e.jpg",
+    year: "2025",
+    rating: "6.3",
+    type: "movie",
+    detailPath: "karate-kid-legends-g8IGDhh8im8"
+  },
+  {
+    subjectId: "4192447489649296464",
+    title: "Ballerina",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/30/be5f59a92ed90c23825fd1a26a7da7cf.jpg",
+    year: "2025",
+    rating: "6.9",
+    type: "movie",
+    detailPath: "ballerina-gCLsr69sHZ4"
+  },
+  {
+    subjectId: "3339767763907888176",
+    title: "Heads of State",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/12/03/419f44a61b5ef225f049292a053714c2.jpg",
+    year: "2025",
+    rating: "6.4",
+    type: "movie",
+    detailPath: "heads-of-state-q5uDCmEaIY3"
+  },
+  {
+    subjectId: "7428149681496408912",
+    title: "Mission: Impossible",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/b7fe27b82cdd2c69e894b9245335e9e6.jpg",
+    year: "2025",
+    rating: "7.2",
+    type: "movie",
+    detailPath: "mission-impossible-the-final-reckoning-waRSiIg0JQ8"
+  },
+  {
+    subjectId: "608631316313265056",
+    title: "The Pickup",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/29/8e88156c020dccbba4d0c68004bac063.jpg",
+    year: "2025",
+    rating: "5.4",
+    type: "movie",
+    detailPath: "the-pickup-gUyHfDlxXI"
+  },
+  {
+    subjectId: "1881185875070011208",
+    title: "Ice Road 2: Road to the Sky",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/9e176a0e386218ad402b4c2553638008.jpg",
+    year: "2025",
+    rating: "4.8",
+    type: "movie",
+    detailPath: "ice-road-2-road-to-the-sky-CZnUsgMQXe2"
+  },
+  {
+    subjectId: "2908887247384723616",
+    title: "The Amateur",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/50e57d9199484e026c0a144201c4c92f.jpg",
+    year: "2025",
+    rating: "6.5",
+    type: "movie",
+    detailPath: "the-amateur-uD0mYexJSs3"
+  },
+  {
+    subjectId: "2177957257546286104",
+    title: "Predator: Killer of Killers",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/d861a84799ff0a72dd31c7e21928fa30.jpg",
+    year: "2025",
+    rating: "7.5",
+    type: "movie",
+    detailPath: "predator-killer-of-killers-SFjprSa4TA2"
+  },
+  {
+    subjectId: "3801511732347028560",
+    title: "Holy Night: Demon Hunters",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/0b1fc25e5bab39ae23e440aa3e8100e2.jpg",
+    year: "2025",
+    rating: "4.8",
+    type: "movie",
+    detailPath: "holy-night-demon-hunters-wEQqKRLXOw4"
+  },
+  {
+    subjectId: "793759415309936728",
+    title: "The Last Testament",
+    poster: "https://pbcdnw.aoneroom.com/image/2025/11/28/eb616974c3eb25c2c647c730b0288f45.jpeg",
+    year: "2025",
+    rating: "7.1",
+    type: "movie",
+    detailPath: "the-last-testament-AAtggiXMjN9"
+  }
 ];
 
 // ============================================================
-// ✅ TMDB (POU AFICHE PLIS FIM)
+// ✅ AFICHE FIM YO
 // ============================================================
-const TMDB_API_KEY = '0d52884a56cdb80bb562ba562d96642b';
-const TMDB_BASE = 'https://api.themoviedb.org/3';
-const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
-
-async function fetchTMDB() {
-  try {
-    const pages = await Promise.all([
-      fetch(`${TMDB_BASE}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`),
-      fetch(`${TMDB_BASE}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=2`),
-      fetch(`${TMDB_BASE}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=3`)
-    ]);
-    
-    let allMovies = [];
-    for (const p of pages) {
-      const d = await p.json();
-      allMovies.push(...(d.results || []));
-    }
-    
-    return allMovies.map(m => ({
-      subjectId: String(m.id), 
-      title: m.title,
-      poster: m.poster_path ? TMDB_IMG + m.poster_path : '',
-      year: (m.release_date || '').slice(0, 4),
-      rating: m.vote_average ? m.vote_average.toFixed(1) : 'N/A',
-      type: 'movie'
-    }));
-  } catch (e) {
-    console.warn('TMDB pa mache:', e.message);
-    return [];
-  }
-}
-
-// ============================================================
-// ✅ FONKSYON POU JWENN FIM (6 API YO)
-// ============================================================
-async function fetchFromAPIs() {
-  for (const domain of WEB_DOMAINS) {
-    try {
-      console.log(`🔍 Eseye ${domain}`);
-      const res = await fetch(`${domain}/wefeed-h5api-bff/subject/filter`, {
-        method: 'POST',
-        headers: {
-          'User-Agent': WEB_USER_AGENT,
-          'Referer': `${domain}/`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ tabId: 2, page: 1, perPage: 30 })
-      });
-      
-      if (res.ok) {
-        const json = await res.json();
-        const items = json.data?.items || [];
-        if (items.length > 0) {
-          console.log(`✅ ${items.length} fim nan ${domain}`);
-          return items.map(m => ({
-            subjectId: String(m.subjectId || m.subject_id),
-            title: m.title,
-            poster: m.cover?.url || '',
-            year: (m.releaseDate || '').slice(0, 4),
-            rating: m.imdbRatingValue || 'N/A',
-            type: m.subjectType === 2 ? 'series' : 'movie'
-          }));
-        }
-      }
-    } catch (e) {
-      console.warn(`${domain} pa mache:`, e.message);
-    }
-  }
-  return [];
-}
-
-// ============================================================
-// ✅ CHAJE FIM YO
-// ============================================================
-async function loadMovies() {
+function renderMovies(movies) {
   const grid = document.getElementById("movieGrid");
-  const title = document.querySelector('.section-title');
   
-  // 1. Eseye TMDB
-  console.log('🔍 Chèche nan TMDB...');
-  let allMovies = await fetchTMDB();
-  
-  // 2. Si TMDB pa mache, eseye API yo
-  if (allMovies.length === 0) {
-    console.log('🔍 Chèche nan API yo...');
-    allMovies = await fetchFromAPIs();
+  if (movies.length === 0) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-dim);">Aucun film</div>`;
+    return;
   }
   
-  // 3. Fallback
-  if (allMovies.length === 0) {
-    console.log('⚠️ Itilize fallback');
-    allMovies = [
-      { subjectId:"8759851328492438440", title:"Train Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year:"2025", rating:7.7, type:"movie" },
-      { subjectId:"4956801153355891744", title:"Stranger Things", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year:"2016", rating:8.6, type:"series" },
-      { subjectId:"144265366439707640", title:"One Battle After Another", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year:"2025", rating:8.2, type:"movie" },
-      { subjectId:"488603172416769952", title:"Roofman", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year:"2025", rating:7.2, type:"movie" }
-    ];
-  }
-  
-  // Afiche fim yo
-  document.getElementById("loader").classList.add("hidden");
-  title.innerHTML = `<i class="fas fa-fire"></i> Films (${allMovies.length})`;
-  
-  grid.innerHTML = allMovies.map(m => {
+  grid.innerHTML = movies.map(m => {
     const params = new URLSearchParams({
       subjectId: m.subjectId,
       title: m.title,
       poster: m.poster || '',
       year: m.year || '',
       rating: m.rating || '',
-      type: m.type || 'movie'
+      type: m.type || 'movie',
+      detailPath: m.detailPath || ''
     });
     
     return `
@@ -278,21 +343,21 @@ async function loadMovies() {
         <div class="poster-wrap">
           <img class="poster" src="${m.poster}" alt="${m.title}" loading="lazy"
                onerror="this.src='https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image'">
-          ${m.rating && m.rating !== 'N/A' ? `<div class="rating"><i class="fas fa-star"></i>${m.rating}</div>` : ''}
+          ${m.rating ? `<div class="rating"><i class="fas fa-star"></i>${m.rating}</div>` : ''}
         </div>
         <div class="info">
           <div class="title">${m.title}</div>
-          <div class="meta">${m.year || ''} • ${m.type === 'series' ? 'Série' : 'Film'}</div>
+          <div class="meta">${m.year} • ${m.type === 'series' ? 'Série' : 'Film'}</div>
         </div>
       </a>
     `;
   }).join('');
 }
 
-// ============================================================
-// ✅ KÒMANSE
-// ============================================================
-loadMovies();
+// Kòmanse
+document.getElementById("loader").classList.add("hidden");
+document.getElementById("movieCount").textContent = `(${MOVIES.length})`;
+renderMovies(MOVIES);
 </script>
 </body>
 </html>
