@@ -23,6 +23,7 @@
             font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
             background:var(--black); color:var(--text); min-height:100vh;
             overflow-x:hidden; overflow-y:auto;
+            -webkit-overflow-scrolling:touch;
         }
         .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); }
         .bg-neo::before {
@@ -75,15 +76,24 @@
             50% { transform:scale(1.1); }
             75% { transform:scale(1.3); }
         }
-        /* IFRAME CONTAINER */
+        
+        /* =====================================================
+           IFRAME CONTAINER — WOTÈ AJISTE
+           FILM: 420px (byen chita nan mitan)
+           SERI: 480px (plis espas pou episodes)
+           ===================================================== */
         .iframe-wrap {
             position:relative;
             width:100%;
-            height:340px;
+            height:420px; /* FILM — byen chita */
             background:#000;
             overflow:hidden;
             margin-bottom:0;
             isolation:isolate;
+            overscroll-behavior:contain;
+        }
+        .iframe-wrap.series-mode {
+            height:480px; /* SERI — pi wo pou episodes */
         }
         .iframe-wrap iframe {
             position:absolute;
@@ -96,29 +106,54 @@
             scrollbar-width:none;
             -ms-overflow-style:none;
         }
-        .iframe-wrap iframe::-webkit-scrollbar { display:none; width:0; height:0; }
+        .iframe-wrap iframe::-webkit-scrollbar {
+            display:none; width:0; height:0;
+        }
+        
+        /* =====================================================
+           MASK-TOP — ADAPTE PA TIP
+           FILM: 75px sèlman (bar Moviesbox ~70px)
+           SERI: 110px (plis espas)
+           ===================================================== */
         .iframe-wrap .mask-top {
             position:absolute;
             top:0; left:0; right:0;
-            height:140px;
-            background:linear-gradient(to bottom, #000 0%, #000 88%, rgba(0,0,0,0.4) 96%, transparent 100%);
+            height:75px; /* FILM — ase pou kache bar, pa koupe imaj */
+            background:linear-gradient(to bottom, 
+                #000 0%, 
+                #000 78%, 
+                rgba(0,0,0,0.5) 92%, 
+                transparent 100%);
             z-index:10;
             pointer-events:none;
         }
+        .iframe-wrap.series-mode .mask-top {
+            height:110px; /* SERI — plis espas pou episodes */
+        }
+        
+        /* MASK ANBA */
         .iframe-wrap .mask-bottom {
             position:absolute;
             bottom:0; left:0; right:0;
-            height:50px;
-            background:linear-gradient(to top, #000 0%, #000 70%, transparent 100%);
+            height:35px; /* FILM — piti */
+            background:linear-gradient(to top, 
+                #000 0%, 
+                #000 70%, 
+                transparent 100%);
             z-index:10;
             pointer-events:none;
         }
-        /* CONTENT */
+        .iframe-wrap.series-mode .mask-bottom {
+            height:50px; /* SERI — pi wo */
+        }
+        
+        /* KONTNI ANBA A */
         .content {
             max-width:1000px;
             margin:0 auto;
             padding:12px 16px 40px;
         }
+        
         /* INFO CARD */
         .info-card {
             background:var(--glass-1);
@@ -145,7 +180,12 @@
             box-shadow:0 4px 16px rgba(0,0,0,0.5);
         }
         .info-content { flex:1; min-width:0; }
-        .info-title { font-size:17px; font-weight:800; margin-bottom:6px; line-height:1.2; }
+        .info-title {
+            font-size:17px;
+            font-weight:800;
+            margin-bottom:6px;
+            line-height:1.2;
+        }
         .info-meta {
             display:flex;
             flex-wrap:wrap;
@@ -192,6 +232,7 @@
         }
         .btn-favorite.active i { animation:heartBeat 0.6s ease; }
         .btn-favorite:active { transform:scale(0.96); }
+        
         /* EPISODES */
         .episodes-section {
             background:var(--glass-1);
@@ -271,6 +312,7 @@
         }
         .episode-btn .ep-num { display:block; font-size:13px; font-weight:900; margin-bottom:1px; }
         .episode-btn .ep-label { display:block; font-size:8px; font-weight:600; opacity:0.7; }
+        
         /* WHATSAPP */
         .wa-card {
             display:flex;
@@ -301,6 +343,7 @@
             cursor:pointer; text-decoration:none;
             white-space:nowrap;
         }
+        
         /* SIJESYON */
         .suggest-head {
             display:flex;
@@ -409,6 +452,7 @@
             color:var(--cyan);
             font-size:7px; font-weight:700;
         }
+        
         /* TOAST */
         .toast {
             position:fixed; bottom:100px;
@@ -427,8 +471,10 @@
         }
         .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
         .toast i { font-size:14px; color:var(--pink); }
+        
         @media (max-width:768px) {
-            .iframe-wrap { height:340px; }
+            .iframe-wrap { height:420px; }
+            .iframe-wrap.series-mode { height:480px; }
             .content { padding:10px 12px 40px; }
             .info-title { font-size:15px; }
             .info-poster { width:70px; }
@@ -452,7 +498,7 @@
     </button>
 </header>
 
-<div class="iframe-wrap">
+<div class="iframe-wrap" id="iframeWrap">
     <iframe 
         id="playerIframe" 
         allowfullscreen 
@@ -533,6 +579,19 @@ const data = {
     episodes: parseInt(params.get('episodes')) || 0
 };
 
+// ============================================================
+// ✅ ADAPTE WOTÈ IFRAME
+// FILM: 420px (byen chita nan mitan)
+// SERI: 480px (plis espas pou episodes)
+// ============================================================
+const iframeWrap = document.getElementById('iframeWrap');
+if (data.type === 'series') {
+    iframeWrap.classList.add('series-mode');
+    console.log('📺 SERI — iframe: 480px, mask-top: 110px');
+} else {
+    console.log('🎬 FILM — iframe: 420px, mask-top: 75px (pa koupe imaj)');
+}
+
 document.getElementById('headerTitle').textContent = data.title;
 document.getElementById('infoPoster').src = data.poster || 'https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image';
 document.getElementById('infoTitle').textContent = data.title;
@@ -560,7 +619,7 @@ console.log('🔗 Iframe URL:', iframeUrl);
 iframe.src = iframeUrl;
 
 // ============================================================
-// ✅ EPISODES
+// ✅ EPISODES (pou series)
 // ============================================================
 if (data.type === 'series' && data.episodes > 0) {
     const episodesSection = document.getElementById('episodesSection');
@@ -710,10 +769,9 @@ updateFavButtons();
 })();
 
 // ============================================================
-// ✅ DATABASE FIM POU SIJESYON (konplè)
+// ✅ DATABASE FIM POU SIJESYON
 // ============================================================
 const ALL_MOVIES = [
-    // ACTION
     { subjectId: "144265366439707640", title: "One Battle After Another", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year: "2025", rating: "8.2", category: "Action", detailPath: "one-battle-after-another-AorB0GGJEa", desc: "Ex-revolutionaries reunite." },
     { subjectId: "407974060606504992", title: "The Family Plan 2", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/873fd90dff1123846fe6cc34c1010f10.jpg", year: "2025", rating: "5.6", category: "Action", detailPath: "the-family-plan-2-YctPw7Aw8u", desc: "Dan wants quality time." },
     { subjectId: "1740329846154085032", title: "The Family Plan", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/44b4bb2b8981eb13b9ce374e1d0f6df5.jpg", year: "2023", rating: "6.3", category: "Action", detailPath: "the-family-plan-4KeFZScJy42", desc: "A former assassin." },
@@ -721,7 +779,6 @@ const ALL_MOVIES = [
     { subjectId: "5354442815432983440", title: "The Great Flood", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/7adc70e408e9dc6a418514beaa7f97ec.jpg", year: "2025", rating: "8.7", category: "Action", detailPath: "the-great-flood-4Q3rir6pxn6", desc: "A great flood." },
     { subjectId: "6543511268924743688", title: "Batman Returns", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/5c28e8bd6737c8240414503bbf79fa54.jpg", year: "1992", rating: "7.1", category: "Action", detailPath: "batman-returns-WNIc4nLlnN7", desc: "Batman and Penguin." },
     { subjectId: "4923184478689855992", title: "Die Hard 2", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/7cb05853b2133cb1d5c0fb00ab751829.jpg", year: "1990", rating: "7.2", category: "Action", detailPath: "die-hard-2-GNgIXzHeGR5", desc: "John McClane saves lives." },
-    // DRAMA
     { subjectId: "8759851328492438440", title: "Train Dreams", poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year: "2025", rating: "7.7", category: "Drama", detailPath: "train-dreams-OJyRf09d6ra", desc: "Portrait of a logger." },
     { subjectId: "4326134359691510608", title: "Love, Lust & Other Things", poster: "https://pbcdnw.aoneroom.com/image/2025/11/10/df4d08e143c4f5a96d71da4804062c16.jpg", year: "2023", rating: "8.7", category: "Drama", detailPath: "love-lust-and-other-things-YEBc3qXJz95", desc: "A divorced woman." },
     { subjectId: "1409391957499169288", title: "LOVE IN EVERY WORD 2", poster: "https://pbcdnw.aoneroom.com/image/2025/10/27/24c90921fb4c785f0f74ca9a8e800616.jpeg", year: "2025", rating: "6.5", category: "Drama", detailPath: "love-in-every-word-2-YErqWLR17G1", desc: "The Wedding." },
@@ -729,7 +786,6 @@ const ALL_MOVIES = [
     { subjectId: "4322477612187765392", title: "MILES AWAY FROM HOME", poster: "https://pbcdnw.aoneroom.com/image/2025/11/24/d57dd6994404e21d2512465eebda075c.jpeg", year: "2025", rating: "6.7", category: "Drama", detailPath: "miles-away-from-home-uJVxrkAZi95", desc: "Miles from home." },
     { subjectId: "9072045687273147024", title: "Tell Me Softly", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/c265dc32cae2f68587eec454a78c6ffc.jpg", year: "2025", rating: "6.3", category: "Drama", detailPath: "tell-me-softly-GvNwkL34aOa", desc: "Kamila's life." },
     { subjectId: "1548711178933884504", title: "10 Dance", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/981d2a25b771c10bfcf60d0d106c4bdc.jpg", year: "2025", rating: "6.5", category: "Drama", detailPath: "10-dance-4srmfN27pQ1", desc: "Two expert dancers." },
-    // COMEDY
     { subjectId: "1163978523174912112", title: "Ajosepo", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/b04aa69cc737d9c8b23dd69b60cf2f13.jpg", year: "2024", rating: "8.8", category: "Comedy", detailPath: "ajosepo-qvhGAD62Zn1", desc: "A wedding." },
     { subjectId: "8857965935064499248", title: "Playdate", poster: "https://pbcdnw.aoneroom.com/image/2025/10/28/edc4c3b20c646359da2ce17a49624c51.jpg", year: "2025", rating: "7.0", category: "Comedy", detailPath: "playdate-mr2NLFPzlya", desc: "Brian fired." },
     { subjectId: "2843458714177258400", title: "Oh. What. Fun.", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/58f229187499f92b61c83d3c83ac3f2b.jpg", year: "2025", rating: "5.3", category: "Comedy", detailPath: "oh-what-fun-CDwbQdp43o3", desc: "Claire's Christmas." },
@@ -737,21 +793,16 @@ const ALL_MOVIES = [
     { subjectId: "3688012692507217704", title: "Love Actually", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/66674c56b50831cd9a05baa7b48fccc2.jpg", year: "2003", rating: "7.5", category: "Comedy", detailPath: "love-actually-y94fACv8ro4", desc: "Eight couples." },
     { subjectId: "5260672975765916136", title: "Home Alone", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/628d4d8a9f5c798e41e6584298581a13.jpg", year: "1990", rating: "7.7", category: "Comedy", detailPath: "home-alone-SdRNmP9WBg6", desc: "A boy defends home." },
     { subjectId: "5696096776340603272", title: "Wake Up Dead Man", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/05b76b8516b25e3e270e8d6407e41780.jpg", year: "2025", rating: "8.0", category: "Comedy", detailPath: "wake-up-dead-man-a-knives-out-mystery-udzfX0obMM6", desc: "Benoit Blanc." },
-    // CRIME
     { subjectId: "3854326812578922640", title: "After the Hunt", poster: "https://pbcdnw.aoneroom.com/image/2025/11/21/40a1b8238733d1169d079a5e7af0fc7f.jpg", year: "2025", rating: "6.2", category: "Crime", detailPath: "after-the-hunt-G9uUgYaRIA4", desc: "A professor's crossroads." },
     { subjectId: "488603172416769952", title: "Roofman", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year: "2025", rating: "7.2", category: "Crime", detailPath: "roofman-axKcIQ4O5A", desc: "A criminal hides." },
     { subjectId: "3813785855525798528", title: "Domitilla: The Sequel", poster: "https://pbcdnw.aoneroom.com/image/2025/11/12/dd2b53beb63191803dd0a54f1bddc259.jpg", year: "2023", rating: "8.0", category: "Crime", detailPath: "domitilla-the-sequel-IkpVGG8bJx4", desc: "Domitilla." },
-    // SCI-FI
     { subjectId: "3725096513421442384", title: "Bugonia", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/cbb960d2b8053e40398372b031d7c6af.jpg", year: "2025", rating: "7.2", category: "Sci-Fi", detailPath: "bugonia-WTd7eaSmwY2", desc: "Conspiracy theorist." },
-    // ADVENTURE
     { subjectId: "6243981402900418232", title: "Home Alone 2", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/69d198524358e91c600688b1bdf0c928.jpg", year: "1992", rating: "6.9", category: "Adventure", detailPath: "home-alone-2-lost-in-new-york-WD9ZN64vfr7", desc: "Kevin in NYC." },
     { subjectId: "5818215316253462312", title: "Elf", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/e99797bc5226ae898ce4bf4badf5e467.jpg", year: "2003", rating: "7.1", category: "Adventure", detailPath: "elf-4eQykofuNV6", desc: "Buddy's journey." },
     { subjectId: "8992435016898596648", title: "A Wrinkle in Time", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/b2749a629f6e6282e75a6f359acf26b4.jpg", year: "2018", rating: "4.3", category: "Adventure", detailPath: "a-wrinkle-in-time-ybrgzgLrhIa", desc: "Meg travels." },
-    // THRILLER
     { subjectId: "6998664604679571240", title: "The Herd", poster: "https://pbcdnw.aoneroom.com/image/2025/10/06/472f3a01a90a5ac784520745b22484ba.jpg", year: "2025", rating: "6.1", category: "Thriller", detailPath: "the-herd-2hU5z5pXZk8", desc: "The Herd." },
     { subjectId: "5110177139714851560", title: "High Infidelity", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/541b6773c2dd6eded80e28c97875a1ec.jpg", year: "2023", rating: "7.1", category: "Thriller", detailPath: "high-infidelity-Ao9CQegFu56", desc: "An affair." },
     { subjectId: "2727018929557326344", title: "Malice", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/9f245368e969cfbebf6e2f0d2f166dcc.jpg", year: "2025", rating: "5.8", category: "Thriller", detailPath: "malice-YIz16w5Mrf3", desc: "A tutor infiltrates." },
-    // SERIES
     { subjectId: "3646928918696838480", title: "IT: Welcome to Derry", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg", year: "2025", rating: "7.7", category: "Series", detailPath: "it-welcome-to-derry-UeZadKkYol4", desc: "Derry 1962." },
     { subjectId: "4956801153355891744", title: "Stranger Things", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year: "2016", rating: "8.6", category: "Series", detailPath: "stranger-things-wsymkZvcaU5", desc: "Supernatural forces." },
     { subjectId: "9028867555875774472", title: "Wednesday", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/0dbb4e91afb214a1ccebb8a9aa93ce35.jpg", year: "2022", rating: "8.0", category: "Series", detailPath: "wednesday-urChTxajYKa", desc: "Wednesday Addams." },
@@ -763,7 +814,6 @@ const ALL_MOVIES = [
     { subjectId: "3425205252130258896", title: "Gen V", poster: "https://pbcdnw.aoneroom.com/image/2025/12/03/553459017d603d9ad54980561567be76.jpg", year: "2023", rating: "7.6", category: "Series", detailPath: "gen-v-WXriVfxt154", desc: "The Boys universe." },
     { subjectId: "4120704302786790728", title: "Task", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/f81e5cb17fdb5da5aa1c9de0726b9403.jpg", year: "2025", rating: "8.0", category: "Series", detailPath: "task-QOUf94URoU4", desc: "FBI task force." },
     { subjectId: "8955962000002143264", title: "Monster", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/b80fee19ffda0a648b1ccd87f6a00ae0.jpg", year: "2022", rating: "7.8", category: "Series", detailPath: "monster-MY4FMlRoAFa", desc: "Serial killers." },
-    // ANIMATION
     { subjectId: "4548438624232169480", title: "The Grinch", poster: "https://pbcdnw.aoneroom.com/image/2023/02/15/0b5a669e3716664cf67b0ad980aeb73b.jpg", year: "2018", rating: "6.4", category: "Animation", detailPath: "the-grinch-GJEj1FCTZp5", desc: "The Grinch." },
     { subjectId: "2634029642214166320", title: "A Christmas Carol", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/8e2024d4d94793bcd674ccf44ccfea56.jpg", year: "2009", rating: "6.8", category: "Animation", detailPath: "a-christmas-carol-w8qlYXMSz83", desc: "Scrooge." },
     { subjectId: "7753995911654967800", title: "The Polar Express", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/d7342e9116966372e9480381b71c7a10.jpg", year: "2004", rating: "6.6", category: "Animation", detailPath: "the-polar-express-CjI3akMnNe9", desc: "Polar Express." },
@@ -822,9 +872,6 @@ document.getElementById('refreshBtn').addEventListener('click', (e) => {
     setTimeout(() => btn.classList.remove('spinning'), 600);
 });
 
-// ============================================================
-// ✅ TOAST
-// ============================================================
 function showToast(text) {
     const toast = document.getElementById('toast');
     document.getElementById('toastText').textContent = text;
