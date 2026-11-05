@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <title>BLAST FLIX - Tous les Films</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
+    :root {
+      --black:#000; --charcoal:#121214; --slate:#1c1c1f;
+      --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --pink:#ff375f;
+      --glass-1:rgba(255,255,255,0.035); --glass-2:rgba(255,255,255,0.07);
+      --glass-border:rgba(255,255,255,0.09); --glass-border-bright:rgba(255,255,255,0.22);
+      --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.20);
+      --text:#f5f5f7; --text-dim:rgba(245,245,247,0.55);
+      --r-lg:24px; --blur-glass:blur(40px) saturate(180%);
+      --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif;
+      background:var(--black); color:var(--text); min-height:100vh;
+      padding-bottom:80px; overflow-x:hidden;
+    }
+    .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); }
+    .bg-neo::before {
+      content:''; position:absolute; inset:0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100,210,255,0.22), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(10,132,255,0.15), transparent),
+        radial-gradient(ellipse 50% 30% at 0% 50%, rgba(191,90,242,0.1), transparent);
+      filter:blur(80px);
+    }
+    .noise {
+      position:fixed; inset:0; z-index:-1; opacity:0.05; pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode:overlay;
+    }
+    /* HEADER */
+    .header {
+      position:sticky; top:0; z-index:100; padding:14px 20px;
+      background:rgba(10,10,12,0.85); backdrop-filter:var(--blur-glass);
+      border-bottom:1px solid var(--glass-border);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding-top:calc(14px + env(safe-area-inset-top,0px));
+      box-shadow:var(--glass-highlight);
+    }
+    .back-btn {
+      width:42px; height:42px; border-radius:50%;
+      background:var(--glass-2); border:1px solid var(--glass-border);
+      color:var(--text); display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:all var(--spring); flex-shrink:0;
+    }
+    .back-btn:hover { border-color:var(--cyan); background:rgba(100,210,255,0.15); }
+    .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; flex:1; }
+    .logo-mark {
+      width:34px; height:34px; border-radius:11px;
+      background:linear-gradient(135deg, var(--cyan), var(--blue), var(--purple));
+      display:flex; align-items:center; justify-content:center;
+      color:var(--black); font-size:15px;
+      box-shadow:0 6px 20px rgba(100,210,255,0.5), inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+    .logo-text { font-size:17px; font-weight:800; }
+    .count-badge {
+      padding:6px 12px; background:rgba(100,210,255,0.15);
+      border:1px solid rgba(100,210,255,0.4); border-radius:50px;
+      font-size:11px; font-weight:700; color:var(--cyan); flex-shrink:0;
+    }
+    /* SEARCH BAR */
+    .search-wrap { padding:16px 20px 8px; max-width:1200px; margin:0 auto; }
+    .search-box {
+      width:100%; padding:14px 16px 14px 46px; border-radius:16px;
+      background:var(--glass-2); border:1px solid var(--glass-border);
+      color:var(--text); font-size:15px; font-family:inherit; outline:none;
+      transition:all var(--spring); position:relative;
+    }
+    .search-box::placeholder { color:var(--text-dim); }
+    .search-box:focus { border-color:var(--cyan); background:rgba(100,210,255,0.08); box-shadow:0 0 0 3px rgba(100,210,255,0.15); }
+    .search-icon-wrap { position:relative; }
+    .search-icon-wrap .fa-search {
+      position:absolute; left:16px; top:50%; transform:translateY(-50%);
+      color:var(--text-dim); font-size:16px; pointer-events:none;
+    }
+    /* FILTERS */
+    .filters { display:flex; gap:8px; padding:12px 20px 8px; overflow-x:auto; scrollbar-width:none; max-width:1200px; margin:0 auto; }
+    .filters::-webkit-scrollbar { display:none; }
+    .filter-btn {
+      padding:9px 16px; background:var(--glass-1);
+      border:1px solid var(--glass-border); border-radius:50px;
+      color:var(--text-dim); font-size:12px; font-weight:600;
+      white-space:nowrap; cursor:pointer; font-family:inherit;
+      transition:all var(--spring); flex-shrink:0;
+    }
+    .filter-btn.active {
+      background:linear-gradient(135deg, rgba(100,210,255,0.25), rgba(191,90,242,0.2));
+      border-color:var(--cyan); color:var(--cyan);
+      box-shadow:0 4px 20px rgba(100,210,255,0.3);
+    }
+    .filter-btn:hover:not(.active) { border-color:var(--glass-border-bright); color:var(--text); }
+    /* CONTENT */
+    .content { max-width:1200px; margin:0 auto; padding:16px 20px 24px; }
+    .results-info {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:16px; font-size:13px; color:var(--text-dim);
+    }
+    .results-info strong { color:var(--cyan); font-weight:700; }
+    /* GRID */
+    .grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+      gap:14px;
+    }
+    .card {
+      border-radius:var(--r-lg); overflow:hidden;
+      background:var(--glass-1); border:1px solid var(--glass-border);
+      cursor:pointer; transition:transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      text-decoration:none; color:inherit; display:block;
+      box-shadow:var(--glass-highlight), 0 4px 12px rgba(0,0,0,0.3);
+      position:relative; transform:translateZ(0); will-change:transform;
+    }
+    .card:hover {
+      transform:translateY(-6px) scale(1.02) translateZ(0);
+      border-color:var(--glass-border-bright);
+      box-shadow:0 20px 40px rgba(0,0,0,0.6), 0 0 30px rgba(100,210,255,0.2);
+    }
+    .poster-wrap {
+      position:relative; width:100%; aspect-ratio:2/3;
+      overflow:hidden; background:linear-gradient(135deg, #1a1a1c, #2a2a2e);
+    }
+    .poster {
+      width:100%; height:100%; object-fit:cover; display:block;
+      transition:transform 0.5s ease, opacity 0.3s ease;
+      opacity:0; background:linear-gradient(135deg, #1a1a1c, #2a2a2e);
+    }
+    .poster.loaded { opacity:1; }
+    .card:hover .poster { transform:scale(1.08); }
+    /* Skeleton loading */
+    .poster-skeleton {
+      position:absolute; inset:0;
+      background:linear-gradient(90deg, #1a1a1c 25%, #2a2a2e 50%, #1a1a1c 75%);
+      background-size:200% 100%;
+      animation:shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position:200% 0; }
+      100% { background-position:-200% 0; }
+    }
+    .card-hd {
+      position:absolute; top:8px; right:8px;
+      padding:3px 7px; background:rgba(0,0,0,0.75);
+      border:1px solid rgba(255,255,255,0.2); border-radius:6px;
+      font-size:9px; font-weight:800; color:var(--cyan);
+      backdrop-filter:blur(10px);
+    }
+    .card-info { padding:9px 11px; }
+    .card-title {
+      font-size:12px; font-weight:700;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      margin-bottom:3px;
+    }
+    .card-meta { display:flex; gap:6px; font-size:10px; color:var(--text-dim); align-items:center; }
+    .card-meta .rating { color:var(--cyan); font-weight:700; display:inline-flex; align-items:center; gap:2px; }
+    .card-meta .rating i { font-size:8px; }
+    /* EMPTY STATE */
+    .empty {
+      text-align:center; padding:80px 20px; color:var(--text-dim);
+    }
+    .empty i { font-size:48px; margin-bottom:16px; opacity:0.4; }
+    .empty h3 { font-size:18px; margin-bottom:8px; color:var(--text); }
+    /* LOAD MORE */
+    .load-more-wrap { text-align:center; padding:32px 0; }
+    .load-more-btn {
+      padding:14px 40px; border-radius:50px;
+      background:linear-gradient(135deg, rgba(100,210,255,0.2), rgba(191,90,242,0.15));
+      border:1px solid var(--cyan); color:var(--cyan);
+      font-size:14px; font-weight:700; font-family:inherit;
+      cursor:pointer; transition:all var(--spring);
+      display:inline-flex; align-items:center; gap:10px;
+    }
+    .load-more-btn:hover { background:rgba(100,210,255,0.25); transform:translateY(-2px); }
+    .load-more-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    /* FOOTER */
+    .footer {
+      position:fixed; bottom:0; left:0; right:0; z-index:90;
+      padding:10px 20px; background:rgba(10,10,12,0.9);
+      backdrop-filter:var(--blur-glass);
+      border-top:1px solid var(--glass-border);
+      display:flex; align-items:center; justify-content:space-around;
+      padding-bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+    }
+    .footer-btn {
+      display:flex; flex-direction:column; align-items:center; gap:3px;
+      color:var(--text-dim); text-decoration:none;
+      font-size:10px; font-weight:600;
+      padding:6px 14px; border-radius:12px;
+      transition:all var(--spring);
+    }
+    .footer-btn i { font-size:18px; }
+    .footer-btn.active { color:var(--cyan); }
+    @media (max-width: 768px) {
+      .grid { grid-template-columns:repeat(3, 1fr); gap:10px; }
+      .content { padding:12px 14px 24px; }
+      .search-wrap, .filters { padding-left:14px; padding-right:14px; }
+      .header { padding:12px 14px; }
+      .card-title { font-size:11px; }
+    }
+    @media (max-width: 380px) {
+      .grid { grid-template-columns:repeat(2, 1fr); }
+    }
+    /* Smooth scroll */
+    html { scroll-behavior:smooth; }
+  </style>
+</head>
+<body>
+<div class="bg-neo"></div>
+<div class="noise"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="back-btn" aria-label="Retour">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <a href="index.html" class="logo">
+    <div class="logo-mark"><i class="fas fa-play"></i></div>
+    <span class="logo-text">BLAST FLIX</span>
+  </a>
+  <div class="count-badge" id="totalCount">0 films</div>
+</header>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-icon-wrap">
+    <i class="fas fa-search"></i>
+    <input type="text" class="search-box" id="searchInput" placeholder="Rechercher un film, une série, un genre...">
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters" id="filters"></div>
+
+<!-- CONTENT -->
+<div class="content">
+  <div class="results-info">
+    <span id="resultsLabel">Chargement...</span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
+    <button class="load-more-btn" id="loadMoreBtn">
+      <i class="fas fa-plus"></i> Charger plus
+    </button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <a href="index.html" class="footer-btn"><i class="fas fa-home"></i><span>Accueil</span></a>
+  <a href="movies.html" class="footer-btn active"><i class="fas fa-film"></i><span>Films</span></a>
+  <a href="#" class="footer-btn" onclick="alert('Login pa disponib')"><i class="fas fa-user"></i><span>Login</span></a>
+</footer>
+
+<script>
+// ============================================================
+// ✅ TOUT FIM OU YO (250+ fim soti nan done ou)
+// ============================================================
+const MOVIES = [
+  // ===== INDEX (50 bèl fim) =====
+  { subjectId:"4548438624232169480", title:"The Grinch", poster:"https://pbcdnw.aoneroom.com/image/2023/02/15/0b5a669e3716664cf67b0ad980aeb73b.jpg", year:"2018", rating:"6.4", type:"movie", genre:"Animation", detailPath:"the-grinch-GJEj1FCTZp5", desc:"A grumpy Grinch plots to ruin Christmas." },
+  { subjectId:"2634029642214166320", title:"A Christmas Carol", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/8e2024d4d94793bcd674ccf44ccfea56.jpg", year:"2009", rating:"6.8", type:"movie", genre:"Animation", detailPath:"a-christmas-carol-w8qlYXMSz83", desc:"Ebenezer Scrooge is visited by three Christmas spirits." },
+  { subjectId:"7753995911654967800", title:"The Polar Express", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/d7342e9116966372e9480381b71c7a10.jpg", year:"2004", rating:"6.6", type:"movie", genre:"Animation", detailPath:"the-polar-express-CjI3akMnNe9", desc:"A young boy embarks on a magical adventure to the North Pole." },
+  { subjectId:"3578565637020569624", title:"Diary of A Wimpy Kid Christmas: The Last Straw", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/152264464e2e2bd1fb2a747d2fb5bf34.jpg", year:"2025", rating:"7.1", type:"movie", genre:"Animation", detailPath:"diary-of-a-wimpy-kid-christmas-the-last-straw-Gvx3KPQRlg4", desc:"Greg must impress Holly Hills." },
+  { subjectId:"3344346067511956200", title:"WondLa", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/eec0976ca036d8a41ce2c7a501a56780.jpg", year:"2024", rating:"7.5", type:"series", genre:"Animation", detailPath:"wondla-CfmbYXH83Z3", desc:"A young woman tries to figure out her place." },
+  { subjectId:"1545308682756443088", title:"Jurassic World: Chaos Theory", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/ca2298c11deb69ee1b1db062fec07274.jpg", year:"2024", rating:"7.5", type:"series", genre:"Animation", detailPath:"jurassic-world-chaos-theory-gSbqlWRw9Q1", desc:"The Camp Cretaceous gang unravels a global conspiracy." },
+  { subjectId:"6172272644495658000", title:"The Mighty Nein", poster:"https://pbcdnw.aoneroom.com/image/2025/10/28/0ab699b11fd4010b01c4c02b16fab812.jpg", year:"2025", rating:"6.5", type:"series", genre:"Animation", detailPath:"the-mighty-nein-aRomIcB4Xl7", desc:"Criminals must prevent the kingdom from chaos." },
+  { subjectId:"3365868962528515104", title:"Record of Ragnarok", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/dfc211906092e6a8bed4b6485d670ddd.jpg", year:"2021", rating:"6.5", type:"series", genre:"Anime", detailPath:"record-of-ragnarok-c2czqBmID04", desc:"Gods decide humanity must be extinct." },
+  { subjectId:"5179348510898013008", title:"Tomb Raider: The Legend of Lara Croft", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/65c48c2b3e465bec97c9d93790ce5cb7.jpg", year:"2024", rating:"5.5", type:"series", genre:"Animation", detailPath:"tomb-raider-the-legend-of-lara-croft-SH8Ub1dtBa6", desc:"Lara Croft confronts her traumatic past." },
+  { subjectId:"144265366439707640", title:"One Battle After Another", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year:"2025", rating:"8.2", type:"movie", genre:"Action", detailPath:"one-battle-after-another-AorB0GGJEa", desc:"Ex-revolutionaries reunite to rescue a daughter." },
+  { subjectId:"407974060606504992", title:"The Family Plan 2", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/873fd90dff1123846fe6cc34c1010f10.jpg", year:"2025", rating:"5.6", type:"movie", genre:"Action", detailPath:"the-family-plan-2-YctPw7Aw8u", desc:"Dan wants quality time with his kids." },
+  { subjectId:"1740329846154085032", title:"The Family Plan", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/44b4bb2b8981eb13b9ce374e1d0f6df5.jpg", year:"2023", rating:"6.3", type:"movie", genre:"Action", detailPath:"the-family-plan-4KeFZScJy42", desc:"A former assassin living as a suburban dad." },
+  { subjectId:"3551015833440864784", title:"Resurrection Road", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/4dbb392a0c402c393bd4459395a18150.jpg", year:"2025", rating:"5.9", type:"movie", genre:"Action", detailPath:"resurrection-road-2DPUL5NGje4", desc:"Elite squad led by ex-slave Barabbas." },
+  { subjectId:"5354442815432983440", title:"The Great Flood", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/7adc70e408e9dc6a418514beaa7f97ec.jpg", year:"2025", rating:"8.7", type:"movie", genre:"Action", detailPath:"the-great-flood-4Q3rir6pxn6", desc:"A disastrous great flood sweeps the planet." },
+  { subjectId:"6543511268924743688", title:"Batman Returns", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/5c28e8bd6737c8240414503bbf79fa54.jpg", year:"1992", rating:"7.1", type:"movie", genre:"Action", detailPath:"batman-returns-WNIc4nLlnN7", desc:"Batman deals with Penguin and Catwoman." },
+  { subjectId:"4923184478689855992", title:"Die Hard 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/7cb05853b2133cb1d5c0fb00ab751829.jpg", year:"1990", rating:"7.2", type:"movie", genre:"Action", detailPath:"die-hard-2-GNgIXzHeGR5", desc:"John McClane saves hundreds of lives." },
+  { subjectId:"8759851328492438440", title:"Train Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year:"2025", rating:"7.7", type:"movie", genre:"Drama", detailPath:"train-dreams-OJyRf09d6ra", desc:"Portrait of logger Robert Grainier." },
+  { subjectId:"4326134359691510608", title:"Love, Lust & Other Things", poster:"https://pbcdnw.aoneroom.com/image/2025/11/10/df4d08e143c4f5a96d71da4804062c16.jpg", year:"2023", rating:"8.7", type:"movie", genre:"Drama", detailPath:"love-lust-and-other-things-YEBc3qXJz95", desc:"A divorced woman finds herself." },
+  { subjectId:"1409391957499169288", title:"LOVE IN EVERY WORD 2", poster:"https://pbcdnw.aoneroom.com/image/2025/10/27/24c90921fb4c785f0f74ca9a8e800616.jpeg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"love-in-every-word-2-YErqWLR17G1", desc:"The Wedding." },
+  { subjectId:"5557188829699866736", title:"Love In Every Word", poster:"https://pbcdnw.aoneroom.com/image/2025/10/27/5d5ef6e5932c6f964d8066351743225f.jpeg", year:"2025", rating:"6.0", type:"movie", genre:"Drama", detailPath:"love-in-every-word-mn60vIZYvC6", desc:"Love In Every Word." },
+  { subjectId:"4322477612187765392", title:"MILES AWAY FROM HOME", poster:"https://pbcdnw.aoneroom.com/image/2025/11/24/d57dd6994404e21d2512465eebda075c.jpeg", year:"2025", rating:"6.7", type:"movie", genre:"Drama", detailPath:"miles-away-from-home-uJVxrkAZi95", desc:"MILES AWAY FROM HOME." },
+  { subjectId:"9072045687273147024", title:"Tell Me Softly", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/c265dc32cae2f68587eec454a78c6ffc.jpg", year:"2025", rating:"6.3", type:"movie", genre:"Drama", detailPath:"tell-me-softly-GvNwkL34aOa", desc:"Kamila's life turns upside down." },
+  { subjectId:"1548711178933884504", title:"10 Dance", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/981d2a25b771c10bfcf60d0d106c4bdc.jpg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"10-dance-4srmfN27pQ1", desc:"Two expert dancers master each other's styles." },
+  { subjectId:"1163978523174912112", title:"Ajosepo", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b04aa69cc737d9c8b23dd69b60cf2f13.jpg", year:"2024", rating:"8.8", type:"movie", genre:"Comedy", detailPath:"ajosepo-qvhGAD62Zn1", desc:"Family tensions on the eve of a wedding." },
+  { subjectId:"8857965935064499248", title:"Playdate", poster:"https://pbcdnw.aoneroom.com/image/2025/10/28/edc4c3b20c646359da2ce17a49624c51.jpg", year:"2025", rating:"7.0", type:"movie", genre:"Comedy", detailPath:"playdate-mr2NLFPzlya", desc:"Brian has just been fired." },
+  { subjectId:"2843458714177258400", title:"Oh. What. Fun.", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/58f229187499f92b61c83d3c83ac3f2b.jpg", year:"2025", rating:"5.3", type:"movie", genre:"Comedy", detailPath:"oh-what-fun-CDwbQdp43o3", desc:"Claire plans a special Christmas." },
+  { subjectId:"4010544823357818704", title:"Jingle Bell Heist", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/9d9b457f3b7ce221b4f145199856e078.jpg", year:"2025", rating:"5.7", type:"movie", genre:"Comedy", detailPath:"jingle-bell-heist-AcvbGEWkgM4", desc:"Two strangers rob a department store." },
+  { subjectId:"3688012692507217704", title:"Love Actually", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/66674c56b50831cd9a05baa7b48fccc2.jpg", year:"2003", rating:"7.5", type:"movie", genre:"Comedy", detailPath:"love-actually-y94fACv8ro4", desc:"Eight couples in London before Christmas." },
+  { subjectId:"5260672975765916136", title:"Home Alone", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/628d4d8a9f5c798e41e6584298581a13.jpg", year:"1990", rating:"7.7", type:"movie", genre:"Comedy", detailPath:"home-alone-SdRNmP9WBg6", desc:"A boy defends his home against burglars." },
+  { subjectId:"5696096776340603272", title:"Wake Up Dead Man: A Knives Out Mystery", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/05b76b8516b25e3e270e8d6407e41780.jpg", year:"2025", rating:"8.0", type:"movie", genre:"Comedy", detailPath:"wake-up-dead-man-a-knives-out-mystery-udzfX0obMM6", desc:"Benoit Blanc returns." },
+  { subjectId:"3854326812578922640", title:"After the Hunt", poster:"https://pbcdnw.aoneroom.com/image/2025/11/21/40a1b8238733d1169d079a5e7af0fc7f.jpg", year:"2025", rating:"6.2", type:"movie", genre:"Crime", detailPath:"after-the-hunt-G9uUgYaRIA4", desc:"A college professor at a crossroads." },
+  { subjectId:"488603172416769952", title:"Roofman", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year:"2025", rating:"7.2", type:"movie", genre:"Crime", detailPath:"roofman-axKcIQ4O5A", desc:"A criminal hides in a toy store." },
+  { subjectId:"3813785855525798528", title:"Domitilla: The Sequel", poster:"https://pbcdnw.aoneroom.com/image/2025/11/12/dd2b53beb63191803dd0a54f1bddc259.jpg", year:"2023", rating:"8.0", type:"movie", genre:"Crime", detailPath:"domitilla-the-sequel-IkpVGG8bJx4", desc:"Domitilla: The Sequel." },
+  { subjectId:"3725096513421442384", title:"Bugonia", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/cbb960d2b8053e40398372b031d7c6af.jpg", year:"2025", rating:"7.2", type:"movie", genre:"Sci-Fi", detailPath:"bugonia-WTd7eaSmwY2", desc:"A conspiracy theorist kidnaps a CEO." },
+  { subjectId:"6243981402900418232", title:"Home Alone 2: Lost in New York", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/69d198524358e91c600688b1bdf0c928.jpg", year:"1992", rating:"6.9", type:"movie", genre:"Adventure", detailPath:"home-alone-2-lost-in-new-york-WD9ZN64vfr7", desc:"Kevin boards a flight to NYC." },
+  { subjectId:"5818215316253462312", title:"Elf", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/e99797bc5226ae898ce4bf4badf5e467.jpg", year:"2003", rating:"7.1", type:"movie", genre:"Adventure", detailPath:"elf-4eQykofuNV6", desc:"Buddy travels to NYC to meet his father." },
+  { subjectId:"8992435016898596648", title:"A Wrinkle in Time", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/b2749a629f6e6282e75a6f359acf26b4.jpg", year:"2018", rating:"4.3", type:"movie", genre:"Adventure", detailPath:"a-wrinkle-in-time-ybrgzgLrhIa", desc:"Meg travels through space to find her father." },
+  { subjectId:"6998664604679571240", title:"The Herd", poster:"https://pbcdnw.aoneroom.com/image/2025/10/06/472f3a01a90a5ac784520745b22484ba.jpg", year:"2025", rating:"6.1", type:"movie", genre:"Thriller", detailPath:"the-herd-2hU5z5pXZk8", desc:"The Herd." },
+  { subjectId:"5110177139714851560", title:"High Infidelity", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/541b6773c2dd6eded80e28c97875a1ec.jpg", year:"2023", rating:"7.1", type:"movie", genre:"Thriller", detailPath:"high-infidelity-Ao9CQegFu56", desc:"Larissa discovers her husband's affair." },
+  { subjectId:"2727018929557326344", title:"Malice", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/9f245368e969cfbebf6e2f0d2f166dcc.jpg", year:"2025", rating:"5.8", type:"series", genre:"Thriller", detailPath:"malice-YIz16w5Mrf3", desc:"A tutor infiltrates a wealthy family." },
+  { subjectId:"3646928918696838480", title:"IT: Welcome to Derry", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg", year:"2025", rating:"7.7", type:"series", genre:"Fantasy", detailPath:"it-welcome-to-derry-UeZadKkYol4", desc:"A couple moves to Derry, Maine." },
+  { subjectId:"4956801153355891744", title:"Stranger Things", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year:"2016", rating:"8.6", type:"series", genre:"Drama", detailPath:"stranger-things-wsymkZvcaU5", desc:"Young friends witness supernatural forces." },
+  { subjectId:"9028867555875774472", title:"Wednesday", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/0dbb4e91afb214a1ccebb8a9aa93ce35.jpg", year:"2022", rating:"8.0", type:"series", genre:"Comedy", detailPath:"wednesday-urChTxajYKa", desc:"Wednesday Addams as a student." },
+  { subjectId:"4820822255225686840", title:"Dark", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/e617d431f604d5f223f1b54ed4b9a44f.jpg", year:"2017", rating:"8.7", type:"series", genre:"Crime", detailPath:"dark-english-UG1YreRp7K5", desc:"A family saga in a German town." },
+  { subjectId:"1716151170995028536", title:"Landman", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/fb97784b6e658e8c6d7813fb0cd8975d.jpg", year:"2024", rating:"8.2", type:"series", genre:"Drama", detailPath:"landman-EOXbCKpZL22", desc:"West Texas oil rigs fortune seeking." },
+  { subjectId:"2136335731818646680", title:"Fallout", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/b5c44d8606b70a8124338792213a7066.jpg", year:"2024", rating:"8.3", type:"series", genre:"Action", detailPath:"fallout-qfHeMzirOx2", desc:"Post-apocalyptic LA bunkers." },
+  { subjectId:"3819281169544270880", title:"The Witcher", poster:"https://pbcdnw.aoneroom.com/image/2025/11/25/a0556db0b6923ac7c210fe8b92168135.jpg", year:"2019", rating:"7.9", type:"series", genre:"Action", detailPath:"the-witcher-qdCxXLAl8y4", desc:"Geralt of Rivia, monster hunter." },
+  { subjectId:"5262873104975547168", title:"Tulsa King", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/05ba7442193c17115040adec740d31c8.jpg", year:"2022", rating:"7.9", type:"series", genre:"Action", detailPath:"tulsa-king-MsmATkU0Mg6", desc:"Mafia capo exiled to Tulsa." },
+  { subjectId:"3425205252130258896", title:"Gen V", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/553459017d603d9ad54980561567be76.jpg", year:"2023", rating:"7.6", type:"series", genre:"Action", detailPath:"gen-v-WXriVfxt154", desc:"From the world of The Boys." },
+  { subjectId:"4120704302786790728", title:"Task", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/f81e5cb17fdb5da5aa1c9de0726b9403.jpg", year:"2025", rating:"8.0", type:"series", genre:"Crime", detailPath:"task-QOUf94URoU4", desc:"FBI agent ends a string of robberies." },
+  { subjectId:"8955962000002143264", title:"Monster", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b80fee19ffda0a648b1ccd87f6a00ae0.jpg", year:"2022", rating:"7.8", type:"series", genre:"Biography", detailPath:"monster-MY4FMlRoAFa", desc:"Real life stories of serial killers." },
+
+  // ===== TURKISH DRAMA =====
+  { subjectId:"4005576370830069944", title:"Arafta", poster:"https://pbcdnw.aoneroom.com/image/2025/11/24/06ce1018e2757aa2b51fa6b2e56d5bb9.jpg", year:"2025", rating:"6.1", type:"series", genre:"Drama", detailPath:"arafta-EKVBjg6ATL4", desc:"Arafta series." },
+  { subjectId:"3450802136764810992", title:"Esref Rüya", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/f929354e184066b157489206e9bce442.jpg", year:"2025", rating:"6.7", type:"series", genre:"Romance", detailPath:"esref-ruya-english-Eid3rL2IU64", desc:"A wealthy man captivated by love." },
+  { subjectId:"7994806617432904016", title:"Uzak Sehir", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/558bc46fcd42c6cf0b90dcc41bdda8ab.jpg", year:"2025", rating:"7.0", type:"series", genre:"Drama", detailPath:"uzak-sehir-english-0kslfQxiAw9", desc:"A woman arrives in her late husband's homeland." },
+  { subjectId:"5602977400880517312", title:"Gözleri Karadeniz", poster:"https://pbcdnw.aoneroom.com/image/2025/11/27/e343e1d550c2072ebae7c820b7faded7.jpg", year:"2025", rating:"4.7", type:"series", genre:"Drama", detailPath:"gozleri-karadeniz-english-Kf4mPb9HTF6", desc:"A young man discovers his dynasty heritage." },
+  { subjectId:"86722753964967664", title:"Sekizinci Aile", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/18469a9cb8fa52915acbb2cf4b5d6986.jpg", year:"2025", rating:"5.6", type:"series", genre:"Comedy", detailPath:"sekizinci-aile-SlvHoIQbp6", desc:"A textile family's rise to power." },
+  { subjectId:"6528924796020315528", title:"Golden Boy", poster:"https://pbcdnw.aoneroom.com/image/2025/10/04/dce0db163b78f998d3d6f02007a6a560.jpg", year:"2022", rating:"5.8", type:"series", genre:"Drama", detailPath:"golden-boy-english-8yNsSkMxiM7", desc:"A grandfather decides to marry off his grandson." },
+  { subjectId:"3645829386131197720", title:"Love Is in the Air", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/e512ae152719f65611a5ff66bd68354f.jpg", year:"2020", rating:"7.3", type:"series", genre:"Comedy", detailPath:"love-is-in-the-air-english-EmTWbR6Wjl4", desc:"Serkan and Eda pretend to be engaged." },
+  { subjectId:"8004440538315477328", title:"Tasacak Bu Deniz", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/b053e1f5c5fa0d886fd2cdb3d9d2f387.jpeg", year:"2025", rating:"9.6", type:"series", genre:"Drama", detailPath:"tasacak-bu-deniz-english-ko7Abqcqix9", desc:"Tasacak Bu Deniz." },
+  { subjectId:"6525922854398579024", title:"Güller ve Günahlar", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/51664bb9c14f1e821ee4b6855fb9c572.jpg", year:"2025", rating:"7.4", type:"series", genre:"Drama", detailPath:"guller-ve-gunahlar-english-ytMLctlN4M7", desc:"A man discovers his wife's secret." },
+  { subjectId:"4217130130365368296", title:"Bereketli Topraklar", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/6c390f2fda6dbc793c5123fb34b62a4f.jpg", year:"2025", rating:"6.4", type:"series", genre:"Drama", detailPath:"bereketli-topraklar-english-uZ9UMP2vw15", desc:"Two families in a power struggle." },
+  { subjectId:"4654037293458770872", title:"Halef: Köklerin Çagrisi", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/6eb2039d18bbf94b9e221bdc3721542c.jpg", year:"2025", rating:"5.2", type:"series", genre:"Drama", detailPath:"halef-koklerin-cagrisi-english-gWXmYruxNx5", desc:"A surgeon returns to Urfa." },
+  { subjectId:"4023234553341954448", title:"Sahtekarlar", poster:"https://pbcdnw.aoneroom.com/image/2025/10/16/dff141d3baf698e29cd122126ca0d9aa.jpg", year:"2025", rating:"9.7", type:"series", genre:"Crime", detailPath:"sahtekarlar-english-wKTA3tkscN4", desc:"Sahtekarlar." },
+  { subjectId:"5572285633302778048", title:"Veliaht", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/64bdfe5cf042ff52e06bb5568fc8c310.jpg", year:"2025", rating:"6.9", type:"series", genre:"Action", detailPath:"veliaht-english-wA4BupT7DD6", desc:"A mechanic takes on heir role." },
+  { subjectId:"7765162893733516680", title:"Kurulus: Orhan", poster:"https://pbcdnw.aoneroom.com/image/2025/10/31/d49e9ea5c39fb270cad6254487220adc.jpeg", year:"2023", rating:"6.4", type:"series", genre:"Action", detailPath:"kurulus-orhan-english-QSsQ1jLwCf9", desc:"Kurulus: Orhan." },
+  { subjectId:"2592280642931118072", title:"Ben Onun Annesiyim", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/f4162af43ca83510caeb55f801efa38d.jpg", year:"2025", rating:"6.8", type:"series", genre:"Drama", detailPath:"ben-onun-annesiyim-english-Ye8rdqIFu53", desc:"A woman wants to reunite with her daughter." },
+  { subjectId:"8196336103687868608", title:"Aynadaki Yabanci", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/f8b8c8a9e64c60790740ccaa9abf3130.jpg", year:"2025", rating:"7.2", type:"series", genre:"Drama", detailPath:"aynadaki-yabanci-english-q3P6FsZitL9", desc:"A woman with dark secrets." },
+  { subjectId:"7437268460243420912", title:"Ben Leman", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/263eb2d86e1f2a6c3492f0c8be4d3f72.jpg", year:"2025", rating:"6.5", type:"series", genre:"Drama", detailPath:"ben-leman-english-ccPwxVDLoR8", desc:"Ben Leman." },
+  { subjectId:"8981433585408313072", title:"Ask ve Gözyasi", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/dfd4d1175e50bfb3065c0c0b077a0def.jpg", year:"2025", rating:"5.5", type:"series", genre:"Drama", detailPath:"ask-ve-gozyasi-english-Y8NWzTM3tHa", desc:"A man tries to win back his wife." },
+  { subjectId:"2045204064002017008", title:"Kiskanmak", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/1a02c7546566097982bf21524ef2e8bc.jpg", year:"2025", rating:"6.9", type:"series", genre:"Drama", detailPath:"kiskanmak-english-ylURwsu35r2", desc:"Jealousy weaves through relationships." },
+  { subjectId:"3123917329827090768", title:"Cennetin Çocuklari", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/2ec6c5376fc1de15fa8bc2bd861d97e6.jpg", year:"2025", rating:"6.5", type:"series", genre:"Comedy", detailPath:"cennetin-cocuklari-english-CjkMwqCzLI3", desc:"Cennetin Çocuklari." },
+
+  // ===== WESTERN TV =====
+  { subjectId:"227711592396478040", title:"The Abandons", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/fa46824a82234b25f90dea876a85da84.jpg", year:"2025", rating:"6.7", type:"series", genre:"Drama", detailPath:"the-abandons-UMqVoh8VOg", desc:"Families pursue their Manifest Destiny." },
+  { subjectId:"5763754289126593304", title:"Mayor of Kingstown", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/44e350f35a6110292b4bd7522db012e3.jpg", year:"2021", rating:"8.1", type:"series", genre:"Crime", detailPath:"mayor-of-kingstown-adii5ts3MR6", desc:"McLusky family in Kingstown, Michigan." },
+  { subjectId:"3082091617596194960", title:"Boots", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/2eb281838616e5cece38a4b794b4032a-s.jpg", year:"2025", rating:"7.9", type:"series", genre:"Comedy", detailPath:"boots-ytGC9jL0GF3", desc:"A gay teen joins the Marine Corps." },
+  { subjectId:"1285226284775361584", title:"The Last Frontier", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/af956ade984c9d7ee60c6b73f16e92d1.jpg", year:"2025", rating:"6.8", type:"series", genre:"Action", detailPath:"the-last-frontier-6bGhstHlWw1", desc:"A US Marshal in Alaska deals with a prison crash." },
+  { subjectId:"8425071555620880536", title:"Lazarus", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/e1a6a61f7adc20c855aa27bc46067251.jpg", year:"2025", rating:"6.2", type:"series", genre:"Mystery", detailPath:"lazarus-om3kAmRUm2a", desc:"A man experiences disturbing events." },
+  { subjectId:"6098665530947162904", title:"9-1-1", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b51f96758b5e20c41e6627e07e118685.jpg", year:"2018", rating:"7.9", type:"series", genre:"Action", detailPath:"9-1-1-44RVZG4Xvg7", desc:"First responders in high-pressure situations." },
+  { subjectId:"8264471735991502064", title:"High Potential", poster:"https://pbcdnw.aoneroom.com/image/2025/10/16/101decd9ba512bf03b18aeee3831b131.jpeg", year:"2024", rating:"7.6", type:"series", genre:"Crime", detailPath:"high-potential-8UqmEtPmvQ9", desc:"A mom helps solve crimes." },
+  { subjectId:"4179251535492304688", title:"Grey's Anatomy", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/207fbc4b495b11554d7f9eead4519b22.jpg", year:"2005", rating:"7.6", type:"series", genre:"Drama", detailPath:"greys-anatomy-mjmvIV01JY4", desc:"Surgical interns' lives." },
+  { subjectId:"1493863293365143136", title:"House of David", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/26b243181907d6997080a6cdd821981c.jpg", year:"2025", rating:"7.4", type:"series", genre:"History", detailPath:"house-of-david-iVwYG0pUlM1", desc:"King Saul and David." },
+  { subjectId:"8617584105930344264", title:"Black Rabbit", poster:"https://pbcdnw.aoneroom.com/image/2025/10/04/b08d79862ed7ca8ed5dd672957879de1.jpg", year:"2025", rating:"7.3", type:"series", genre:"Crime", detailPath:"black-rabbit-UmN1KLQCAga", desc:"NYC hotspot owner reunites with brother." },
+  { subjectId:"8760681588620428552", title:"The Terminal List: Dark Wolf", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/3be1030a6d441c7c9e22f1080f21bac4.jpg", year:"2025", rating:"7.6", type:"series", genre:"Action", detailPath:"the-terminal-list-dark-wolf-6PO0mcU0ara", desc:"Navy SEAL Ben Edwards' new job." },
+
+  // ===== K-DRAMA =====
+  { subjectId:"5140442812177173552", title:"The Moon Flows Through the River", poster:"https://pbcdnw.aoneroom.com/image/2025/11/29/537ba2e764d923c23cf271771331d22e.jpg", year:"2025", rating:"7.7", type:"series", genre:"Comedy", detailPath:"the-moon-flows-through-the-river-UccWhnwhJ76", desc:"A prince and a merchant swap souls." },
+  { subjectId:"6642751429658696096", title:"Taxi Driver", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/96a9c51973ee296b4539d48c40740ad2.jpg", year:"2021", rating:"8.1", type:"series", genre:"Action", detailPath:"taxi-driver-STi4l34SHU7", desc:"A deluxe taxi driver gets revenge." },
+  { subjectId:"8551787290014663888", title:"Dear X", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/4c259736189c9a20e42e96a5dd7e5c73.jpg", year:"2025", rating:"6.8", type:"series", genre:"Crime", detailPath:"dear-x-mZjVxV8hJba", desc:"A woman dons a mask to rise to power." },
+  { subjectId:"2540915058863915040", title:"The Manipulated", poster:"https://pbcdnw.aoneroom.com/image/2025/11/30/e095d03a689dc34ca01e92c04bce8872.jpg", year:"2025", rating:"8.0", type:"series", genre:"Action", detailPath:"the-manipulated-wkqcEvUpH13", desc:"A man takes revenge on those who framed him." },
+  { subjectId:"7532552730611960632", title:"The 4th Love Revolution", poster:"https://pbcdnw.aoneroom.com/image/2025/11/19/0f4758568844d32a190b822c98889bd4.jpg", year:"2025", rating:"6.4", type:"series", genre:"Comedy", detailPath:"the-4th-love-revolution-gAOxnWCarY8", desc:"University merger leads to romance." },
+  { subjectId:"1180032457555560968", title:"Dynamite Kiss", poster:"https://pbcdnw.aoneroom.com/image/2025/11/27/70d86c2a1b7b78804313b607fad4fb5a.jpg", year:"2025", rating:"8.2", type:"series", genre:"Comedy", detailPath:"dynamite-kiss-O3t3G9Nyap1", desc:"A single woman disguises as married mom." },
+  { subjectId:"8042839547396475400", title:"Don't Call Me Ma'am", poster:"https://pbcdnw.aoneroom.com/image/2025/11/10/99293c4c82f04ed69861b357424c5ebd.jpg", year:"2025", rating:"7.1", type:"series", genre:"Comedy", detailPath:"dont-call-me-maam-wY0aFv0i8A9", desc:"Three 41-year-old friends." },
+  { subjectId:"7595822042025819976", title:"As You Stood By", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/87f6924d897dff6f630ff197530e9ded.jpg", year:"2025", rating:"9.2", type:"series", genre:"Crime", detailPath:"as-you-stood-by-6Xy2gECW639", desc:"Two women driven to murder." },
+  { subjectId:"7067777287819083920", title:"Would You Marry Me?", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/7d0bfa691305f4b5f63105dc9d1bbbcf.jpg", year:"2025", rating:"8.1", type:"series", genre:"Comedy", detailPath:"would-you-marry-me-ESDvhDGu6q8", desc:"A fake husband for 90 days." },
+  { subjectId:"6200753306537968464", title:"Spirit Fingers", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/8bae20a5042e65b4f8289f607a090abb.jpg", year:"2025", rating:"9.4", type:"series", genre:"Comedy", detailPath:"spirit-fingers-gmrYmeZv3o7", desc:"A scared high school girl finds herself." },
+  { subjectId:"8687022708368067632", title:"Ms. Incognito", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/36e79c73f56bca2ece63f9f2c66692af.jpg", year:"2025", rating:"8.5", type:"series", genre:"Crime", detailPath:"ms-incognito-sCoKXiGEIla", desc:"A bodyguard enters a contract marriage." },
+  { subjectId:"8962252613651680272", title:"Last Summer", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b8d786cb20b369da411d94b66d168919.jpg", year:"2025", rating:"6.2", type:"series", genre:"Drama", detailPath:"last-summer-8QgGc89d3Ga", desc:"Twin brothers and hidden feelings." },
+  { subjectId:"7971460695630268168", title:"Nice to Not Meet You", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/cb497f6d4144ab021b9b44d10fac679d.jpg", year:"2025", rating:"6.8", type:"series", genre:"Comedy", detailPath:"nice-to-not-meet-you-ISQbrNdnRu9", desc:"A journalist meets a fading actor." },
+  { subjectId:"5613114608178413712", title:"Typhoon Boss", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/bbff0646041eb6865431d8dfcdca88dc.jpg", year:"2025", rating:"7.4", type:"series", genre:"Drama", detailPath:"typhoon-boss-Olw7qpI7EG6", desc:"CEO Kang Tae Pung." },
+  { subjectId:"2496623666037948736", title:"Genie, Make a Wish", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/829c1e3febb61799a9ad9829dffb5352.jpg", year:"2025", rating:"6.5", type:"series", genre:"Comedy", detailPath:"genie-make-a-wish-I8jhwHTyqY2", desc:"A genie and his master." },
+  { subjectId:"8351361447146015120", title:"Bon Appétit, Your Majesty", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/530934d5bf0d946027f1454e27c78c34.jpg", year:"2025", rating:"8.1", type:"series", genre:"Drama", detailPath:"bon-appetit-your-majesty-qvFmiz5kVW9", desc:"A chef lands in Joseon Dynasty." },
+  { subjectId:"634873111225286800", title:"Confidence Queen", poster:"https://pbcdnw.aoneroom.com/image/2025/11/27/c9a5f5a9a505d0a31dc2e906249c479b.jpg", year:"2025", rating:"6.3", type:"series", genre:"Comedy", detailPath:"confidence-queen-gCNHc9ZITK", desc:"A con artist exposes scammers." },
+  { subjectId:"4957671848453521360", title:"Tempest", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/5f92b8a6c3e5c5b57bc2673b959cb99d.jpg", year:"2025", rating:"6.8", type:"series", genre:"Action", detailPath:"tempest-e9Hr04LbeU5", desc:"A conspiracy threatens the Korean peninsula." },
+  { subjectId:"8022091249731667208", title:"Twelve", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/8d56b59cf8d99894a1830d2fe681df2b.jpg", year:"2025", rating:"5.2", type:"series", genre:"Action", detailPath:"twelve-wKVmT5jgBy9", desc:"Twelve angels protect Korea." },
+  { subjectId:"6211407022844792592", title:"The Murky Stream", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/ebaf57a6a9f1c0d4d099b0b9edc54455.jpg", year:"2025", rating:"7.7", type:"series", genre:"Action", detailPath:"the-murky-stream-A2WxFSdjQo7", desc:"A gangster becomes a Joseon legend." },
+
+  // ===== THAI-DRAMA =====
+  { subjectId:"7919789329219044256", title:"ClaireBell", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/f3550a53800e9125f3c0ec01457cb77e.jpg", year:"2025", rating:"6.6", type:"series", genre:"Drama", detailPath:"clairebell-U0UDKpAI2r9", desc:"A mysterious inmate helps Bell." },
+  { subjectId:"7820084590462615696", title:"Me and Thee", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/dcae76214896486fa54ba9878c247887.jpg", year:"2025", rating:"6.3", type:"series", genre:"Drama", detailPath:"me-and-thee-iZ8LLzm4Gj9", desc:"A mentor meets a wealthy businessman." },
+  { subjectId:"5539017420070964272", title:"Burnout Syndrome", poster:"https://pbcdnw.aoneroom.com/image/2025/11/29/2aa0dd15ed69a16d2fea75b5333e9ee1.jpg", year:"2025", rating:"6.4", type:"series", genre:"Drama", detailPath:"burnout-syndrome-mx5NnR1LaB6", desc:"A burned-out artist between two men." },
+  { subjectId:"3716542298386221784", title:"Zomvivor", poster:"https://pbcdnw.aoneroom.com/image/2025/11/11/d605447453cc3620607f1025ec8b0ae1.jpg", year:"2025", rating:"6.3", type:"series", genre:"Horror", detailPath:"zomvivor-qx0YCkNNxq4", desc:"Students survive a zombie virus." },
+  { subjectId:"4389417883688911384", title:"My Safe Zone", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/c4879aa0de2e3ec231819ff6291e33a5.jpg", year:"2025", rating:"9.7", type:"series", genre:"Comedy", detailPath:"my-safe-zone-0sujBlZzfe5", desc:"Two childhood best friends reunite." },
+  { subjectId:"1217225517129253008", title:"Head 2 Head", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/55b0caef4cddb06787e5e3cf7e16fa78.jpg", year:"2025", rating:"8.8", type:"series", genre:"Comedy", detailPath:"head-2-head-0qZkhP9UUr1", desc:"A man foresees his rival's death." },
+  { subjectId:"897475028827229232", title:"Dangerous Queen", poster:"https://pbcdnw.aoneroom.com/image/2025/10/13/30797f344b909192839c2a38bc67f2f0.jpg", year:"2025", rating:"6.3", type:"series", genre:"Drama", detailPath:"dangerous-queen-OBgryaBri41", desc:"Dangerous Queen." },
+  { subjectId:"3349341353384755720", title:"Goddess Bless You from Death", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/62a6f388320179589e52c3b6288f3e9b.jpg", year:"2025", rating:"6.5", type:"series", genre:"Drama", detailPath:"goddess-bless-you-from-death-23bc8Ma1qZ3", desc:"Investigators face mysterious murders." },
+  { subjectId:"542707740880391216", title:"Love Design", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/cb12bec031e61f866170bd9e65c34e47.jpg", year:"2025", rating:"9.5", type:"series", genre:"Comedy", detailPath:"love-design-Eg0Xm7EB5E", desc:"Two rival architects." },
+  { subjectId:"4885208215186817744", title:"Khemjira", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/3e702a34bd76ec080358794b3cbf6871.jpg", year:"2025", rating:"8.7", type:"series", genre:"Drama", detailPath:"khemjira-Cdv1daWiSO5", desc:"A cursed family and a girl's name." },
+  { subjectId:"5284393719901340800", title:"The Dark Dice", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/75819bbd511ef2398d6594504ad4e886.jpg", year:"2025", rating:"8.3", type:"series", genre:"Drama", detailPath:"the-dark-dice-Y2I3xPUzmi6", desc:"A high school overachiever." },
+  { subjectId:"6272965878565191960", title:"Poisonous Love", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/0bfcd2347a84a66ea7b9a75fa397589c.jpg", year:"2025", rating:"9.2", type:"series", genre:"Romance", detailPath:"poisonous-love-mZphA3wfot7", desc:"A poisonous love." },
+  { subjectId:"4175109108791758208", title:"Only You", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/0888f9995daa2f993a522d704ebc635e.jpg", year:"2025", rating:"7.1", type:"series", genre:"Action", detailPath:"only-you-qtsuwbJ2qY4", desc:"A bodyguard protects a performer." },
+  { subjectId:"9004876161155058736", title:"Everybody Loves Me When I'm Dead", poster:"https://pbcdnw.aoneroom.com/image/2025/10/28/fe52c6896077ae9d1c20246834ca7c86.jpeg", year:"2025", rating:"6.4", type:"movie", genre:"Drama", detailPath:"everybody-loves-me-when-im-dead-EASJuAyqcJa", desc:"Two bank employees steal money." },
+  { subjectId:"1811633058714471504", title:"Queendom", poster:"https://pbcdnw.aoneroom.com/image/2025/08/14/7d1258f829c8fa6d28f350e414ed4ce2.jpeg", year:"2025", rating:"6.0", type:"series", genre:"Drama", detailPath:"queendom-siaIDVviP92", desc:"Queendom." },
+  { subjectId:"6205729421287378072", title:"F4 Thailand: Boys Over Flowers", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/cbc419f3abb9310b45affd4216a6781c.jpg", year:"2021", rating:"7.8", type:"series", genre:"Comedy", detailPath:"f4-thailand-boys-over-flowers-scflow0jqo7", desc:"Gorya meets the F4 leader." },
+  { subjectId:"1885388270788299792", title:"Mission: Love or Lies", poster:"https://pbcdnw.aoneroom.com/image/2025/10/31/0d49dbe2a6352a4cf50c190b25f19ba3.jpg", year:"2025", rating:"6.2", type:"series", genre:"Comedy", detailPath:"mission-love-or-lies-o8iIwN56hf2", desc:"A police captain protects a daughter." },
+  { subjectId:"3629228738384216104", title:"The Wicked Game", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/ac0e46a8d6dcc768e7acc68a7619fd05.jpg", year:"2025", rating:"8.3", type:"series", genre:"Drama", detailPath:"the-wicked-game-8m7sZ8bU5k4", desc:"A police officer guards a son." },
+  { subjectId:"2845937822987617096", title:"Love in the Moonlight", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b58e62364c04b2c84c724b4f54e00691.jpg", year:"2025", rating:"8.9", type:"series", genre:"Drama", detailPath:"love-in-the-moonlight-YySP5knqeo3", desc:"A prince sent to Bangkok to marry." },
+
+  // ===== C-DRAMA =====
+  { subjectId:"3391926381473841352", title:"Sniper Butterfly", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/911c62db627888a22228220caebb41eb.jpg", year:"2025", rating:"6.8", type:"series", genre:"Drama", detailPath:"sniper-butterfly-IsV0L4E3z24", desc:"A rural boy helps Jin Cen." },
+  { subjectId:"1518333190929369232", title:"Love on the Turquoise Land", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/325a47cdcd41533c47147d5bc65fcd5e.jpg", year:"2025", rating:"8.0", type:"series", genre:"Action", detailPath:"love-on-the-turquoise-land-kyqBmhTY9O1", desc:"An ancient Qin Dynasty secret army." },
+  { subjectId:"3644032215048242984", title:"Love and Crown", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/80acfc894e47026db41b5bce14a0ccae.jpg", year:"2023", rating:"7.1", type:"series", genre:"Drama", detailPath:"love-and-crown-YctWuEMHbl4", desc:"Feng Huang tai shang." },
+  { subjectId:"5985904021280899344", title:"Fight for Love", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/245e09b02c9e8d8dbea82f424ab1a152.jpg", year:"2025", rating:"5.1", type:"series", genre:"Drama", detailPath:"fight-for-love-m5Bi25fvb87", desc:"Chu Yu escapes an arranged marriage." },
+  { subjectId:"2249924942886224176", title:"Sword and Beloved", poster:"https://pbcdnw.aoneroom.com/image/2025/10/05/8315c36dc5e1272a98f1dedbbff97819.jpg", year:"2025", rating:"6.3", type:"series", genre:"Drama", detailPath:"sword-and-beloved-O9QcSkaGcG2", desc:"A warrior and an enigmatic spirit." },
+  { subjectId:"2758396863257756016", title:"Blood River", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/b2153f4e72a6ae4c0457ac9f636b810b.jpg", year:"2025", rating:"8.9", type:"series", genre:"Action", detailPath:"blood-river-QWcmtDbuLh3", desc:"An assassin organization in rebellion." },
+  { subjectId:"6931635758067860408", title:"Whispers of Fate", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/cbc491007db5240c80ef62c386e2670b-s.jpg", year:"2025", rating:"8.5", type:"series", genre:"Drama", detailPath:"whispers-of-fate-Au61IEQX2g8", desc:"A murder case and conspiracy." },
+  { subjectId:"4916324359893143904", title:"Love in the Clouds", poster:"https://pbcdnw.aoneroom.com/image/2025/10/08/8cac3be2fff5f9955385e92edd1d753c.jpeg", year:"2023", rating:"6.9", type:"series", genre:"Drama", detailPath:"love-in-the-clouds-GNM7blHOaR5", desc:"A poisoned female warrior." },
+  { subjectId:"2992584043880925824", title:"Love's Ambition", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/b0806d3f0cbbf13ee2aa1a94605968e0.jpg", year:"2025", rating:"7.5", type:"series", genre:"Drama", detailPath:"loves-ambition-4OOhkh844z3", desc:"A high-profile anchor's marriage." },
+  { subjectId:"7048753533340336384", title:"Fated Hearts", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/7d034592c80d16f3307c7fdc5ad7d503.jpg", year:"2025", rating:"8.3", type:"series", genre:"Drama", detailPath:"fated-hearts-ks7tBLGmHo8", desc:"A female archer loses her memory." },
+  { subjectId:"4688867328598198416", title:"The Seven Relics of ill Omen", poster:"https://pbcdnw.aoneroom.com/image/2025/11/27/ca979d897e23e3cdc475ff51e67dd510.jpg", year:"2025", rating:"6.9", type:"series", genre:"Action", detailPath:"the-seven-relics-of-ill-omen-Kn4cCKQ3nA5", desc:"Seven evil thoughts sealed into bamboo." },
+  { subjectId:"2779341086593008192", title:"Yummy Yummy Yummy", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/0e1e09805733290b0f56dddabc18f020.jpg", year:"2025", rating:"7.3", type:"series", genre:"Comedy", detailPath:"yummy-yummy-yummy-MaHRSqwpjj3", desc:"The Shen family's journey." },
+  { subjectId:"187795130567608152", title:"ABO Desire", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/571780a0f7c51e8368811ffeea12bfb8.jpg", year:"2025", rating:"8.0", type:"series", genre:"Drama", detailPath:"abo-desire-y52DjAq6Sd", desc:"A virus changes human biology." },
+  { subjectId:"4874288179232360888", title:"The Journey of Legend", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/244d20214fa01bd5057ca129da5d316a.jpg", year:"2025", rating:"5.2", type:"series", genre:"Action", detailPath:"the-journey-of-legend-EwaJ5O4i4O5", desc:"Mingming Xiao and martial arts." },
+  { subjectId:"2065117278290470008", title:"When Destiny Brings the Demon", poster:"https://pbcdnw.aoneroom.com/image/2025/11/30/5b25b59b1b0b5043aec97643ffb19002.jpg", year:"2025", rating:"7.9", type:"series", genre:"Drama", detailPath:"when-destiny-brings-the-demon-e78rpL3gys2", desc:"An immortal master and a mortal." },
+  { subjectId:"9117479537104896368", title:"Shadow Love", poster:"https://pbcdnw.aoneroom.com/image/2025/10/08/8cac3be2fff5f9955385e92edd1d753c.jpeg", year:"2025", rating:"6.7", type:"series", genre:"Drama", detailPath:"shadow-love-WTpsqau9wRa", desc:"General Li Shuang and Jin'an." },
+  { subjectId:"6019002993473995104", title:"Moonlit Reunion", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/a793686f6c3fcc6333078ac81083b1fa.jpg", year:"2025", rating:"7.6", type:"series", genre:"Drama", detailPath:"moonlit-reunion-iftxY236Da7", desc:"Wu Zhen and Mei Zhu Yu." },
+  { subjectId:"7066767931849822184", title:"Legend of the Female General", poster:"https://pbcdnw.aoneroom.com/image/2025/09/12/b807efdc45a7bd91209a32faec089d1e.jpg", year:"2025", rating:"8.0", type:"series", genre:"Action", detailPath:"legend-of-the-female-general-8K3o3m4S1q8", desc:"Two generals combat deceit." },
+  { subjectId:"8144874245781441016", title:"Revenged Love", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/db7863093ab0e9e6637b633744eafb24.jpg", year:"2025", rating:"8.8", type:"series", genre:"Romance", detailPath:"revenged-love-kAZ7TAQBFH9", desc:"A poor man plots revenge." },
+  { subjectId:"415334092658671712", title:"The Immortal Ascension", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/05cf67d937f57666c131d4986c3694cf.jpg", year:"2024", rating:"7.4", type:"series", genre:"Action", detailPath:"the-immortal-ascension-MaHJ0CxeGu", desc:"A poor child saved by a Taoist master." },
+
+  // ===== ANIME =====
+  { subjectId:"1935876747371726288", title:"My Hero Academia", poster:"https://pbcdnw.aoneroom.com/image/2024/09/04/1b97828fc8be7ef15da68ace2bd775ca.jpg", year:"2016", rating:"8.2", type:"series", genre:"Anime", detailPath:"my-hero-academia-english-iB4F0KPk0j2", desc:"A boy enrolls in a hero academy." },
+  { subjectId:"767589788957527088", title:"My Status as an Assassin Obviously Exceeds the Hero's", poster:"https://pbcdnw.aoneroom.com/image/2025/10/05/753a93f2c893e45a4c6bd5d535135e66.jpg", year:"2025", rating:"7.2", type:"series", genre:"Anime", detailPath:"my-status-as-an-assassin-obviously-exceeds-the-heros-english-wcgltGizHU", desc:"A teen transported to a fantasy world." },
+  { subjectId:"2988443351810195536", title:"SPY x FAMILY", poster:"https://pbcdnw.aoneroom.com/image/2024/05/01/04be74c17599c68d7484a198852305df.jpg", year:"2022", rating:"8.1", type:"series", genre:"Anime", detailPath:"spy-x-family-english-iNQGy4l6Ly3", desc:"A spy forms a fake family." },
+  { subjectId:"816140427836508512", title:"Campfire Cooking in Another World with My Absurd Skill", poster:"https://pbcdnw.aoneroom.com/image/2024/04/15/0e765096ef00a6ad37f448542c3528d9.jpg", year:"2023", rating:"7.6", type:"series", genre:"Anime", detailPath:"campfire-cooking-in-another-world-with-my-absurd-skill-english-a7bzlULVhY", desc:"A chef in a fantasy world." },
+  { subjectId:"7646871808557613376", title:"To Your Eternity", poster:"https://pbcdnw.aoneroom.com/image/2024/04/15/04f68c140949721cf31db41c573bd7f0.jpg", year:"2021", rating:"8.3", type:"series", genre:"Anime", detailPath:"to-your-eternity-english-ahEBQpKKS69", desc:"A boy wandering the Arctic." },
+  { subjectId:"8620434978519796264", title:"One Punch Man", poster:"https://pbcdnw.aoneroom.com/image/2025/10/06/b7ed67acf80b9ecb01f6dfdf6df7a720.jpg", year:"2015", rating:"8.6", type:"series", genre:"Anime", detailPath:"one-punch-man-english-8UMMNYnGNga", desc:"Saitama defeats enemies with one punch." },
+  { subjectId:"8411756968024720848", title:"Attack on Titan", poster:"https://pbcdnw.aoneroom.com/image/2024/04/15/e214b039c7e9e29d9ed6283508b404d0.jpg", year:"2013", rating:"9.1", type:"series", genre:"Anime", detailPath:"attack-on-titan-english-6lPl9A2Wn1a", desc:"Eren fights against giant Titans." },
+  { subjectId:"6732266150736413040", title:"Naruto: Shippuden", poster:"https://pbcdnw.aoneroom.com/image/2025/02/19/f77cc99fe5bb7459530ae40359935bd5.jpg", year:"2007", rating:"8.7", type:"series", genre:"Anime", detailPath:"naruto-shippuden-english-84CHPUIQj18", desc:"Naruto becomes Hokage." },
+  { subjectId:"7459884463091499088", title:"Black Clover", poster:"https://pbcdnw.aoneroom.com/image/2024/04/15/386a86ed69fea9bcb84146ae4ef90c98.jpg", year:"2017", rating:"7.1", type:"series", genre:"Anime", detailPath:"black-clover-english-4Q7h8lHl4T8", desc:"Asta and Yuno compete to be Emperor." },
+  { subjectId:"3569304491382001728", title:"Naruto", poster:"https://pbcdnw.aoneroom.com/image/2024/04/15/9009d4eea2d9bbc484e092c21af7dee2.jpg", year:"2007", rating:"8.4", type:"series", genre:"Anime", detailPath:"naruto-english-A0dBFa3sFf4", desc:"Naruto searches for recognition." },
+  { subjectId:"6215111956123599216", title:"Kaiju No. 8", poster:"https://pbcdnw.aoneroom.com/image/2025/06/23/103e5da5811b39f1db62448d27c89a1e.jpg", year:"2024", rating:"8.2", type:"series", genre:"Anime", detailPath:"kaiju-no-8-english-mR9Ucjhh7p7", desc:"A man becomes a monster." },
+  { subjectId:"1428171996206190096", title:"Gachiakuta", poster:"https://pbcdnw.aoneroom.com/image/2025/07/04/8b8dd5189782a10c17657c30aceaa469.jpg", year:"2025", rating:"8.1", type:"series", genre:"Anime", detailPath:"gachiakuta-english-O1SzWSE2vH1", desc:"A young boy exiled to a junkyard." },
+  { subjectId:"6041603077025711040", title:"Dandadan", poster:"https://pbcdnw.aoneroom.com/image/2025/07/23/1bf08722d704648d6c502a555504c208.jpg", year:"2025", rating:"8.3", type:"series", genre:"Anime", detailPath:"dandadan-english-UqzyWbABic7", desc:"Ghosts, aliens and powers." },
+  { subjectId:"4406513734722765168", title:"Sakamoto Days", poster:"https://pbcdnw.aoneroom.com/image/2025/06/30/478d02095fd8c3d74a2b2dd26b58a342.jpg", year:"2025", rating:"7.5", type:"series", genre:"Anime", detailPath:"sakamoto-days-english-ijPlmoxSvf5", desc:"A retired hitman." },
+  { subjectId:"8039230986741337168", title:"Dr. Stone", poster:"https://pbcdnw.aoneroom.com/image/2025/07/04/82eda88a0e8bf028d71253686c723834.jpg", year:"2025", rating:"8.1", type:"series", genre:"Anime", detailPath:"dr-stone-english-ybnR9MjLRz9", desc:"Rebuild civilization with science." },
+  { subjectId:"5601152875150950768", title:"The Rising of the Shield Hero", poster:"https://pbcdnw.aoneroom.com/image/2025/07/16/5ee1c35bab696989bce15c4893d74531.jpg", year:"2025", rating:"7.7", type:"series", genre:"Anime", detailPath:"the-rising-of-the-shield-hero-english-gQaqjo3lLF6", desc:"A gamer summoned to a parallel universe." },
+  { subjectId:"4497149879814442768", title:"I Was Reincarnated as the 7th Prince", poster:"https://pbcdnw.aoneroom.com/image/2025/07/04/78f8b11ee7dc2b22bc1e4537de5e6723.jpg", year:"2025", rating:"6.9", type:"series", genre:"Anime", detailPath:"i-was-reincarnated-as-the-7th-prince-so-i-can-take-my-time-perfecting-my-magical-ability-english-alqXmyDZcm5", desc:"Reborn to master magic." },
+  { subjectId:"1309445768566262656", title:"Call of the Night", poster:"https://pbcdnw.aoneroom.com/image/2025/06/30/089d4df0889dac1db157cd706f1e3d89.jpg", year:"2025", rating:"7.5", type:"series", genre:"Anime", detailPath:"call-of-the-night-english-aJmzh45hJy1", desc:"Ko falls for a vampire." },
+  { subjectId:"3299473853910500720", title:"My Dress-Up Darling", poster:"https://pbcdnw.aoneroom.com/image/2025/07/08/8e408febfa2e589d446f12bbce09d9d5.jpg", year:"2025", rating:"7.9", type:"series", genre:"Anime", detailPath:"my-dress-up-darling-english-QCILXtLCJV3", desc:"Cosplay dreams come true." },
+  { subjectId:"7012691746677574912", title:"Rent-a-Girlfriend", poster:"https://pbcdnw.aoneroom.com/image/2025/07/22/285298715095387213b63d4fa30d59dc.jpg", year:"2025", rating:"6.8", type:"series", genre:"Anime", detailPath:"rent-a-girlfriend-english-O1ST1Nyc2m8", desc:"A rented girlfriend." },
+  { subjectId:"134079758618484744", title:"Jujutsu Kaisen", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/0e87961ac4b81616b286fa0602aa510a.jpg", year:"2020", rating:"8.5", type:"series", genre:"Anime", detailPath:"jujutsu-kaisen-gCBS4ln5U9", desc:"A boy swallows a cursed talisman." },
+
+  // ===== ANIMATED FILM =====
+  { subjectId:"7158973292098241616", title:"In Your Dreams", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/4aa0ccda642560c4238b0da0e2067802.jpg", year:"2025", rating:"6.5", type:"movie", genre:"Animation", detailPath:"in-your-dreams-MGFSEqLaQw8", desc:"Two siblings journey into their dreams." },
+  { subjectId:"5148221611593613264", title:"Bat-Fam", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/5d3e4413afe94777e70767baf8550056.jpg", year:"2025", rating:"5.8", type:"series", genre:"Animation", detailPath:"bat-fam-s8l26voUi86", desc:"Batman, Alfred, and Damian Wayne." },
+  { subjectId:"5476466502066916368", title:"The Bad Guys: Breaking In", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/f7439a416fc3ed23ec92c137d7b60c53.jpg", year:"2025", rating:"6.3", type:"series", genre:"Animation", detailPath:"the-bad-guys-breaking-in-cmsw4S1hyw6", desc:"The Bad Guys before becoming good." },
+  { subjectId:"8199575084554764432", title:"The Twits", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/67023f7ea5bea571824402c88c6534f0.jpg", year:"2025", rating:"4.7", type:"movie", genre:"Animation", detailPath:"the-twits-WHRzhxJ8IL9", desc:"Orphans and magical animals." },
+  { subjectId:"8809959505049141304", title:"Ejen Ali: The Movie 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/cb1abec5b14b8b57a50d939edc93acd0.jpg", year:"2025", rating:"7.8", type:"movie", genre:"Animation", detailPath:"ejen-ali-the-movie-2-sEzweyTHNua", desc:"A secret agent pilots an AI suit." },
+  { subjectId:"2107937477850792728", title:"The Bad Guys 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/82798200c9eb6dc76c2eaec004681701.jpg", year:"2025", rating:"7.0", type:"movie", genre:"Animation", detailPath:"the-bad-guys-2-o4SYdojnIv2", desc:"The Bad Guys are pulled back." },
+  { subjectId:"6828962573602701264", title:"Elio", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/de834a463487c1bbcb00320e620e8da3.jpg", year:"2025", rating:"6.7", type:"movie", genre:"Animation", detailPath:"elio-cwJklFHIs88", desc:"A boy on a cosmic misadventure." },
+
+  // ===== HOT SHORT TV =====
+  { subjectId:"397194884546971472", title:"Bound by Honor", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/16e1f6870c7d4194cf58f568b1b457a6.jpg", year:"2025", rating:"6.6", type:"series", genre:"Drama", detailPath:"bound-by-honor-4ScbiGI9lt", desc:"Bound by Honor." },
+  { subjectId:"7962477479472910048", title:"Tell Me Not to Love You", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/31331c5a67f90e00a2515753ef2f54dc.jpg", year:"2025", rating:"6.8", type:"series", genre:"Drama", detailPath:"tell-me-not-to-love-you-elTWPelecu9", desc:"Tell Me Not to Love You." },
+  { subjectId:"7618806737751410504", title:"Step Aside I'm the King of Capital", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/51eac7491b4dac840346c31e0a74d911.jpeg", year:"2025", rating:"6.7", type:"series", genre:"Drama", detailPath:"step-aside-im-the-king-of-capital-kmqfD6ndO49", desc:"The king of capital." },
+  { subjectId:"5615140733230497936", title:"Never Mess with Mom", poster:"https://pbcdnw.aoneroom.com/image/2025/09/22/6835e179826070ce8dea8b65741f3ca8.jpg", year:"2025", rating:"7.7", type:"series", genre:"Drama", detailPath:"never-mess-with-mom-UwIzCt3pNG6", desc:"A mother's revenge." },
+  { subjectId:"6149397889195331704", title:"House Husband? Try Supreme Immortal", poster:"https://pbcdnw.aoneroom.com/image/2025/11/13/d5a4e9c0ee65e18331d6a711ceec289c.jpg", year:"2024", rating:"7.5", type:"series", genre:"Drama", detailPath:"house-husband-try-supreme-immortal-dubbed-4cVHej4jgk7", desc:"An immortal protects a family." },
+  { subjectId:"7066071900187249160", title:"She is the one, Boss!", poster:"https://pbcdnw.aoneroom.com/image/2025/11/09/f48587a6c1f3c5abdbce1600f22046fa.jpg", year:"2024", rating:"7.2", type:"series", genre:"Drama", detailPath:"she-is-the-one-boss-yftKkkqGYp8", desc:"A single mother and a CEO." },
+  { subjectId:"6408325936869425400", title:"Love Frequency at 30,000 Feet", poster:"https://pbcdnw.aoneroom.com/image/2025/11/24/18eba1b9753d7aa1b466e7b16ac2f260.jpg", year:"2025", rating:"9.3", type:"series", genre:"Romance", detailPath:"love-frequency-at-30-000-feet-cw7s5NrcoD7", desc:"A controller and a pilot." },
+  { subjectId:"4135542029667519536", title:"Watch Out, I'm The Lady Boss", poster:"https://pbcdnw.aoneroom.com/image/2025/10/04/9f54bca3c81611d5ad0905f392c014d8.jpg", year:"2024", rating:"7.2", type:"series", genre:"Drama", detailPath:"watch-out-im-the-lady-boss-MU6JizePuV4", desc:"A secret CEO." },
+  { subjectId:"6436977783960226864", title:"Pucked by My Brother's Rival", poster:"https://pbcdnw.aoneroom.com/image/2025/10/07/d976f6f225fb2d20d6e553c2360a48b3.jpg", year:"2024", rating:"7.7", type:"series", genre:"Drama", detailPath:"pucked-by-my-brothers-rival-Yia0TCrqvF7", desc:"A hockey romance." },
+  { subjectId:"4381694759396591904", title:"Perfect Score, Perfect Payback", poster:"https://pbcdnw.aoneroom.com/image/2025/08/13/1d323eae3af7f0d88dcdef979de141e5.jpg", year:"2024", rating:"7.9", type:"series", genre:"Drama", detailPath:"perfect-score-perfect-payback-dubbed-qViqGpVcGd5", desc:"A wealthy family's revenge." },
+  { subjectId:"5423008573141958688", title:"Touching Your Heartbeat", poster:"https://pbcdnw.aoneroom.com/image/2025/10/04/018dc2879535ebea8e9548ea40e6b10b.jpg", year:"2024", rating:"7.4", type:"series", genre:"Drama", detailPath:"touching-your-heartbeat-CVp7q35rBs6", desc:"A contract marriage." },
+  { subjectId:"6375075479032333248", title:"No Shadow Can Hide Her Light", poster:"https://pbcdnw.aoneroom.com/image/2025/09/19/559d62183a2fe998aec27f76981f03f0.jpg", year:"2024", rating:"7.2", type:"series", genre:"Drama", detailPath:"no-shadow-can-hide-her-light-M4WKMPCUVA7", desc:"A temple girl becomes a princess." },
+  { subjectId:"1834257743838953840", title:"Daddy Dominant's Good Girl", poster:"https://pbcdnw.aoneroom.com/image/2025/08/07/59b7207115bd55744230a00cfe96ae3f.jpg", year:"2024", rating:"7.1", type:"series", genre:"Drama", detailPath:"daddy-dominants-good-girl-sMrfkc2Vub2", desc:"A dangerous game of desire." },
+  { subjectId:"1824757568237977872", title:"Trapped and Redeemed By His Love", poster:"https://pbcdnw.aoneroom.com/image/2025/09/04/c317f58aa78d5330c1256af6f4594051.jpeg", year:"2025", rating:"6.5", type:"series", genre:"Drama", detailPath:"trapped-and-redeemed-by-his-love-CboGlhmpNa2", desc:"Trapped and Redeemed By His Love." },
+  { subjectId:"7895437672104476952", title:"Miss You After Goodbye", poster:"https://pbcdnw.aoneroom.com/image/2025/08/22/9cd56ca106128bf8e16da1e2d69f9e21.jpg", year:"2024", rating:"7.2", type:"series", genre:"Drama", detailPath:"miss-you-after-goodbye-AoT9PPFbfp9", desc:"A secret contract marriage." },
+  { subjectId:"4900184482680058608", title:"MOVE ASIDE! IM THE EX BEYOND YOUR REACH!", poster:"https://pbcdnw.aoneroom.com/image/2025/08/05/4e78b40fc2c94946a848ebffafcfb1db.jpg", year:"2025", rating:"7.1", type:"series", genre:"Drama", detailPath:"move-aside-im-the-ex-beyond-your-reach-w08UDKBTYP5", desc:"A reborn couple." },
+  { subjectId:"2083465782305929304", title:"Ex-Convict Nanny and Billionaire Single Dad", poster:"https://pbcdnw.aoneroom.com/image/2025/09/02/9d1d4ea4da118c4ea655572f2a1ff2ad.jpeg", year:"2025", rating:"6.2", type:"series", genre:"Drama", detailPath:"ex-convict-nanny-and-billionaire-single-dad-w4sCYsjiUt2", desc:"An ex-convict becomes a nanny." },
+  { subjectId:"469631167998870040", title:"Serve Me! Ball Girl Heiress", poster:"https://pbcdnw.aoneroom.com/image/2025/09/10/ec81d00049c4d76939b3dc71bf3811b8.jpg", year:"2024", rating:"7.7", type:"series", genre:"Drama", detailPath:"serve-me-ball-girl-heiress-YcHFx4MUGy", desc:"A country club heiress." },
+  { subjectId:"2908125818402621056", title:"Undercover Prison King", poster:"https://pbcdnw.aoneroom.com/image/2025/04/23/2d81275142e906739b54aa62dadf206d.jpg", year:"2025", rating:"7.1", type:"series", genre:"Drama", detailPath:"undercover-prison-king-4wjo9RjfPs3", desc:"An ex-soldier inherits a corrupt prison." },
+  { subjectId:"3659884325157457680", title:"Runaway Bride, Billionaire's Catch", poster:"https://pbcdnw.aoneroom.com/image/2025/08/31/2f6924c4e8589442f5b84c7250aac819.jpg", year:"2024", rating:"7.7", type:"series", genre:"Drama", detailPath:"runaway-bride-billionaires-catch-qNCcmW9jmm4", desc:"A runaway bride." },
+  { subjectId:"261408321494810976", title:"True Heiress vs. Fake Queen Bee", poster:"https://pbcdnw.aoneroom.com/image/2024/12/17/c44fd1c2ec5caf49c585aeb146485d71.jpg", year:"2024", rating:"8.2", type:"series", genre:"Drama", detailPath:"true-heiress-vs-fake-queen-bee-42inL5Gfjj", desc:"A wealthy teen hides her identity." },
+  { subjectId:"5247435028103082736", title:"Fake Dating My Rich Nemesis", poster:"https://pbcdnw.aoneroom.com/image/2025/08/19/ad02f1bc98ac59545c6c6b3e7fe5fe53.jpg", year:"2024", rating:"7.1", type:"series", genre:"Drama", detailPath:"fake-dating-my-rich-nemesis-cKuLQk6jDf6", desc:"A fake dating scheme." },
+  { subjectId:"6167657249017083992", title:"A Mistaken Surrogate for the Ruthless Billionaire", poster:"https://pbcdnw.aoneroom.com/image/2025/09/03/848cc37cae9d20b9e09034aede77b19d.jpg", year:"2025", rating:"7.5", type:"series", genre:"Drama", detailPath:"a-mistaken-surrogate-for-the-ruthless-billionaire-Sb8rVz0WBl7", desc:"A mistaken surrogacy." },
+
+  // ===== NOLLYWOOD =====
+  { subjectId:"8221332401033825872", title:"The Last Testament", poster:"https://pbcdnw.aoneroom.com/image/2025/11/28/eb616974c3eb25c2c647c730b0288f45.jpeg", year:"2025", rating:"7.1", type:"movie", genre:"Drama", detailPath:"the-last-testament-AAtggiXMjN9", desc:"The Last Testament." },
+  { subjectId:"557835148272848112", title:"Campus Chronicles 7", poster:"https://pbcdnw.aoneroom.com/image/2025/11/18/50d2d680103877a0ee52e07f0c17702d.jpeg", year:"2025", rating:"6.9", type:"movie", genre:"Drama", detailPath:"campus-chronicles-7-yN4KLBeTcF", desc:"Campus Chronicles 7." },
+  { subjectId:"5095493247825335360", title:"Clap Back", poster:"https://pbcdnw.aoneroom.com/image/2025/11/18/3eab307bd32a5aecb3390b77d12eb265.jpeg", year:"2025", rating:"6.3", type:"movie", genre:"Drama", detailPath:"clap-back-SpLut5Cpp46", desc:"Clap Back." },
+  { subjectId:"4312927048030472896", title:"A Place to Heal", poster:"https://pbcdnw.aoneroom.com/image/2025/11/12/a6c8c375fb87e0572d8cb6f97de35ed2.jpeg", year:"2025", rating:"6.3", type:"movie", genre:"Drama", detailPath:"a-place-to-heal-maurice-sam-osas-ighodaro-2025-latest-full-nigerian-movie-4gFl6iBfB85", desc:"A Place to Heal." },
+  { subjectId:"8711395771599538264", title:"Forbidden Desire", poster:"https://pbcdnw.aoneroom.com/image/2025/11/12/7ded0a5a9d65f59fd0e51778b663f63e.jpeg", year:"2025", rating:"6.7", type:"movie", genre:"Drama", detailPath:"forbidden-desire-new-movie-eddie-watson-faith-duke-kennneth-nwadike-2025-latest-nigerian-movie-s4rNCKFhwna", desc:"Forbidden Desire." },
+  { subjectId:"5663707010085407888", title:"The Other Woman", poster:"https://pbcdnw.aoneroom.com/image/2025/10/27/0360fbdd4c1d5cf0ff104a3c1cd945e4.jpeg", year:"2025", rating:"6.2", type:"movie", genre:"Drama", detailPath:"the-other-woman-CVXW21YPnK6", desc:"The Other Woman." },
+  { subjectId:"4772787804843790400", title:"Iya Olokpa", poster:"https://pbcdnw.aoneroom.com/image/2025/10/22/b70d91445c22dd5c10f42dd354eafb3c.jpg", year:"2025", rating:"6.9", type:"movie", genre:"Drama", detailPath:"iya-olokpa-Oz7FqNXpzG5", desc:"A mother's unbreakable love." },
+  { subjectId:"8773646872968855872", title:"Tit for Tat", poster:"https://pbcdnw.aoneroom.com/image/2025/10/20/137a3e0acadc684c7c6107818769f45f.jpeg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"tit-for-tat-sarian-martin-destiny-etiko-eddie-watson-2025-nigerian-movie-kO2LEixo7sa", desc:"Tit for Tat." },
+  { subjectId:"5046682404795173936", title:"Who I Am", poster:"https://pbcdnw.aoneroom.com/image/2025/10/17/585f65a9a859242078fc03860a8aeb00.jpeg", year:"2025", rating:"6.1", type:"movie", genre:"Drama", detailPath:"who-i-am-daniel-etim-sarian-martin-latest-2025-nigerian-movies-IoTv7PfRN06", desc:"Who I Am." },
+  { subjectId:"1751718735234192824", title:"One Little Secret", poster:"https://pbcdnw.aoneroom.com/image/2025/10/17/f54464a907a21b8f8ce39c0e8d9f553f.jpeg", year:"2025", rating:"6.0", type:"movie", genre:"Drama", detailPath:"one-little-secret-sonia-uche-bryan-okwara-precious-akaeze-blossom-ihuoma-latest-nigerian-movie-mBZThFcTo52", desc:"One Little Secret." },
+  { subjectId:"7301604041229238848", title:"Fight or Flight", poster:"https://pbcdnw.aoneroom.com/image/2025/10/06/f35498e882577b7cd8a53f42b9165861.jpeg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"fight-or-flight-online-uche-montana-samuel-perry-broda-shaggi-latest-2025-nigerian-movie-AozeHKhqnH8", desc:"Fight or Flight." },
+  { subjectId:"406943206178540376", title:"Lady in Red", poster:"https://pbcdnw.aoneroom.com/image/2025/10/07/336704086880f2db3465d76e42d4af6d.jpeg", year:"2025", rating:"6.6", type:"movie", genre:"Drama", detailPath:"lady-in-red-ebube-nwagbo-chike-daniels-ebube-obio-latest-2025-nigerian-movies-2R4QLlRN3u", desc:"Lady in Red." },
+  { subjectId:"6495182899435258000", title:"Beside Love", poster:"https://pbcdnw.aoneroom.com/image/2025/09/15/56d24304cb9bd049b9580963b5c888af.jpeg", year:"2025", rating:"6.2", type:"movie", genre:"Drama", detailPath:"beside-love-k0Fjbkp0OJ7", desc:"Beside Love." },
+  { subjectId:"40084410619904640", title:"Think Twice", poster:"https://pbcdnw.aoneroom.com/image/2025/09/10/1e414d2a6d71aa0d99ef21d8edbdbd1c.jpeg", year:"2025", rating:"6.2", type:"movie", genre:"Drama", detailPath:"think-twice-OfVZHwoAX2", desc:"Think Twice." },
+  { subjectId:"8110367026826330392", title:"Love in the Time of Luxury", poster:"https://pbcdnw.aoneroom.com/image/2025/09/05/9d40400eee3c3af0a211520322abd50c.jpeg", year:"2025", rating:"6.8", type:"movie", genre:"Drama", detailPath:"love-in-the-time-of-luxury-KR5YyE9z7F9", desc:"Love in the Time of Luxury." },
+  { subjectId:"8014181749628486152", title:"Prophet Suddenly 3", poster:"https://pbcdnw.aoneroom.com/image/2025/09/05/36a7b0d455b4cdfecb05e4399b70ddaa.jpeg", year:"2025", rating:"6.3", type:"movie", genre:"Drama", detailPath:"prophet-suddenly-3-EiVUqUj21y9", desc:"Prophet Suddenly 3." },
+  { subjectId:"2195246618331563336", title:"Accidentally Us", poster:"https://pbcdnw.aoneroom.com/image/2025/08/13/b4a87c14c74da845ab908ddd4ccdb8a5.jpeg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"accidentally-us-clinton-joshua-omeche-oko-sandra-osei-nti-latest-2025-nigerian-movies-0i3YKLFfaC2", desc:"Accidentally Us." },
+  { subjectId:"3596710527373922024", title:"If We Perish", poster:"https://pbcdnw.aoneroom.com/image/2025/08/13/c3e827f2143125a2c2c29be0215d7af6.jpeg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"if-we-perish-maurice-sam-sarian-martin-2025-full-nigerian-movie-ckVISNhYGh4", desc:"If We Perish." },
+  { subjectId:"4091613905175430472", title:"Prince of Peace", poster:"https://pbcdnw.aoneroom.com/image/2025/08/13/ccb694a41d62caa5272309992fb12460.jpeg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"prince-of-peace-full-movie-nosa-rex-doris-frances-latest-nollywood-movie-2025-trending-movie-kgh4PinDfS4", desc:"Prince of Peace." },
+  { subjectId:"7113209606494912792", title:"Chances", poster:"https://pbcdnw.aoneroom.com/image/2025/08/07/5ca1677c48d02affff00aa5f54a044ca.jpeg", year:"2025", rating:"6.0", type:"movie", genre:"Drama", detailPath:"chances-sonia-uche-eso-dike-detola-jones-latest-2025-nigerian-movie-uJ3h35Gzst8", desc:"Chances." },
+  { subjectId:"2843458714177258400", title:"Oh. What. Fun.", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/58f229187499f92b61c83d3c83ac3f2b.jpg", year:"2025", rating:"5.3", type:"movie", genre:"Comedy", detailPath:"oh-what-fun-CDwbQdp43o3", desc:"Oh. What. Fun." },
+  { subjectId:"4430625575895711992", title:"My Secret Santa", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/d4ecd8af9cc5ac1c5b926a01bb478026.jpg", year:"2025", rating:"6.2", type:"movie", genre:"Drama", detailPath:"my-secret-santa-MUqYrSljih5", desc:"My Secret Santa." },
+  { subjectId:"7328889873971430544", title:"Holiday Touchdown: A Bills Love Story", poster:"https://pbcdnw.aoneroom.com/image/2025/11/27/a2c6571ab8d1b373e2e5e56c838363c1.jpg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"holiday-touchdown-a-bills-love-story-qJkcG8oooJ8", desc:"Holiday Touchdown." },
+  { subjectId:"87909547918217312", title:"Champagne Problems", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/301bdbf18a24f08024f4dc0d699ff4e3.jpg", year:"2025", rating:"6.1", type:"movie", genre:"Comedy", detailPath:"champagne-problems-mvc18TQCu6", desc:"Champagne Problems." },
+  { subjectId:"1089960465008052048", title:"A Very Jonas Christmas Movie", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/0f7911af08df4817bd6c941bea16e6f8.jpg", year:"2025", rating:"5.7", type:"movie", genre:"Comedy", detailPath:"a-very-jonas-christmas-movie-KPqsqdT1wi1", desc:"A Very Jonas Christmas Movie." },
+  { subjectId:"261235495768934488", title:"A Merry Little Ex-Mas", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/8a3d7b5ff041113684cd841ad28935a8.jpg", year:"2025", rating:"6.9", type:"movie", genre:"Drama", detailPath:"a-merry-little-ex-mas-M2bkKoBsij", desc:"A Merry Little Ex-Mas." },
+  { subjectId:"2866565148603465760", title:"Christmas Above the Clouds", poster:"https://pbcdnw.aoneroom.com/image/2025/11/29/7a17f961441b570aa41a1323cab809c9.jpg", year:"2025", rating:"7.0", type:"movie", genre:"Drama", detailPath:"christmas-above-the-clouds-ASMnsXITKp3", desc:"Christmas Above the Clouds." },
+  { subjectId:"8072618773473283888", title:"How the Grinch Stole Christmas", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/593cd331ecabc11b43cb587c9386741a.jpg", year:"2000", rating:"6.4", type:"movie", genre:"Comedy", detailPath:"how-the-grinch-stole-christmas-Eqb26u8GkC9", desc:"A green revenge-seeking Grinch." },
+  { subjectId:"4826857467571224824", title:"The Holiday", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/2fdd49844f51921b744f77dad4ccd2ef.jpg", year:"2006", rating:"7.0", type:"movie", genre:"Comedy", detailPath:"the-holiday-gSzDUwC3zK5", desc:"Two women swap houses at Christmas." },
+  { subjectId:"3364914603615473440", title:"The Santa Clause", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/58c41b93c55d37799fd4ba3099f6735d.jpg", year:"1994", rating:"6.6", type:"movie", genre:"Comedy", detailPath:"the-santa-clause-OfLSWzmlz04", desc:"A man inadvertently becomes Santa." },
+  { subjectId:"4322477612187765392", title:"MILES AWAY FROM HOME", poster:"https://pbcdnw.aoneroom.com/image/2025/11/24/d57dd6994404e21d2512465eebda075c.jpeg", year:"2025", rating:"6.7", type:"movie", genre:"Drama", detailPath:"miles-away-from-home-uJVxrkAZi95", desc:"MILES AWAY FROM HOME." },
+  { subjectId:"4006467628083595088", title:"Koleoso pt 7", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/d82c6873bf4657b2bbe89807472c2a51.jpeg", year:"2025", rating:"6.3", type:"movie", genre:"Drama", detailPath:"koleoso-pt-7-GFIxvlbFXL4", desc:"Koleoso pt 7." },
+  { subjectId:"5550755408924542704", title:"Love and Wine", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/d9d124805ab0211a5b5d42077bf9cb9a.jpg", year:"2025", rating:"6.6", type:"movie", genre:"Comedy", detailPath:"love-and-wine-CVzYHJ9w2C6", desc:"A rich guy pretends to be poor." },
+  { subjectId:"3410615345399463616", title:"Spartacus: House of Ashur", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/6b811a0d2e6ecac8ba3b1f215f50e6c6.jpg", year:"2025", rating:"6.8", type:"series", genre:"Action", detailPath:"spartacus-house-of-ashur-g02HyLzEW34", desc:"Ashur claws his way to power." },
+  { subjectId:"7060871794303320312", title:"The Price of Confession", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/16f0efd174bf435417c24bd410cfd365.jpg", year:"2025", rating:"6.4", type:"series", genre:"Crime", detailPath:"the-price-of-confession-4E9CXxNRAp8", desc:"A woman accused of murder." },
+  { subjectId:"9091050007024795968", title:"Jay Kelly", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/592f5b0ca8520d7ff5a3085ba3caac7d.jpg", year:"2025", rating:"6.7", type:"movie", genre:"Comedy", detailPath:"jay-kelly-8w0l8tx6zPa", desc:"A famous actor on a self-discovery journey." },
+  { subjectId:"287457954738094328", title:"Surely Tomorrow", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/ec339b07b7e908b7d8d38f19880e3909.jpg", year:"2025", rating:"6.0", type:"series", genre:"Comedy", detailPath:"surely-tomorrow-2VGoEuKyel", desc:"Former lovers reunite." },
+  { subjectId:"4993864003479817912", title:"Blood Coast", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/6ab3ec55de7e0c56c4b29e2fa1c2763e.jpg", year:"2023", rating:"7.0", type:"series", genre:"Action", detailPath:"blood-coast-86v8ufUWTW5", desc:"Marseille police officers." },
+  { subjectId:"8330445383763738768", title:"Man vs Baby", poster:"https://pbcdnw.aoneroom.com/image/2025/11/24/839473f33991377e00fb7d4914780dfc.jpg", year:"2025", rating:"6.8", type:"series", genre:"Comedy", detailPath:"man-vs-baby-8u5wJxKwnV9", desc:"A man housesits a penthouse." },
+  { subjectId:"1627732942183190552", title:"Single Papa", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/93772b8cd5c93336fd02881fc57711f6.jpg", year:"2025", rating:"6.0", type:"series", genre:"Drama", detailPath:"single-papa-oMM8wf72fW1", desc:"A man adopts a baby." },
+  { subjectId:"1548711178933884504", title:"10 Dance", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/981d2a25b771c10bfcf60d0d106c4bdc.jpg", year:"2025", rating:"6.5", type:"movie", genre:"Drama", detailPath:"10-dance-4srmfN27pQ1", desc:"Two expert dancers." },
+  { subjectId:"8378894317280187160", title:"Emily in Paris", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/898843ea30a73d642d11e260394b42be.jpg", year:"2020", rating:"6.8", type:"series", genre:"Comedy", detailPath:"emily-in-paris-mJBrEblqXY9", desc:"An American in Paris." },
+  { subjectId:"164752281521505240", title:"How to Ruin Love", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/5864469d5f9ece10a4c28e461e405280.jpg", year:"2024", rating:"5.2", type:"series", genre:"Comedy", detailPath:"how-to-ruin-love-wKHlZiazac", desc:"Zoleka plans to catch her boyfriend." },
+  { subjectId:"8761434751938056184", title:"Love Me", poster:"https://pbcdnw.aoneroom.com/image/2025/11/24/b783890a234c8ad59cb862b7e75009b3.jpg", year:"2023", rating:"6.4", type:"series", genre:"Drama", detailPath:"love-me-4oJIP3Msdra", desc:"A successful OB-GYN finds emptiness." },
+  { subjectId:"3065017840546861048", title:"Made in Korea", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/f737a2a2eba5d2b73ba0ffb992da5f66.jpg", year:"2025", rating:"7.1", type:"series", genre:"Action", detailPath:"made-in-korea-iLPB8TtOpE3", desc:"Ambition and power in Korea." },
+  { subjectId:"1208311896621958920", title:"Cashero", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/917e0e2205e1fe3e391cc6fce246f501.jpeg", year:"2025", rating:"6.2", type:"series", genre:"Action", detailPath:"cashero-gUcHrx25gr1", desc:"A superhero and ordinary heroes." },
+  { subjectId:"825412349548022832", title:"The Copenhagen Test", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/d4d4a79024e3f0de4ccc5c0765d7339d.jpg", year:"2025", rating:"6.0", type:"series", genre:"Action", detailPath:"the-copenhagen-test-o2p7ZhDoYY", desc:"An analyst's brain is hacked." },
+  { subjectId:"2845168888013275776", title:"Percy Jackson and the Olympians", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/201316596a391576eec1382211202ae3.jpg", year:"2023", rating:"7.0", type:"series", genre:"Action", detailPath:"percy-jackson-and-the-olympians-OxG19N1Uao3", desc:"Demigod Percy Jackson's quest." },
+  { subjectId:"575375178381902192", title:"The Institute", poster:"https://pbcdnw.aoneroom.com/image/2025/11/28/24986c763c5904b296c06cce1aee830a.jpg", year:"2025", rating:"6.7", type:"series", genre:"Horror", detailPath:"the-institute-GXFdSFUdvG", desc:"A teen genius wakes up in a strange place." },
+  { subjectId:"1216407338207298384", title:"One Piece [netflix]", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/502f5a9ee6616315a1dd6e3a96256987.jpg", year:"2023", rating:"8.3", type:"series", genre:"Action", detailPath:"one-piece-netflix-qL3bmkP9Rr1", desc:"Monkey D. Luffy's treasure voyage." },
+  { subjectId:"7850278583678682192", title:"Avatar: The Last Airbender", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/af87bf2d90825f8bffa6aed7ceb7029b.jpg", year:"2024", rating:"7.2", type:"series", genre:"Action", detailPath:"avatar-the-last-airbender-YoJu6LgmUl9", desc:"The Avatar masters four elements." },
+  { subjectId:"3333771074197671728", title:"The Umbrella Academy", poster:"https://pbcdnw.aoneroom.com/image/2025/11/30/340e1633e6cb76a5c930677274af27c5.jpg", year:"2019", rating:"7.8", type:"series", genre:"Action", detailPath:"the-umbrella-academy-MWTblhPHgY3", desc:"Former child heroes reunite." },
+  { subjectId:"4012935953521201944", title:"His Dark Materials", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b85bea2e7ce5dc97bd0f5f2264d051f7.jpg", year:"2019", rating:"7.7", type:"series", genre:"Adventure", detailPath:"his-dark-materials-W33FiQVhrM4", desc:"A girl liberates her world." },
+  { subjectId:"5630787213727335352", title:"Chilling Adventures of Sabrina", poster:"https://pbcdnw.aoneroom.com/image/2024/03/19/94a0b350373622d509a1548713a3a87e.jpg", year:"2018", rating:"6.3", type:"series", genre:"Drama", detailPath:"chilling-adventures-of-sabrina-UQ2kyx24XH6", desc:"Sabrina's dual nature." },
+  { subjectId:"7799944270651479072", title:"Sweet Tooth", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/06fc34218a454f85d8c10c151a5aa5ce.jpg", year:"2021", rating:"7.7", type:"series", genre:"Action", detailPath:"sweet-tooth-QI3N2XiPbi9", desc:"A half-human half-deer boy survives." },
+  { subjectId:"2596136651147592784", title:"Dead Boy Detectives", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/95c04e449e1ed29768f1220a6cb53e47.jpg", year:"2024", rating:"7.5", type:"series", genre:"Action", detailPath:"dead-boy-detectives-qDLnOBFkM53", desc:"Two ghosts investigate the supernatural." },
+  { subjectId:"8382755684005333552", title:"Merlin", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/67f519ed0fd4567eac8fcc7aba30761b.jpg", year:"2009", rating:"7.9", type:"series", genre:"Adventure", detailPath:"merlin-sMxCiIO6fZ9", desc:"Young sorcerer Merlin." },
+  { subjectId:"801622183708610352", title:"The Vampire Diaries", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/f80f926a679b2bdea660df61c596379b.jpg", year:"2009", rating:"7.7", type:"series", genre:"Drama", detailPath:"the-vampire-diaries-0KncV4ardX", desc:"A girl between two vampire brothers." },
+  { subjectId:"1358939779294970704", title:"Teen Wolf", poster:"https://pbcdnw.aoneroom.com/image/2025/10/04/5831de83920a1302731b048816c9a370.jpg", year:"2011", rating:"7.7", type:"series", genre:"Action", detailPath:"teen-wolf-wKJrLSqXnC1", desc:"A high school werewolf." },
+  { subjectId:"1552207535178925136", title:"Harlan Coben's Shelter", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/71f730189f6607828ad7d50d02c5845b.jpg", year:"2023", rating:"6.6", type:"series", genre:"Crime", detailPath:"harlan-cobens-shelter-KV3bC6S7FQ1", desc:"Mickey's father isn't dead." },
+  { subjectId:"2434705759104553752", title:"Legacies", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/edacef3e8be6e62d7b1269a9b9b18418.jpg", year:"2018", rating:"7.2", type:"series", genre:"Adventure", detailPath:"legacies-sIZc8eEYQT2", desc:"Hope Mikaelson, a tribrid." },
+  { subjectId:"2565732360763364384", title:"Locke & Key", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/87ee7dd025ad6c293188804ed4dc37ad.jpg", year:"2020", rating:"7.3", type:"series", genre:"Drama", detailPath:"locke-and-key-M2XFH135x33", desc:"Three siblings discover magical keys." },
+  { subjectId:"1081797865166490296", title:"The Believers", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/e185a08e8c4668c5daf7407d13050532.jpg", year:"2024", rating:"7.6", type:"series", genre:"Crime", detailPath:"the-believers-WbzTg42EUh1", desc:"Three entrepreneurs' new business." },
+  { subjectId:"7535775794330062000", title:"Heated Rivalry", poster:"https://pbcdnw.aoneroom.com/image/2025/11/30/1d43575838c499fd5383d52100da3290.jpeg", year:"2025", rating:"6.6", type:"series", genre:"Drama", detailPath:"heated-rivalry-AgDCIMQVFY8", desc:"Two hockey stars develop feelings." },
+  { subjectId:"1630808302512735240", title:"A Man on the Inside", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/cff4d8dc4344e4413caf1714a3ce4ea5.jpg", year:"2024", rating:"7.6", type:"series", genre:"Comedy", detailPath:"a-man-on-the-inside-AsFPZGo7tW1", desc:"A retired man becomes a mole." },
+  { subjectId:"7242722155409409240", title:"Palm Royale", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/6ec3d008c7f9187a6e3b8d000be86770.jpg", year:"2024", rating:"6.7", type:"series", genre:"Comedy", detailPath:"palm-royale-ePWTg89K1D8", desc:"Palm Beach high society." },
+  { subjectId:"6345447110997328152", title:"Maxton Hall", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/ff6604f0c8c3c65e866442a4230f5bea.jpeg", year:"2024", rating:"7.5", type:"series", genre:"Drama", detailPath:"maxton-hall-the-world-between-us-english-0EeSENkdKy7", desc:"A scholarship student witnesses a secret." },
+  { subjectId:"3650256853168278024", title:"Pluribus", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/726b78ce1cebbf027af6c8175752d26c.jpg", year:"2025", rating:"8.4", type:"series", genre:"Drama", detailPath:"pluribus-c4rPFTkdEl4", desc:"A mysterious wave of forced happiness." },
+  { subjectId:"5044120937839448848", title:"All Her Fault", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/49f9c3f09f4b7bd1e5a9d9c272788766.jpg", year:"2025", rating:"7.6", type:"series", genre:"Drama", detailPath:"all-her-fault-skHugLT7C06", desc:"A parent's nightmare." },
+  { subjectId:"4081044379891286536", title:"Mistletoe Murders", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/cfc2ef8d2ba514dab3755be77e170dd2.jpg", year:"2024", rating:"7.7", type:"series", genre:"Drama", detailPath:"mistletoe-murders-gM2gNS2etR4", desc:"A Christmas store owner investigates." },
+  { subjectId:"1411877511444792144", title:"Happy's Place", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/acc39ff5290f2b6654fa5e836e6ad28d.jpg", year:"2024", rating:"5.9", type:"series", genre:"Comedy", detailPath:"happys-place-yLxBllFpiG1", desc:"Bobbie inherits a restaurant." },
+  { subjectId:"6828676656556114104", title:"The Vince Staples Show", poster:"https://pbcdnw.aoneroom.com/image/2025/10/28/7e5bee178ebc775aa24ab56c8ca66f5f.jpg", year:"2024", rating:"7.4", type:"series", genre:"Biography", detailPath:"the-vince-staples-show-mh3r5Wvpr88", desc:"Vince Staples navigates everyday life." },
+  { subjectId:"5539220821668940352", title:"Youngins", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/75532e05361b14f083fd8d6cec8e594e.jpg", year:"2024", rating:"8.4", type:"series", genre:"Drama", detailPath:"youngins-qPxHkRMGbB6", desc:"A teen telenovela in Johannesburg." },
+  { subjectId:"4220839310829966384", title:"Fatal Seduction", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/1ff0ee04e7cfaad663870332f24b26a9.jpg", year:"2023", rating:"5.0", type:"series", genre:"Crime", detailPath:"fatal-seduction-Mk8Rj2juN15", desc:"A dangerous weekend trip." },
+  { subjectId:"7585839457308657496", title:"Shaka iLembe", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/1d92706c9264a0af403f2748baadd318.jpg", year:"2023", rating:"8.9", type:"series", genre:"Action", detailPath:"shaka-ilembe-CNhm8EXdn29", desc:"The story of King Shaka." },
+  { subjectId:"9024835728341091408", title:"Adulting", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/ccfa799efee6b3b893daa59942642d31.jpg", year:"2023", rating:"7.8", type:"series", genre:"Drama", detailPath:"adulting-CvwBDXhQFKa", desc:"Four friends in Johannesburg." },
+  { subjectId:"1559895628107397208", title:"Ehostela", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/1f5ca4de2e1c62337122ab3b06d45803.jpg", year:"2019", rating:"9.2", type:"series", genre:"Crime", detailPath:"ehostela-uDAleiZkeR1", desc:"A crime boss's adopted son." },
+  { subjectId:"3559523746505446168", title:"Kings of Jo'burg", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/794b6f101952440f80f95dbbf2e3aaf1.jpg", year:"2023", rating:"5.4", type:"series", genre:"Crime", detailPath:"kings-of-joburg-ISCGLFHEWe4", desc:"The Masire brothers." },
+  { subjectId:"8918764104832141912", title:"Empini", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/808041957cc021cec98d303adce93c8e.jpg", year:"2024", rating:"7.7", type:"series", genre:"Drama", detailPath:"empini-ISeEUx72QCa", desc:"A vengeful daughter's mission." },
+  { subjectId:"1641753686290350624", title:"Isibaya", poster:"https://pbcdnw.aoneroom.com/image/2025/09/29/0f95a80b32b762fc01a1b17f53b1563a.jpeg", year:"2014", rating:"8.6", type:"series", genre:"Drama", detailPath:"isibaya-alMIojsfhX1", desc:"A century-old feud." },
+  { subjectId:"8213885704594702288", title:"The Wife", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/388413bc67ba54d36396be2372ed5496.jpg", year:"2021", rating:"7.8", type:"series", genre:"Crime", detailPath:"the-wife-8SxKI1oGLM9", desc:"Eight Zulu brothers." },
+  { subjectId:"5571568452684370976", title:"Blood & Water", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b87cb87c0d9d4abd00d29355520b067c.jpg", year:"2020", rating:"6.7", type:"series", genre:"Drama", detailPath:"blood-and-water-cU5YJ2fQzD6", desc:"A teen uncovers her family's past." },
+
+  // ===== BLACK SHOWS =====
+  { subjectId:"1018086181784933408", title:"Sistas", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/5f3a2303098fa4cf7826e9a4199ac069.jpg", year:"2019", rating:"5.7", type:"series", genre:"Comedy", detailPath:"sistas-WvtmA9qQcd1", desc:"Single black females bond." },
+  { subjectId:"7638377634019562528", title:"The Oval", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/7e05da813f798e1271a9d22e7a0832fe.jpg", year:"2019", rating:"4.4", type:"series", genre:"Crime", detailPath:"the-oval-Me5h4IJQf69", desc:"A newly-elected US President." },
+  { subjectId:"695049665544344344", title:"Zatima", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/bf2e36f728da50d1a30a44e3951cb361.jpg", year:"2022", rating:"6.9", type:"series", genre:"Comedy", detailPath:"zatima-YayVf8LklP", desc:"Zac and Fatima's relationship." },
+  { subjectId:"2781623667900437536", title:"All the Queen's Men", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/a2304db4b472bf6ce7d2d48c6bb69e35.jpg", year:"2021", rating:"6.7", type:"series", genre:"Crime", detailPath:"all-the-queens-men-KZRjzyGRtj3", desc:"A drug lady rules her house." },
+  { subjectId:"5904172458474619680", title:"Beauty in Black", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/bbf4b25f6ffd6d2d78c5d15abcf20f22-s.jpg", year:"2024", rating:"5.8", type:"series", genre:"Drama", detailPath:"beauty-in-black-E6NEe5Ha927", desc:"Two women with contrasting lives." },
+  { subjectId:"8305817665478836816", title:"Divorced Sistas", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/c919564c3ab2885ba95544fe833f9a1d.jpg", year:"2025", rating:"6.6", type:"series", genre:"Comedy", detailPath:"divorced-sistas-eVJcGKrJyT9", desc:"Five friends support each other." },
+  { subjectId:"2586420771551597336", title:"The Chi", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/16e49007ef2ea1189f6774731a240d89.jpg", year:"2018", rating:"7.5", type:"series", genre:"Drama", detailPath:"the-chi-0OZDg6KP353", desc:"Residents of Chicago's South Side." },
+  { subjectId:"7829314425252631320", title:"BMF", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/fbda6a59911bfbd488ebb3edc1e97e39.jpg", year:"2021", rating:"7.4", type:"series", genre:"Biography", detailPath:"bmf-qXPfEZglmk9", desc:"Two brothers from Detroit." },
+  { subjectId:"6888523112573818592", title:"Forever", poster:"https://pbcdnw.aoneroom.com/image/2025/05/07/77941237eeacd41227d53358918a7b56.jpg", year:"2025", rating:"6.0", type:"series", genre:"Drama", detailPath:"forever-koD44myvRc8", desc:"Two teens in Los Angeles." },
+  { subjectId:"9076586042693666672", title:"Unseen", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/c88e888ba01d10ca859a2d505f371b42.jpg", year:"2023", rating:"6.0", type:"series", genre:"Crime", detailPath:"unseen-aHNjxglRuOa", desc:"A house cleaner commits murders." },
+  { subjectId:"4229390210611696672", title:"Godfather of Harlem", poster:"https://pbcdnw.aoneroom.com/image/2025/11/27/653d0b00aed6bd5f49a1db54558eb8d7.jpg", year:"2019", rating:"8.1", type:"series", genre:"Crime", detailPath:"godfather-of-harlem-qfj3fqqEq25", desc:"Bumpy Johnson in 1960s Harlem." },
+  { subjectId:"631837183527247152", title:"G20", poster:"https://pbcdnw.aoneroom.com/image/2025/10/04/cdefc0dc1b6bb29c6cf362009eb43a7c.jpg", year:"2025", rating:"5.1", type:"movie", genre:"Action", detailPath:"g20-en8WcWTOFK", desc:"Terrorists take over the G20 summit." },
+  { subjectId:"3980537671419578696", title:"Tyler Perry's Duplicity", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/2320381d7db45a3093ccc1162136b250.jpg", year:"2025", rating:"4.7", type:"movie", genre:"Drama", detailPath:"tyler-perrys-duplicity-kyGQXU5U2K4", desc:"An attorney uncovers the truth." },
+  { subjectId:"1117528396034098792", title:"One of Them Days", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/17db0b4c3c5af7e8cbc0ee37d2fc3f95.jpg", year:"2025", rating:"6.5", type:"movie", genre:"Comedy", detailPath:"one-of-them-days-iFCAj66iyk1", desc:"Two best friends need rent money." },
+  { subjectId:"5299732996419895616", title:"Tyler Perry's Divorce in the Black", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/13637799f0e8d66ba3a6337f1ac54228.jpg", year:"2024", rating:"4.6", type:"movie", genre:"Drama", detailPath:"tyler-perrys-divorce-in-the-black-arjizoFPuj6", desc:"Ava's husband abandons their marriage." },
+  { subjectId:"7006130377215935352", title:"Mea Culpa", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/6b775f983e90f168f3eb84acc548dbd5.jpg", year:"2024", rating:"4.2", type:"movie", genre:"Crime", detailPath:"mea-culpa-WxOhwco9yl8", desc:"An attorney seduced by her client." },
+  { subjectId:"6060991864533046304", title:"Ruthless", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/53e71dc4ca9f21c95060995115d54b11.jpg", year:"2020", rating:"4.7", type:"series", genre:"Crime", detailPath:"ruthless-GDxWvFepJd7", desc:"A scandalous religious cult." },
+  { subjectId:"1167223938976469784", title:"All American", poster:"https://pbcdnw.aoneroom.com/image/2025/11/21/900ab67fa1eb09f642c3dfcc511b3725.jpg", year:"2018", rating:"7.6", type:"series", genre:"Drama", detailPath:"all-american-qHnle0GTdo1", desc:"A football player joins Beverly Hills High." },
+
+  // ===== ACTION =====
+  { subjectId:"101354977397981216", title:"Trap House", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/6c65483160d5d9a943bbc1fcc7449df6.jpg", year:"2025", rating:"6.5", type:"movie", genre:"Action", detailPath:"trap-house-YaWWkdPcu7", desc:"DEA agent pursues his own teens." },
+  { subjectId:"1843778105786154624", title:"Safe House", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b4fefd0dce91fc068ada29854bb61220.jpg", year:"2025", rating:"5.9", type:"movie", genre:"Thriller", detailPath:"safe-house-OF4sBvrwcc2", desc:"Six federal agents in hiding." },
+  { subjectId:"3491264705832930352", title:"Stolen Girl", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/3377cdea05f40b685797a26135dfd2ea.jpg", year:"2025", rating:"5.3", type:"movie", genre:"Action", detailPath:"stolen-girl-ifJl1ZO1U94", desc:"A mother tracks down her abducted daughter." },
+  { subjectId:"3843768500917617656", title:"The Naked Gun", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/b5aa3cf6c7d54fdeb5f72cfe29e063e4.jpg", year:"2025", rating:"6.4", type:"movie", genre:"Action", detailPath:"the-naked-gun-Q6UIpY1vWz4", desc:"A detective solves a murder case." },
+  { subjectId:"6404541527368386376", title:"Nobody 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/259c45b7a121808cde5d38d31f7e82fd.jpg", year:"2025", rating:"6.3", type:"movie", genre:"Action", detailPath:"nobody-2-WvP6H8PR6D7", desc:"Hutch Mansell returns to violence." },
+  { subjectId:"7428149681496408912", title:"Mission: Impossible - The Final Reckoning", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/b7fe27b82cdd2c69e894b9245335e9e6.jpg", year:"2025", rating:"7.2", type:"movie", genre:"Action", detailPath:"mission-impossible-the-final-reckoning-waRSiIg0JQ8", desc:"Hunt pursues a dangerous AI." },
+  { subjectId:"608631316313265056", title:"The Pickup", poster:"https://pbcdnw.aoneroom.com/image/2025/11/29/8e88156c020dccbba4d0c68004bac063.jpg", year:"2025", rating:"5.4", type:"movie", genre:"Action", detailPath:"the-pickup-gUyHfDlxXI", desc:"Two armored truck drivers ambushed." },
+  { subjectId:"7016170107546617328", title:"Karate Kid: Legends", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/488b6fac279aa80d33802b575f0c7c0e.jpg", year:"2025", rating:"6.3", type:"movie", genre:"Action", detailPath:"karate-kid-legends-g8IGDhh8im8", desc:"Li Fong enters a karate competition." },
+  { subjectId:"4192447489649296464", title:"Ballerina", poster:"https://pbcdnw.aoneroom.com/image/2025/11/30/be5f59a92ed90c23825fd1a26a7da7cf.jpg", year:"2025", rating:"6.9", type:"movie", genre:"Action", detailPath:"ballerina-gCLsr69sHZ4", desc:"An assassin seeks revenge." },
+  { subjectId:"3339767763907888176", title:"Heads of State", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/419f44a61b5ef225f049292a053714c2.jpg", year:"2025", rating:"6.4", type:"movie", genre:"Action", detailPath:"heads-of-state-q5uDCmEaIY3", desc:"UK PM and US President on the run." },
+  { subjectId:"1881185875070011208", title:"Ice Road 2: Road to the Sky", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/9e176a0e386218ad402b4c2553638008.jpg", year:"2025", rating:"4.8", type:"movie", genre:"Action", detailPath:"ice-road-2-road-to-the-sky-CZnUsgMQXe2", desc:"Mike fights mercenaries in Nepal." },
+  { subjectId:"2991764873358593616", title:"Almost Cops", poster:"https://pbcdnw.aoneroom.com/image/2025/07/10/a901a0cdad8cd5e9a2cbfd118f8dc916.jpg", year:"2025", rating:"4.9", type:"movie", genre:"Action", detailPath:"almost-cops-english-k4LN1kwj0z3", desc:"A buddy cop comedy." },
+  { subjectId:"6172110816570492744", title:"Guns Up", poster:"https://pbcdnw.aoneroom.com/image/2025/10/05/236c322e9c829a39133283a14cbf1890.jpg", year:"2025", rating:"5.4", type:"movie", genre:"Action", detailPath:"guns-up-6Nh0i8EkWl7", desc:"A mob henchman's final job." },
+  { subjectId:"2908887247384723616", title:"The Amateur", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/50e57d9199484e026c0a144201c4c92f.jpg", year:"2025", rating:"6.5", type:"movie", genre:"Action", detailPath:"the-amateur-uD0mYexJSs3", desc:"A CIA decoder takes revenge." },
+  { subjectId:"930281021973627184", title:"Diablo", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/5967290b4d0ee6d2371ba9d12d96ce72.jpg", year:"2025", rating:"5.6", type:"movie", genre:"Action", detailPath:"diablo-OpGrK4dHI61", desc:"An ex-convict's mission." },
+  { subjectId:"2439164833342933144", title:"K.O.", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/9ae8adc7e83d56113e75e8a1261d02c9.jpg", year:"2025", rating:"5.8", type:"movie", genre:"Action", detailPath:"k-o-8g6XhJQobU2", desc:"An MMA fighter's redemption." },
+  { subjectId:"902110352954082296", title:"Shadow Force", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/633783f45aefec9902a1a3ce7e4b373e.jpg", year:"2025", rating:"4.7", type:"movie", genre:"Action", detailPath:"shadow-force-CPM5mEQFD41", desc:"A couple on the run with their son." },
+  { subjectId:"2177957257546286104", title:"Predator: Killer of Killers", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/d861a84799ff0a72dd31c7e21928fa30.jpg", year:"2025", rating:"7.5", type:"movie", genre:"Animation", detailPath:"predator-killer-of-killers-SFjprSa4TA2", desc:"Warriors become prey to Predator." },
+  { subjectId:"2105648425101411352", title:"The Accountant 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/bffd198f05bbff3405294366082a0522.jpg", year:"2025", rating:"6.6", type:"movie", genre:"Action", detailPath:"the-accountant-2-UOLFFkjTxv2", desc:"Christian Wolff reconstructs a murder." },
+  { subjectId:"6938790327474438416", title:"Sinners", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/dc68b1ba52dbab48c07486f1ec8c7e59.jpg", year:"2025", rating:"7.6", type:"movie", genre:"Action", detailPath:"sinners-Mc81wRsJzg8", desc:"Twin brothers face a greater evil." },
+  { subjectId:"5986678506963486704", title:"A Working Man", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/49cc83021d6af4ec3aff3f8088134ba0.jpg", year:"2025", rating:"5.7", type:"movie", genre:"Action", detailPath:"a-working-man-02VAPka3f87", desc:"Levon Cade returns to his skills." },
+  { subjectId:"3801511732347028560", title:"Holy Night: Demon Hunters", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/0b1fc25e5bab39ae23e440aa3e8100e2.jpg", year:"2025", rating:"4.8", type:"movie", genre:"Action", detailPath:"holy-night-demon-hunters-wEQqKRLXOw4", desc:"An occult action film." },
+  { subjectId:"5068826426707722192", title:"Star Trek: Section 31", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/7fde27354dc18285a1856a617edeceb7.jpg", year:"2025", rating:"3.8", type:"movie", genre:"Action", detailPath:"star-trek-section-31-23hmoKhhr26", desc:"Emperor Philippa Georgiou joins a secret division." },
+  { subjectId:"6270635241942436568", title:"Back in Action", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/ccc106379595724d8129d2f4c2bf7d1f.jpg", year:"2025", rating:"5.9", type:"movie", genre:"Action", detailPath:"back-in-action-63s5nTHzdt7", desc:"Former CIA spies pulled back." },
+  { subjectId:"7700102201389581232", title:"Ad Vitam", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/553b9696fe155244aa56fa4b6a90bea0.jpg", year:"2025", rating:"5.9", type:"movie", genre:"Action", detailPath:"ad-vitam-UqHqFk5yOa9", desc:"A man must find his kidnapped wife." },
+  { subjectId:"7926971032618370256", title:"Alarum", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/6c8bd60ff0c4eec3828621345d6d065e.jpg", year:"2025", rating:"3.3", type:"movie", genre:"Action", detailPath:"alarum-ybhEwkUBzr9", desc:"Two rogue spies attacked in a cabin." },
+  { subjectId:"1666233884259877184", title:"Carry-On", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/38c89942338a99eda9f084d83e3ecbec.jpg", year:"2024", rating:"6.5", type:"movie", genre:"Action", detailPath:"carry-on-wqBgqVRm5Z1", desc:"A TSA agent is blackmailed." },
+  { subjectId:"4892526842143540160", title:"Gladiator II", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/dde6ab82d02faf6992050a0d6d597b45.jpg", year:"2024", rating:"6.5", type:"movie", genre:"Action", detailPath:"gladiator-ii-0SPYaH8PpP5", desc:"Lucius enters the Colosseum." },
+  { subjectId:"2168158347105583056", title:"Red One", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/03d9573a7aa9a192a33f407797cd8bc7.jpg", year:"2024", rating:"6.2", type:"movie", genre:"Action", detailPath:"red-one-e5PQ0zFbaA2", desc:"Santa Claus is kidnapped." },
+
+  // ===== HORROR =====
+  { subjectId:"4863947764146784080", title:"The Elixir", poster:"https://pbcdnw.aoneroom.com/image/2025/10/05/23eb2f3d287f4ea058e9fccba119532c.jpg", year:"2025", rating:"5.4", type:"movie", genre:"Horror", detailPath:"the-elixir-english-mBvj60OViN5", desc:"A herbal business triggers a zombie outbreak." },
+  { subjectId:"8085368738226259024", title:"The Long Walk", poster:"https://pbcdnw.aoneroom.com/image/2025/10/02/4f447eb61ff67ea059ed038f8a3eb268.jpg", year:"2025", rating:"7.3", type:"movie", genre:"Thriller", detailPath:"the-long-walk-cC69qLC4hD9", desc:"Teens compete in a deadly walk." },
+  { subjectId:"2882021282055454400", title:"The Strangers: Chapter 2", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/abded168aaa14c3eae80831631d14e34.jpg", year:"2025", rating:"4.7", type:"movie", genre:"Horror", detailPath:"the-strangers-chapter-2-qXbe4REGTq3", desc:"Maya faces three deadly killers." },
+  { subjectId:"2764140928360139480", title:"The Conjuring: Last Rites", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/1b8014431225507ca7b93cc954ff93b6.jpg", year:"2025", rating:"6.2", type:"movie", genre:"Horror", detailPath:"the-conjuring-last-rites-o4iwG7hNbi3", desc:"Ed and Lorraine Warren's last case." },
+  { subjectId:"6946180097879982112", title:"Vicious", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/5aea04e91eb80bd5a27036e88fc9235a.jpg", year:"2025", rating:"4.9", type:"movie", genre:"Horror", detailPath:"vicious-yxu3KURz7h8", desc:"A woman fights for existence." },
+  { subjectId:"4270802874227213304", title:"Him", poster:"https://pbcdnw.aoneroom.com/image/2025/12/01/e5e69d269d24981516c586caa20b63d2.jpg", year:"2025", rating:"5.1", type:"movie", genre:"Horror", detailPath:"him-STAMyAZju55", desc:"An athlete trains with a legend." },
+  { subjectId:"2482316430432161768", title:"Five Nights at Freddy's", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/99ad94dd45b1fd85785fcc4090a41187.jpg", year:"2023", rating:"5.4", type:"movie", genre:"Horror", detailPath:"five-nights-at-freddys-uVpjlNc2nX2", desc:"A security guard at Freddy Fazbear's." },
+  { subjectId:"6989557830903120016", title:"V/H/S/Halloween", poster:"https://pbcdnw.aoneroom.com/image/2025/11/20/5b85aabcc6372c7c16e77ce79bacbaac.jpg", year:"2025", rating:"5.7", type:"movie", genre:"Horror", detailPath:"v-h-s-halloween-e9Z8ierfkk8", desc:"Halloween-themed videotapes." },
+  { subjectId:"5395735210837409472", title:"The Toxic Avenger", poster:"https://pbcdnw.aoneroom.com/image/2025/12/02/539cd3944c3f6dc5415d5faeb2bb3bbb.jpg", year:"2025", rating:"5.9", type:"movie", genre:"Action", detailPath:"the-toxic-avenger-wI8HtdwwAq6", desc:"A toxic accident creates a hero." },
+  { subjectId:"4118785983024381904", title:"The Sadness", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/30188a4722214edd8f48d5de18d5a70c.jpg", year:"2022", rating:"6.5", type:"movie", genre:"Horror", detailPath:"the-sadness-gmLofYa5gU4", desc:"A couple reunites during a plague." },
+
+  // ===== PREMIUM VIP =====
+  { subjectId:"2036860087691609120", title:"Game of Thrones", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/f527ff266fccf690578b80a403761bf2.jpg", year:"2011", rating:"9.2", type:"series", genre:"Action", detailPath:"game-of-thrones-AQP5Q48Qsq2", desc:"Nine families fight for Westeros." },
+  { subjectId:"315796373906018088", title:"Spartacus: Gods of the Arena", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/c6a9cc8f73c17dff11c8bbe8d0b1b991.jpg", year:"2010", rating:"8.4", type:"series", genre:"Action", detailPath:"spartacus-gods-of-the-arena-aXL9QfKlkn", desc:"The life of Spartacus." },
+  { subjectId:"765625015365780944", title:"Squid Game", poster:"https://pbcdnw.aoneroom.com/image/2025/06/30/5870fc25dae7dfe1e223e64544776a7b.jpg", year:"2025", rating:"8.0", type:"series", genre:"Action", detailPath:"squid-game-english-GHjy8KnzyU", desc:"Cash-strapped players compete." },
+  { subjectId:"2726173097488438040", title:"The Sandman", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/09ee79bd62549cfa7f593732b06d293c.jpg", year:"2022", rating:"7.6", type:"series", genre:"Drama", detailPath:"the-sandman-48fHwaUTnf3", desc:"Dream reclaims his lost equipment." },
+  { subjectId:"2730113747162387224", title:"The Originals", poster:"https://pbcdnw.aoneroom.com/image/2022/11/03/efca45d821cb035ade885d3f6fb00a96.jpg", year:"2013", rating:"8.3", type:"series", genre:"Drama", detailPath:"the-originals-ShDV3wTWFf3", desc:"A family of thousand-year-old vampires." },
+  { subjectId:"193974049297629648", title:"The Day of the Jackal", poster:"https://pbcdnw.aoneroom.com/image/2025/12/03/885007b496f67bbb91ad1a6ed37cb143.jpg", year:"2024", rating:"8.1", type:"series", genre:"Action", detailPath:"the-day-of-the-jackal-inLkJUZoke", desc:"An elusive assassin." },
+  { subjectId:"613140447321543448", title:"The Summer I Turned Pretty", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/e90bbb9e8fa4439717732ad6ee3baf5b.jpg", year:"2022", rating:"7.3", type:"series", genre:"Drama", detailPath:"the-summer-i-turned-pretty-qBSaCpLbiJ", desc:"A love triangle." },
+  { subjectId:"104358415815821952", title:"Alice in Borderland", poster:"https://pbcdnw.aoneroom.com/image/2025/06/15/a092c255c26383d5d2b78ba01a56cc46.jpg", year:"2025", rating:"7.8", type:"series", genre:"Action", detailPath:"alice-in-borderland-english-sYRtPqGXH7", desc:"Dangerous games in Tokyo." },
+
+  // ===== ADVENTURE =====
+  { subjectId:"4201113838688914736", title:"Primitive War", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/507eb4ec6203430737c95e33e0786d8e-s.jpg", year:"2025", rating:"5.3", type:"movie", genre:"Action", detailPath:"primitive-war-OTBJo239l05", desc:"Vietnam 1968, Vulture Squad." },
+  { subjectId:"1257402142307009144", title:"Jurassic World: Rebirth", poster:"https://pbcdnw.aoneroom.com/image/2025/11/30/9b09804dc94ce9e58f87dea8f9123ca0.jpg", year:"2025", rating:"5.9", type:"movie", genre:"Action", detailPath:"jurassic-world-rebirth-KH44jQJUSu1", desc:"An expedition extracts DNA." },
+  { subjectId:"2858466994209408840", title:"The Old Guard 2", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/d0f7637d0a1bde2be0ea9de52b61199d.jpg", year:"2025", rating:"5.1", type:"movie", genre:"Action", detailPath:"the-old-guard-2-Cd1topaO9p3", desc:"Immortal warriors." },
+  { subjectId:"8962650157435210416", title:"The Old Guard", poster:"https://pbcdnw.aoneroom.com/image/2022/10/14/2e09ba5b3a1727225ce0f5497a3bbedb.jpg", year:"2020", rating:"6.7", type:"movie", genre:"Action", detailPath:"the-old-guard-QQhA27225Ga", desc:"Immortal mercenaries exposed." },
+  { subjectId:"4882324853317158728", title:"Eden", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/f20860f20a72e679e93a5862c2e93497.jpg", year:"2025", rating:"6.5", type:"movie", genre:"Adventure", detailPath:"eden-88K1EXa6FO5", desc:"Outsiders settle on a remote island." },
+  { subjectId:"4214211710825253168", title:"Dora and the Search for Sol Dorado", poster:"https://pbcdnw.aoneroom.com/image/2025/12/04/d5f301ef2fe8313a889978a36ff34b15.jpg", year:"2025", rating:"5.4", type:"movie", genre:"Action", detailPath:"dora-and-the-search-for-sol-dorado-MqTRcqk8j15", desc:"Dora searches for treasure." },
+  { subjectId:"2775610752877713120", title:"Fountain of Youth", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/c4b8e0179f43b41e7225cbd4ea0dd003.jpg", year:"2025", rating:"5.7", type:"movie", genre:"Action", detailPath:"fountain-of-youth-UAwgDOfk2j3", desc:"Siblings seek the Fountain of Youth." },
+  { subjectId:"2977584447735874896", title:"In the Lost Lands", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/7d0e7c576203de835cd190cdf022d13d.jpg", year:"2025", rating:"4.7", type:"movie", genre:"Action", detailPath:"in-the-lost-lands-uvCNCYPmXx3", desc:"A sorceress and a drifter." },
+  { subjectId:"792146208100892624", title:"The Electric State", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/069f547583b64bc43aa09a7b95787126.jpg", year:"2025", rating:"5.9", type:"movie", genre:"Action", detailPath:"the-electric-state-gAOWjdm2wW", desc:"A teen and a robot seek her brother." },
+  { subjectId:"8453577590182397008", title:"Kingdom of the Planet of the Apes", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/d7861ad5ddcac2343f4d62cd9dc4840b.jpg", year:"2024", rating:"6.8", type:"movie", genre:"Action", detailPath:"kingdom-of-the-planet-of-the-apes-y9YQt5stt4a", desc:"A young ape questions everything." },
+  { subjectId:"7929424179425067552", title:"Borderlands", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/1fe63c4ae5b1e8eeb2118a437b7a428a-s.jpg", year:"2024", rating:"4.7", type:"movie", genre:"Action", detailPath:"borderlands-co3z5mvQKr9", desc:"A bounty hunter on Pandora." },
+  { subjectId:"7717604771867546792", title:"Dungeons & Dragons: Honor Among Thieves", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/30e57d52ae27c589765dfee1d741a6ff.jpg", year:"2023", rating:"7.2", type:"movie", genre:"Action", detailPath:"dungeons-and-dragons-honor-among-thieves-6hLjUT7I6c9", desc:"A thief and his band of adventurers." },
+  { subjectId:"208708012989632088", title:"Jumanji: The Next Level", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/dbd16094cd9582ea925f992469e940e4-s.jpg", year:"2019", rating:"6.6", type:"movie", genre:"Action", detailPath:"jumanji-the-next-level-0azwIBRSpf", desc:"The gang returns to Jumanji." },
+  { subjectId:"7078571519349507112", title:"Jumanji: Welcome to the Jungle", poster:"https://pbcdnw.aoneroom.com/image/2025/11/02/de4138b9e3b2c9cd2f0999a2c9e53b4a.jpg", year:"2017", rating:"6.9", type:"movie", genre:"Action", detailPath:"jumanji-welcome-to-the-jungle-qlsPe8PVTq8", desc:"Four teens in a video game." },
+  { subjectId:"637810524721398824", title:"Journey 2: The Mysterious Island", poster:"https://pbcdnw.aoneroom.com/image/2025/10/03/ed218183c1fd1c513436618c4f6c8389.jpg", year:"2012", rating:"5.7", type:"movie", genre:"Action", detailPath:"journey-2-the-mysterious-island-aVKrxX5b7L", desc:"Sean finds his grandfather." },
+  { subjectId:"1050317497569806840", title:"Journey to the Center of the Earth", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/f83bbd954b26a9a5fcb09e426878b42d.jpg", year:"2008", rating:"5.8", type:"movie", genre:"Action", detailPath:"journey-to-the-center-of-the-earth-yXhbIxQsAf1", desc:"A scientist finds a lost world." },
+  { subjectId:"7992617018946112176", title:"Jurassic World: Dominion", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/d1f067bf410e9fc03cf1afe5e7ba3b25.jpg", year:"2022", rating:"5.6", type:"movie", genre:"Action", detailPath:"jurassic-world-dominion-aDNotJMgqw9", desc:"Dinosaurs roam the Earth." },
+  { subjectId:"1770190953098133752", title:"Jurassic World: Fallen Kingdom", poster:"https://pbcdnw.aoneroom.com/image/2025/11/03/3715bd4c0dd97fdc14b5e457c0fa2f9c.jpg", year:"2018", rating:"6.1", type:"movie", genre:"Action", detailPath:"jurassic-world-fallen-kingdom-cURJ3qAuL62", desc:"Rescue dinosaurs from a volcano." },
+  { subjectId:"1825499583430937064", title:"Jurassic World", poster:"https://pbcdnw.aoneroom.com/image/2025/11/01/e7c27eaaa0c955cd935613eb794c46a3.jpg", year:"2015", rating:"6.9", type:"movie", genre:"Action", detailPath:"jurassic-world-owip9S3OQa2", desc:"A genetically modified hybrid dinosaur." }
+];
+
+// ============================================================
+// ✅ STATE
+// ============================================================
+const STATE = {
+  allMovies: MOVIES,
+  filtered: MOVIES,
+  displayCount: 30,
+  currentFilter: 'all',
+  searchQuery: '',
+  searchTimer: null,
+  observer: null
+};
+
+const PAGE_SIZE = 30;
+
+// ============================================================
+// ✅ INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('totalCount').textContent = `${MOVIES.length} films`;
+  setupFilters();
+  setupSearch();
+  setupLoadMore();
+  renderGrid();
+});
+
+// ============================================================
+// ✅ FILTERS
+// ============================================================
+function setupFilters() {
+  const filters = ['all', 'Action', 'Drama', 'Comedy', 'Animation', 'Anime', 'Crime', 'Horror', 'Sci-Fi', 'Thriller', 'Fantasy', 'Adventure', 'Romance', 'Series'];
+  const labels = { 'all':'Tous', 'Action':'Action', 'Drama':'Drama', 'Comedy':'Comédie', 'Animation':'Animation', 'Anime':'Anime', 'Crime':'Crime', 'Horror':'Horreur', 'Sci-Fi':'Sci-Fi', 'Thriller':'Thriller', 'Fantasy':'Fantasy', 'Adventure':'Aventure', 'Romance':'Romance', 'Series':'Séries' };
+  const container = document.getElementById('filters');
+  container.innerHTML = filters.map(f => `<button class="filter-btn ${f==='all'?'active':''}" data-filter="${f}">${labels[f]}</button>`).join('');
+  container.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      STATE.currentFilter = btn.dataset.filter;
+      STATE.displayCount = PAGE_SIZE;
+      applyFilters();
+    });
+  });
+}
+
+// ============================================================
+// ✅ SEARCH (debounce 300ms)
+// ============================================================
+function setupSearch() {
+  const input = document.getElementById('searchInput');
+  input.addEventListener('input', (e) => {
+    clearTimeout(STATE.searchTimer);
+    STATE.searchTimer = setTimeout(() => {
+      STATE.searchQuery = e.target.value.trim().toLowerCase();
+      STATE.displayCount = PAGE_SIZE;
+      applyFilters();
+    }, 300);
+  });
+}
+
+// ============================================================
+// ✅ LOAD MORE
+// ============================================================
+function setupLoadMore() {
+  document.getElementById('loadMoreBtn').addEventListener('click', () => {
+    STATE.displayCount += PAGE_SIZE;
+    renderGrid();
+  });
+}
+
+// ============================================================
+// ✅ APPLY FILTERS
+// ============================================================
+function applyFilters() {
+  let result = STATE.allMovies;
+  if (STATE.currentFilter === 'Series') {
+    result = result.filter(m => m.type === 'series');
+  } else if (STATE.currentFilter !== 'all') {
+    result = result.filter(m => m.genre.includes(STATE.currentFilter));
+  }
+  if (STATE.searchQuery) {
+    const q = STATE.searchQuery;
+    result = result.filter(m => 
+      m.title.toLowerCase().includes(q) || 
+      m.genre.toLowerCase().includes(q) ||
+      m.desc.toLowerCase().includes(q)
+    );
+  }
+  STATE.filtered = result;
+  renderGrid();
+}
+
+// ============================================================
+// ✅ RENDER GRID (lazy + pagination)
+// ============================================================
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const loadMoreWrap = document.getElementById('loadMoreWrap');
+  const resultsLabel = document.getElementById('resultsLabel');
+  
+  const total = STATE.filtered.length;
+  const visible = STATE.filtered.slice(0, STATE.displayCount);
+  
+  if (total === 0) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">
+      <i class="fas fa-search"></i>
+      <h3>Aucun résultat</h3>
+      <p>Essayez un autre mot-clé ou filtre</p>
+    </div>`;
+    loadMoreWrap.style.display = 'none';
+    resultsLabel.innerHTML = `<strong>0</strong> film trouvé`;
+    return;
+  }
+  
+  resultsLabel.innerHTML = `<strong>${visible.length}</strong> sur <strong>${total}</strong> films`;
+  
+  grid.innerHTML = visible.map(m => createCard(m)).join('');
+  
+  // Setup lazy loading
+  setupLazyLoading();
+  
+  // Show/hide load more
+  if (STATE.displayCount < total) {
+    loadMoreWrap.style.display = 'block';
+    document.getElementById('loadMoreBtn').innerHTML = `<i class="fas fa-plus"></i> Charger plus (${total - STATE.displayCount} restants)`;
+  } else {
+    loadMoreWrap.style.display = 'none';
+  }
+}
+
+// ============================================================
+// ✅ CREATE CARD
+// ============================================================
+function createCard(m) {
+  const params = new URLSearchParams({
+    subjectId: m.subjectId, title: m.title, poster: m.poster,
+    year: m.year, rating: m.rating, type: m.type,
+    detailPath: m.detailPath, desc: m.desc
+  });
+  return `
+    <a href="player.html?${params.toString()}" class="card">
+      <div class="poster-wrap">
+        <div class="poster-skeleton"></div>
+        <img class="poster" data-src="${m.poster}" alt="${m.title}" loading="lazy"
+             onerror="this.style.display='none'; this.parentElement.querySelector('.poster-skeleton').style.display='block';">
+        <div class="card-hd">HD</div>
+      </div>
+      <div class="card-info">
+        <div class="card-title">${m.title}</div>
+        <div class="card-meta">
+          <span>${m.year}</span>
+          <span class="rating"><i class="fas fa-star"></i>${m.rating}</span>
+        </div>
+      </div>
+    </a>`;
+}
+
+// ============================================================
+// ✅ LAZY LOADING (IntersectionObserver — chaje imaj sèlman lè parèt)
+// ============================================================
+function setupLazyLoading() {
+  if (STATE.observer) STATE.observer.disconnect();
+  
+  if ('IntersectionObserver' in window) {
+    STATE.observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.dataset.src;
+          if (src) {
+            img.src = src;
+            img.onload = () => {
+              img.classList.add('loaded');
+              const skel = img.parentElement.querySelector('.poster-skeleton');
+              if (skel) skel.style.display = 'none';
+            };
+            img.removeAttribute('data-src');
+          }
+          obs.unobserve(img);
+        }
+      });
+    }, { rootMargin: '200px' });
+    
+    document.querySelectorAll('.poster[data-src]').forEach(img => STATE.observer.observe(img));
+  } else {
+    // Fallback
+    document.querySelectorAll('.poster[data-src]').forEach(img => {
+      img.src = img.dataset.src;
+      img.onload = () => {
+        img.classList.add('loaded');
+        const skel = img.parentElement.querySelector('.poster-skeleton');
+        if (skel) skel.style.display = 'none';
+      };
+    });
+  }
+}
+</script>
+</body>
+  </html>
