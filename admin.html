@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <title>BLAST FLIX - Admin</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
+    :root {
+      --black:#0a0a0c; --charcoal:#121214;
+      --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --pink:#ff375f; --gold:#ffd60a; --green:#30d158; --red:#ff453a;
+      --glass-1:rgba(255,255,255,0.035); --glass-2:rgba(255,255,255,0.07);
+      --glass-3:rgba(255,255,255,0.12);
+      --glass-border:rgba(255,255,255,0.09);
+      --glass-border-bright:rgba(255,255,255,0.22);
+      --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.20);
+      --glass-shadow:0 8px 32px rgba(0,0,0,0.37);
+      --text:#f5f5f7; --text-dim:rgba(245,245,247,0.55);
+      --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
+      --blur-glass:blur(60px) saturate(200%);
+    }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif;
+      background:var(--black); color:var(--text); min-height:100vh;
+      overflow-x:hidden;
+    }
+    /* LIQUID BACKGROUND */
+    .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); overflow:hidden; }
+    .bg-neo::before {
+      content:''; position:absolute; inset:-50%;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(100,210,255,0.35), transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(191,90,242,0.30), transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(10,132,255,0.20), transparent 50%),
+        radial-gradient(circle at 10% 90%, rgba(255,55,95,0.15), transparent 40%);
+      filter:blur(100px);
+      animation:liquidMove 20s ease-in-out infinite;
+    }
+    @keyframes liquidMove {
+      0%, 100% { transform:translate(0, 0) scale(1); }
+      25% { transform:translate(30px, -20px) scale(1.05); }
+      50% { transform:translate(-20px, 30px) scale(1.1); }
+      75% { transform:translate(20px, 20px) scale(1.05); }
+    }
+    .noise {
+      position:fixed; inset:0; z-index:-1; opacity:0.04; pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode:overlay;
+    }
+    /* SVG ICON */
+    .svg {
+      width:20px; height:20px;
+      fill:none; stroke:currentColor; stroke-width:2;
+      stroke-linecap:round; stroke-linejoin:round;
+      display:inline-block; flex-shrink:0;
+    }
+    
+    /* ==========================================================
+       LOGIN SCREEN
+       ========================================================== */
+    .login-screen {
+      position:fixed; inset:0; z-index:1000;
+      background:radial-gradient(ellipse at 50% 0%, rgba(100,210,255,0.15), transparent 60%), var(--black);
+      display:flex; align-items:center; justify-content:center;
+      padding:20px;
+      animation:fadeIn 0.4s ease;
+    }
+    .login-screen.hidden { display:none; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .login-box {
+      width:100%; max-width:380px;
+      background:var(--glass-2);
+      backdrop-filter:var(--blur-glass);
+      -webkit-backdrop-filter:var(--blur-glass);
+      border:1px solid var(--glass-border-bright);
+      border-radius:28px;
+      padding:32px 28px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6), var(--glass-highlight);
+      animation:modalIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform:scale(0.9); }
+      to { opacity:1; transform:scale(1); }
+    }
+    .login-logo {
+      width:70px; height:70px; margin:0 auto 20px;
+      border-radius:20px;
+      background:linear-gradient(135deg, var(--cyan), var(--purple));
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 10px 40px rgba(100,210,255,0.6);
+      animation:logoGlow 2s ease-in-out infinite;
+    }
+    @keyframes logoGlow {
+      0%, 100% { box-shadow:0 10px 40px rgba(100,210,255,0.6); }
+      50% { box-shadow:0 10px 60px rgba(100,210,255,0.9); }
+    }
+    .login-logo .svg { width:32px; height:32px; fill:var(--black); stroke:none; }
+    .login-title {
+      font-size:24px; font-weight:900; text-align:center;
+      margin-bottom:6px;
+      background:linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .login-subtitle {
+      font-size:12px; color:var(--text-dim); text-align:center;
+      margin-bottom:24px;
+      font-weight:600;
+    }
+    .login-input-wrap { position:relative; margin-bottom:14px; }
+    .login-input-wrap .svg {
+      position:absolute; left:14px; top:50%;
+      transform:translateY(-50%);
+      width:16px; height:16px;
+      color:var(--text-dim);
+      pointer-events:none;
+    }
+    .login-input {
+      width:100%; padding:14px 16px 14px 44px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid var(--glass-border);
+      border-radius:14px;
+      color:var(--text); font-size:15px; font-family:inherit;
+      outline:none;
+      transition:all 0.3s;
+    }
+    .login-input:focus { border-color:var(--cyan); background:rgba(100,210,255,0.08); box-shadow:0 0 0 3px rgba(100,210,255,0.15); }
+    .login-btn {
+      width:100%; padding:14px;
+      background:linear-gradient(135deg, var(--cyan), var(--blue));
+      color:var(--black); border:none; border-radius:14px;
+      font-size:15px; font-weight:900; cursor:pointer;
+      font-family:inherit;
+      box-shadow:0 6px 20px rgba(100,210,255,0.4);
+      transition:all var(--spring);
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .login-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(100,210,255,0.6); }
+    .login-btn:active { transform:scale(0.98); }
+    .login-btn .svg { width:16px; height:16px; }
+    .login-error {
+      color:var(--red); font-size:12px; text-align:center;
+      margin-top:12px; font-weight:700;
+      display:none;
+    }
+    .login-error.show { display:block; animation:shake 0.4s; }
+    @keyframes shake {
+      0%, 100% { transform:translateX(0); }
+      25% { transform:translateX(-6px); }
+      75% { transform:translateX(6px); }
+    }
+    
+    /* ==========================================================
+       DASHBOARD
+       ========================================================== */
+    .dashboard { display:none; }
+    .dashboard.active { display:block; animation:fadeIn 0.5s ease; }
+    
+    /* HEADER */
+    .header {
+      position:sticky; top:0; z-index:100;
+      padding:14px 20px;
+      background:rgba(10,10,12,0.7);
+      backdrop-filter:var(--blur-glass);
+      -webkit-backdrop-filter:var(--blur-glass);
+      border-bottom:1px solid var(--glass-border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding-top:calc(14px + env(safe-area-inset-top,0px));
+      box-shadow:var(--glass-highlight);
+    }
+    .header-left { display:flex; align-items:center; gap:12px; }
+    .logo-mark {
+      width:38px; height:38px; border-radius:12px;
+      background:linear-gradient(135deg, var(--cyan), var(--purple));
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 16px rgba(100,210,255,0.5);
+    }
+    .logo-mark .svg { width:18px; height:18px; fill:var(--black); stroke:none; }
+    .header-title {
+      font-size:18px; font-weight:900;
+      background:linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .header-badge {
+      padding:3px 8px;
+      background:linear-gradient(135deg, var(--gold), #ff9500);
+      color:var(--black); font-size:9px; font-weight:900;
+      border-radius:50px;
+      box-shadow:0 2px 8px rgba(255,214,10,0.4);
+    }
+    .logout-btn {
+      padding:9px 16px; border-radius:50px;
+      background:rgba(255,69,58,0.15);
+      border:1px solid rgba(255,69,58,0.4);
+      color:var(--red); font-size:12px; font-weight:800;
+      cursor:pointer; font-family:inherit;
+      display:flex; align-items:center; gap:6px;
+      transition:all var(--spring);
+    }
+    .logout-btn:hover { background:rgba(255,69,58,0.25); }
+    .logout-btn .svg { width:14px; height:14px; }
+    
+    /* CONTAINER */
+    .container { max-width:1400px; margin:0 auto; padding:24px 20px 60px; }
+    
+    /* LIVE BANNER */
+    .live-banner {
+      background:linear-gradient(135deg, rgba(48,209,88,0.15), rgba(48,209,88,0.05));
+      border:1px solid rgba(48,209,88,0.4);
+      border-radius:24px;
+      padding:20px 24px;
+      margin-bottom:20px;
+      display:flex; align-items:center; gap:16px;
+      box-shadow:0 8px 32px rgba(48,209,88,0.2), var(--glass-highlight);
+      backdrop-filter:var(--blur-glass);
+      -webkit-backdrop-filter:var(--blur-glass);
+    }
+    .live-dot-big {
+      width:16px; height:16px; border-radius:50%;
+      background:var(--green);
+      animation:livePulse 1.5s infinite;
+      flex-shrink:0;
+      box-shadow:0 0 20px rgba(48,209,88,0.8);
+    }
+    @keyframes livePulse {
+      0% { box-shadow:0 0 0 0 rgba(48,209,88,0.7); }
+      70% { box-shadow:0 0 0 16px rgba(48,209,88,0); }
+      100% { box-shadow:0 0 0 0 rgba(48,209,88,0); }
+    }
+    .live-info { flex:1; }
+    .live-label-small {
+      font-size:10px; color:var(--text-dim); font-weight:800;
+      text-transform:uppercase; letter-spacing:1.5px;
+      margin-bottom:4px;
+    }
+    .live-count-big {
+      font-size:32px; font-weight:900; color:var(--green);
+      line-height:1;
+      text-shadow:0 0 20px rgba(48,209,88,0.6);
+    }
+    .live-subtext { font-size:12px; color:var(--text-dim); margin-top:6px; font-weight:600; }
+    
+    /* STATS GRID */
+    .stats-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:14px; margin-bottom:24px;
+    }
+    .stat-card {
+      background:var(--glass-2);
+      backdrop-filter:var(--blur-glass);
+      -webkit-backdrop-filter:var(--blur-glass);
+      border:1px solid var(--glass-border);
+      border-radius:22px;
+      padding:20px;
+      display:flex; align-items:center; gap:16px;
+      transition:all var(--spring);
+      box-shadow:var(--glass-shadow), var(--glass-highlight);
+      position:relative; overflow:hidden;
+    }
+    .stat-card::before {
+      content:''; position:absolute;
+      top:-50%; left:-50%; width:200%; height:200%;
+      background:radial-gradient(circle, rgba(255,255,255,0.08), transparent 50%);
+      opacity:0; transition:opacity 0.4s;
+      pointer-events:none;
+    }
+    .stat-card:hover {
+      border-color:var(--glass-border-bright);
+      transform:translateY(-4px);
+      box-shadow:0 15px 40px rgba(0,0,0,0.5), var(--glass-highlight);
+    }
+    .stat-card:hover::before { opacity:1; }
+    .stat-icon {
+      width:52px; height:52px; border-radius:16px;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+      backdrop-filter:blur(20px);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .stat-icon.cyan { background:rgba(100,210,255,0.15); color:var(--cyan); }
+    .stat-icon.cyan .svg { filter:drop-shadow(0 0 8px rgba(100,210,255,0.9)); }
+    .stat-icon.pink { background:rgba(255,55,95,0.15); color:var(--pink); }
+    .stat-icon.pink .svg { filter:drop-shadow(0 0 8px rgba(255,55,95,0.9)); }
+    .stat-icon.gold { background:rgba(255,214,10,0.15); color:var(--gold); }
+    .stat-icon.gold .svg { filter:drop-shadow(0 0 8px rgba(255,214,10,0.9)); }
+    .stat-icon.green { background:rgba(48,209,88,0.15); color:var(--green); }
+    .stat-icon.green .svg { filter:drop-shadow(0 0 8px rgba(48,209,88,0.9)); }
+    .stat-icon.purple { background:rgba(191,90,242,0.15); color:var(--purple); }
+    .stat-icon.purple .svg { filter:drop-shadow(0 0 8px rgba(191,90,242,0.9)); }
+    .stat-icon .svg { width:24px; height:24px; }
+    .stat-info { flex:1; }
+    .stat-value { font-size:28px; font-weight:900; line-height:1; margin-bottom:4px; }
+    .stat-label {
+      font-size:11px; color:var(--text-dim); font-weight:700;
+      text-transform:uppercase; letter-spacing:0.8px;
+    }
+    
+    /* SECTION */
+    .section {
+      background:var(--glass-2);
+      backdrop-filter:var(--blur-glass);
+      -webkit-backdrop-filter:var(--blur-glass);
+      border:1px solid var(--glass-border);
+      border-radius:22px;
+      padding:20px;
+      margin-bottom:20px;
+      box-shadow:var(--glass-shadow), var(--glass-highlight);
+    }
+    .section-title {
+      font-size:16px; font-weight:900;
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:16px;
+    }
+    .section-title .svg {
+      width:20px; height:20px; color:var(--cyan);
+      filter:drop-shadow(0 0 8px rgba(100,210,255,0.8));
+    }
+    .section-subtitle {
+      font-size:11px; color:var(--text-dim); font-weight:700;
+      margin-left:auto;
+      padding:3px 10px; border-radius:50px;
+      background:rgba(100,210,255,0.1);
+      border:1px solid rgba(100,210,255,0.2);
+      color:var(--cyan);
+    }
+    
+    /* TABLE */
+    .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:14px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th {
+      text-align:left; padding:12px 14px;
+      background:rgba(255,255,255,0.03);
+      color:var(--text-dim);
+      font-size:10px; font-weight:900;
+      text-transform:uppercase; letter-spacing:0.5px;
+      border-bottom:1px solid var(--glass-border);
+      white-space:nowrap;
+    }
+    td {
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,0.03);
+      vertical-align:middle;
+    }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:rgba(255,255,255,0.02); }
+    
+    .user-id {
+      font-family:'SF Mono', 'Courier New', monospace;
+      font-size:11px; color:var(--cyan);
+      background:rgba(100,210,255,0.1);
+      padding:4px 10px; border-radius:6px;
+      display:inline-block;
+      border:1px solid rgba(100,210,255,0.2);
+    }
+    .user-name { font-weight:700; }
+    .user-time {
+      font-size:11px; color:var(--text-dim);
+      font-family:'SF Mono', 'Courier New', monospace;
+    }
+    .user-status {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:50px;
+      font-size:10px; font-weight:800;
+    }
+    .user-status.online {
+      background:rgba(48,209,88,0.15); color:var(--green);
+      border:1px solid rgba(48,209,88,0.3);
+    }
+    .user-status.offline {
+      background:rgba(255,69,58,0.1); color:var(--red);
+      border:1px solid rgba(255,69,58,0.2);
+    }
+    .user-status .dot {
+      width:6px; height:6px; border-radius:50%;
+      background:currentColor;
+      box-shadow:0 0 8px currentColor;
+    }
+    
+    .movie-thumb {
+      width:40px; height:60px; border-radius:8px;
+      object-fit:cover; display:block;
+      background:var(--charcoal);
+      box-shadow:0 4px 12px rgba(0,0,0,0.4);
+    }
+    .movie-cell { display:flex; align-items:center; gap:12px; }
+    .movie-title { font-weight:700; font-size:12px; margin-bottom:2px; }
+    .movie-meta { font-size:10px; color:var(--text-dim); }
+    
+    /* EMPTY */
+    .empty-row {
+      text-align:center; padding:50px 20px;
+      color:var(--text-dim);
+    }
+    .empty-row .svg {
+      width:40px; height:40px; opacity:0.4;
+      margin-bottom:12px;
+      animation:floatIcon 3s ease-in-out infinite;
+    }
+    @keyframes floatIcon {
+      0%, 100% { transform:translateY(0); }
+      50% { transform:translateY(-8px); }
+    }
+    .empty-row p { font-size:13px; font-weight:600; }
+    
+    /* ACTION BUTTONS */
+    .actions-bar {
+      display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;
+    }
+    .action-btn {
+      padding:11px 20px; border-radius:50px;
+      background:var(--glass-2);
+      border:1px solid var(--glass-border);
+      color:var(--text); font-size:12px; font-weight:800;
+      cursor:pointer; font-family:inherit;
+      display:inline-flex; align-items:center; gap:8px;
+      transition:all var(--spring);
+      backdrop-filter:blur(20px);
+    }
+    .action-btn:hover {
+      border-color:var(--cyan);
+      background:rgba(100,210,255,0.1);
+      color:var(--cyan);
+      transform:translateY(-2px);
+    }
+    .action-btn:hover .svg { filter:drop-shadow(0 0 6px rgba(100,210,255,0.8)); }
+    .action-btn.danger {
+      color:var(--red);
+      border-color:rgba(255,69,58,0.3);
+    }
+    .action-btn.danger:hover {
+      background:rgba(255,69,58,0.15);
+      border-color:var(--red);
+    }
+    .action-btn.danger:hover .svg { filter:drop-shadow(0 0 6px rgba(255,69,58,0.8)); }
+    .action-btn .svg { width:14px; height:14px; }
+    
+    /* TOAST */
+    .toast {
+      position:fixed; bottom:30px; left:50%;
+      transform:translateX(-50%) translateY(100px);
+      padding:14px 22px; border-radius:50px;
+      background:rgba(30,30,32,0.95);
+      backdrop-filter:var(--blur-glass);
+      -webkit-backdrop-filter:var(--blur-glass);
+      border:1px solid var(--glass-border-bright);
+      color:var(--text); font-size:13px; font-weight:700;
+      z-index:500; opacity:0; pointer-events:none;
+      transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      display:flex; align-items:center; gap:10px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.6);
+    }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast .svg { width:16px; height:16px; color:var(--green); filter:drop-shadow(0 0 8px rgba(48,209,88,0.8)); }
+    
+    /* RESPONSIVE */
+    @media (max-width:768px) {
+      .container { padding:16px 14px 40px; }
+      .stats-grid { grid-template-columns:repeat(2, 1fr); gap:10px; }
+      .stat-card { padding:14px; flex-direction:column; align-items:flex-start; gap:10px; }
+      .stat-value { font-size:22px; }
+      .stat-icon { width:44px; height:44px; }
+      .stat-icon .svg { width:20px; height:20px; }
+      .section { padding:14px; border-radius:18px; }
+      th, td { padding:10px 8px; font-size:12px; }
+      .header { padding:12px 14px; }
+      .header-title { font-size:16px; }
+      .live-banner { padding:16px; gap:12px; }
+      .live-count-big { font-size:24px; }
+      .movie-thumb { width:32px; height:48px; }
+    }
+    @media (max-width:380px) {
+      .stats-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-neo"></div>
+<div class="noise"></div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg class="svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <h1 class="login-title">Admin Panel</h1>
+    <p class="login-subtitle">BLAST FLIX — Accès restreint</p>
+    <div class="login-input-wrap">
+      <svg class="svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <input type="password" class="login-input" id="passwordInput" placeholder="Mot de passe admin" autocomplete="off">
+    </div>
+    <button class="login-btn" onclick="login()">
+      <svg class="svg" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      Se connecter
+    </button>
+    <div class="login-error" id="loginError">Mot de passe incorrect</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg class="svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <span class="header-title">Admin Panel</span>
+      <span class="header-badge">ADMIN</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <svg class="svg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Déconnexion
+    </button>
+  </header>
+  
+  <div class="container">
+    <!-- LIVE BANNER -->
+    <div class="live-banner">
+      <div class="live-dot-big"></div>
+      <div class="live-info">
+        <div class="live-label-small">Visiteurs en direct</div>
+        <div class="live-count-big" id="liveCountBig">0</div>
+        <div class="live-subtext" id="liveSubtext">En attente de visiteurs...</div>
+      </div>
+    </div>
+    
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon cyan">
+          <svg class="svg" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value" id="statVisits">0</div>
+          <div class="stat-label">Visites</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <svg class="svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value" id="statUsers">0</div>
+          <div class="stat-label">Utilisateurs</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon gold">
+          <svg class="svg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value" id="statMovies">0</div>
+          <div class="stat-label">Films vus</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon pink">
+          <svg class="svg" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value" id="statFavs">0</div>
+          <div class="stat-label">Favoris</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ACTIONS -->
+    <div class="actions-bar">
+      <button class="action-btn" onclick="refreshAll()">
+        <svg class="svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Rafraîchir
+      </button>
+      <button class="action-btn danger" onclick="clearAllData()">
+        <svg class="svg" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Effacer données
+      </button>
+    </div>
+    
+    <!-- LIVE USERS -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Utilisateurs en ligne
+        <span class="section-subtitle" id="liveUsersCount">0</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Utilisateur</th>
+              <th>Status</th>
+              <th>Appareil</th>
+              <th>Dernière activité</th>
+            </tr>
+          </thead>
+          <tbody id="liveUsersBody">
+            <tr><td colspan="4" class="empty-row">
+              <svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <p>Aucun utilisateur en ligne</p>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- TOP MOVIES -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Films les plus regardés
+        <span class="section-subtitle" id="topMoviesCount">0</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Film</th>
+              <th>Vues</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="topMoviesBody">
+            <tr><td colspan="4" class="empty-row">
+              <svg class="svg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20"/></svg>
+              <p>Aucun film visionné</p>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- HISTORY -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="svg" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/></svg>
+        Historique récent
+        <span class="section-subtitle" id="historyCount">0</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Film</th>
+              <th>Utilisateur</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="3" class="empty-row">
+              <svg class="svg" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9"/></svg>
+              <p>Aucun historique</p>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg class="svg" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="toastText">OK</span>
+</div>
+
+<script>
+// ============================================================
+// ✅ KONFIGIRASYON
+// ============================================================
+const ADMIN_PASSWORD = 'blastflix2025'; // ⚠️ CHANJE SA!
+const STORAGE_KEYS = {
+  history: 'blastflix_history',
+  favorites: 'blastflix_favorites',
+  users: 'blastflix_users',
+  visits: 'blastflix_visits',
+  liveUsers: 'blastflix_live_users'
+};
+
+// ============================================================
+// ✅ LOGIN
+// ============================================================
+function login() {
+  const input = document.getElementById('passwordInput');
+  const error = document.getElementById('loginError');
+  
+  if (input.value === ADMIN_PASSWORD) {
+    sessionStorage.setItem('blastflix_admin', 'true');
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('dashboard').classList.add('active');
+    loadDashboard();
+    startAutoRefresh();
+  } else {
+    error.classList.add('show');
+    input.value = '';
+    setTimeout(() => error.classList.remove('show'), 3000);
+  }
+}
+
+document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') login();
+});
+
+function logout() {
+  sessionStorage.removeItem('blastflix_admin');
+  location.reload();
+}
+
+if (sessionStorage.getItem('blastflix_admin') === 'true') {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('dashboard').classList.add('active');
+  loadDashboard();
+  startAutoRefresh();
+}
+
+// ============================================================
+// ✅ LOAD DASHBOARD
+// ============================================================
+function loadDashboard() {
+  loadLiveUsers();
+  loadStats();
+  loadTopMovies();
+  loadHistory();
+}
+
+function refreshAll() {
+  loadDashboard();
+  showToast('Données rafraîchies');
+}
+
+// ============================================================
+// ✅ LIVE USERS
+// ============================================================
+function loadLiveUsers() {
+  const liveUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.liveUsers) || '{}');
+  const now = Date.now();
+  const activeUsers = [];
+  
+  Object.keys(liveUsers).forEach(id => {
+    if (now - liveUsers[id].lastSeen < 120000) {
+      activeUsers.push({ id, ...liveUsers[id] });
+    }
+  });
+  
+  const count = activeUsers.length;
+  document.getElementById('liveCountBig').textContent = count;
+  document.getElementById('liveUsersCount').textContent = count;
+  document.getElementById('liveSubtext').textContent = 
+    count === 0 ? 'En attente de visiteurs...' :
+    count === 1 ? '1 personne regarde' :
+    `${count} personnes regardent`;
+  
+  const tbody = document.getElementById('liveUsersBody');
+  
+  if (activeUsers.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="4" class="empty-row">
+        <svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <p>Aucun utilisateur en ligne</p>
+      </td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = activeUsers.map(user => {
+    const ago = Math.floor((now - user.lastSeen) / 1000);
+    const agoText = ago < 60 ? `${ago}s` : `${Math.floor(ago/60)}min`;
+    const device = user.device || 'Inconnu';
+    
+    return `
+      <tr>
+        <td><span class="user-id">${user.id.substring(0, 14)}...</span></td>
+        <td>
+          <span class="user-status online">
+            <span class="dot"></span>
+            En ligne
+          </span>
+        </td>
+        <td><span class="movie-meta">${device}</span></td>
+        <td><span class="user-time">il y a ${agoText}</span></td>
+      </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// ✅ STATS
+// ============================================================
+function loadStats() {
+  const visits = JSON.parse(localStorage.getItem(STORAGE_KEYS.visits) || '[]');
+  document.getElementById('statVisits').textContent = visits.length;
+  
+  const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]');
+  document.getElementById('statUsers').textContent = users.length;
+  
+  const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || '[]');
+  document.getElementById('statMovies').textContent = history.length;
+  
+  const favs = JSON.parse(localStorage.getItem(STORAGE_KEYS.favorites) || '[]');
+  document.getElementById('statFavs').textContent = favs.length;
+}
+
+// ============================================================
+// ✅ TOP MOVIES
+// ============================================================
+function loadTopMovies() {
+  const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || '[]');
+  
+  const counts = {};
+  history.forEach(item => {
+    if (!counts[item.subjectId]) {
+      counts[item.subjectId] = { ...item, views: 0 };
+    }
+    counts[item.subjectId].views++;
+  });
+  
+  const sorted = Object.values(counts).sort((a, b) => b.views - a.views).slice(0, 10);
+  document.getElementById('topMoviesCount').textContent = sorted.length;
+  
+  const tbody = document.getElementById('topMoviesBody');
+  
+  if (sorted.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="4" class="empty-row">
+        <svg class="svg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20"/></svg>
+        <p>Aucun film visionné</p>
+      </td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = sorted.map((movie, i) => `
+    <tr>
+      <td><strong style="color:var(--gold);font-size:16px;text-shadow:0 0 10px rgba(255,214,10,0.5);">#${i + 1}</strong></td>
+      <td>
+        <div class="movie-cell">
+          <img class="movie-thumb" src="${movie.poster}" alt="${movie.title}" onerror="this.style.display='none'">
+          <div>
+            <div class="movie-title">${movie.title}</div>
+            <div class="movie-meta">${movie.year}</div>
+          </div>
+        </div>
+      </td>
+      <td><strong style="color:var(--cyan);font-size:16px;text-shadow:0 0 10px rgba(100,210,255,0.5);">${movie.views}</strong></td>
+      <td><span style="color:var(--gold);font-weight:800;">★ ${movie.rating}</span></td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// ✅ HISTORY
+// ============================================================
+function loadHistory() {
+  const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || '[]');
+  document.getElementById('historyCount').textContent = history.length;
+  
+  const tbody = document.getElementById('historyBody');
+  
+  if (history.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="3" class="empty-row">
+        <svg class="svg" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9"/></svg>
+        <p>Aucun historique</p>
+      </td></tr>`;
+    return;
+  }
+  
+  const recent = history.slice(0, 20);
+  
+  tbody.innerHTML = recent.map(item => {
+    const date = new Date(item.watchedAt || Date.now());
+    const dateStr = date.toLocaleDateString('fr-FR', {
+      day: '2-digit', month: 'short',
+      hour: '2-digit', minute: '2-digit'
+    });
+    
+    return `
+      <tr>
+        <td>
+          <div class="movie-cell">
+            <img class="movie-thumb" src="${item.poster}" alt="${item.title}" onerror="this.style.display='none'">
+            <div>
+              <div class="movie-title">${item.title}</div>
+              <div class="movie-meta">${item.year} • ★ ${item.rating}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="user-name">Utilisateur</span></td>
+        <td><span class="user-time">${dateStr}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// ✅ CLEAR ALL DATA
+// ============================================================
+function clearAllData() {
+  if (confirm('⚠️ ATTENTION!\n\nSa ap efase:\n- Tout istwa\n- Tout favoris\n- Tout estatistik\n\nOu sèten?')) {
+    if (confirm('Dènye konfimasyon: Efase TOUT done?')) {
+      Object.values(STORAGE_KEYS).forEach(key => {
+        localStorage.removeItem(key);
+      });
+      refreshAll();
+      showToast('Toutes les données effacées');
+    }
+  }
+}
+
+// ============================================================
+// ✅ AUTO REFRESH
+// ============================================================
+let refreshTimer = null;
+
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => {
+    loadLiveUsers();
+    loadStats();
+  }, 10000);
+}
+
+// ============================================================
+// ✅ TOAST
+// ============================================================
+function showToast(text) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastText').textContent = text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+
+</body>
+</html>
