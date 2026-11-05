@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
     <title>Lecture - BLAST FLIX</title>
+    <link rel="preconnect" href="https://pbcdnw.aoneroom.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
-            --black:#000; --charcoal:#121214;
+            --black:#000; --charcoal:#121214; --slate:#1c1c1f;
             --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --pink:#ff375f; --gold:#ffd60a;
             --glass-1:rgba(255,255,255,0.035); --glass-2:rgba(255,255,255,0.07);
             --glass-border:rgba(255,255,255,0.09); --glass-border-bright:rgba(255,255,255,0.22);
@@ -49,7 +50,8 @@
             border:1px solid var(--glass-border);
             color:var(--text);
             display:flex; align-items:center; justify-content:center;
-            text-decoration:none; font-size:14px; flex-shrink:0;
+            text-decoration:none; font-size:14px;
+            flex-shrink:0;
             transition:all var(--spring);
         }
         .back-btn:hover { border-color:var(--cyan); background:rgba(100,210,255,0.15); }
@@ -81,7 +83,6 @@
             position:relative;
             width:100%;
             height:380px;
-            max-height:56vw;
             background:#000;
             overflow:hidden;
             margin-bottom:16px;
@@ -97,13 +98,12 @@
             overflow:hidden;
             scrollbar-width:none;
             -ms-overflow-style:none;
-            pointer-events:auto;
         }
         .iframe-wrap iframe::-webkit-scrollbar {
             display:none; width:0; height:0;
         }
         
-        /* MASK ANWO — pi wo pou kache search bar + logo */
+        /* MASK ANWO (130px pou kache search bar Moviesbox) */
         .iframe-wrap .mask-top {
             position:absolute;
             top:0; left:0; right:0;
@@ -116,40 +116,31 @@
             z-index:10;
             pointer-events:none;
         }
-        
         /* MASK ANBA */
         .iframe-wrap .mask-bottom {
             position:absolute;
             bottom:0; left:0; right:0;
             height:60px;
-            background:linear-gradient(to top,
-                #000 0%,
-                #000 70%,
-                rgba(0,0,0,0.4) 90%,
+            background:linear-gradient(to top, 
+                #000 0%, 
+                #000 70%, 
+                rgba(0,0,0,0.4) 90%, 
                 transparent 100%);
             z-index:10;
             pointer-events:none;
         }
-        
-        /* MASK GOUCH */
-        .iframe-wrap .mask-left {
-            position:absolute;
-            top:0; bottom:0; left:0;
-            width:2px;
-            background:#000;
-            z-index:10;
-            pointer-events:none;
-        }
-        
-        /* MASK DWAT */
+        /* MASK GOUCH/DWAT */
+        .iframe-wrap .mask-left,
         .iframe-wrap .mask-right {
             position:absolute;
-            top:0; bottom:0; right:0;
+            top:0; bottom:0;
             width:2px;
             background:#000;
             z-index:10;
             pointer-events:none;
         }
+        .iframe-wrap .mask-left { left:0; }
+        .iframe-wrap .mask-right { right:0; }
         
         /* KONTNI ANBA A */
         .content {
@@ -175,17 +166,17 @@
             margin-bottom:14px;
         }
         .info-poster {
-            width:80px;
+            width:90px;
             aspect-ratio:2/3;
             object-fit:cover;
             border-radius:var(--r-md);
             border:1px solid var(--glass-border);
             flex-shrink:0;
-            background:var(--charcoal);
+            box-shadow:0 4px 16px rgba(0,0,0,0.5);
         }
         .info-content { flex:1; min-width:0; }
         .info-title {
-            font-size:18px;
+            font-size:19px;
             font-weight:800;
             margin-bottom:8px;
             line-height:1.2;
@@ -197,6 +188,7 @@
             font-size:11px;
             color:var(--text-dim);
             font-weight:600;
+            margin-bottom:10px;
         }
         .info-meta span { display:inline-flex; align-items:center; gap:4px; }
         .info-meta i { color:var(--cyan); font-size:10px; }
@@ -210,30 +202,26 @@
             margin-bottom:14px;
         }
         
-        /* ACTIONS */
+        /* BOUTON FAVORI AK ANIMASYON */
         .info-actions {
             display:flex;
             gap:10px;
             flex-wrap:wrap;
         }
-        .btn {
+        .btn-favorite {
             padding:11px 20px;
             border-radius:50px;
             font-size:13px;
             font-weight:800;
             cursor:pointer;
             font-family:inherit;
-            text-decoration:none;
             display:inline-flex;
             align-items:center;
             gap:8px;
-            border:none;
-            transition:all var(--spring);
-        }
-        .btn-favorite {
+            border:1px solid rgba(255,55,95,0.4);
             background:rgba(255,55,95,0.15);
             color:var(--pink);
-            border:1px solid rgba(255,55,95,0.4);
+            transition:all var(--spring);
         }
         .btn-favorite:hover {
             background:rgba(255,55,95,0.25);
@@ -248,9 +236,7 @@
         .btn-favorite.active i {
             animation:heartBeat 0.6s ease;
         }
-        .btn-favorite:active {
-            transform:scale(0.96);
-        }
+        .btn-favorite:active { transform:scale(0.96); }
         
         /* WHATSAPP */
         .wa-card {
@@ -261,7 +247,7 @@
             background:linear-gradient(135deg, rgba(37,211,102,0.15), rgba(18,140,126,0.1));
             border:1px solid rgba(37,211,102,0.4);
             border-radius:var(--r-lg);
-            margin-bottom:14px;
+            margin-bottom:16px;
         }
         .wa-icon {
             width:40px; height:40px;
@@ -277,26 +263,62 @@
             padding:8px 14px;
             background:linear-gradient(135deg, #25D366, #128C7E);
             color:#fff;
-            border:none; border-radius:50px;
-            font-size:11px; font-weight:700;
-            cursor:pointer; text-decoration:none;
+            border:none;
+            border-radius:50px;
+            font-size:11px;
+            font-weight:700;
+            cursor:pointer;
+            text-decoration:none;
             white-space:nowrap;
         }
         
-        /* SIJESYON */
+        /* SIJESYON — AMELYORE */
+        .suggest-head {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-bottom:14px;
+        }
         .suggest-title {
-            font-size:15px;
+            font-size:16px;
             font-weight:800;
-            margin-bottom:12px;
             display:flex;
             align-items:center;
             gap:8px;
         }
-        .suggest-title i { color:var(--cyan); font-size:13px; }
+        .suggest-title i { color:var(--cyan); font-size:14px; }
+        .refresh-btn {
+            padding:7px 14px;
+            border-radius:50px;
+            background:var(--glass-2);
+            border:1px solid var(--glass-border);
+            color:var(--cyan);
+            font-size:11px;
+            font-weight:700;
+            cursor:pointer;
+            font-family:inherit;
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            transition:all var(--spring);
+        }
+        .refresh-btn:hover {
+            background:rgba(100,210,255,0.15);
+            border-color:var(--cyan);
+            transform:rotate(-15deg);
+        }
+        .refresh-btn i { font-size:11px; }
+        .refresh-btn.spinning i {
+            animation:spin 0.6s linear;
+        }
+        @keyframes spin {
+            from { transform:rotate(0deg); }
+            to { transform:rotate(360deg); }
+        }
         .suggest-grid {
             display:grid;
-            grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
-            gap:10px;
+            grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
+            gap:12px;
         }
         .suggest-card {
             border-radius:var(--r-md);
@@ -307,29 +329,98 @@
             color:inherit;
             display:block;
             transition:all var(--spring);
+            position:relative;
         }
         .suggest-card:hover {
-            transform:translateY(-4px);
+            transform:translateY(-5px) scale(1.02);
             border-color:var(--glass-border-bright);
-            box-shadow:0 12px 30px rgba(0,0,0,0.5);
+            box-shadow:0 15px 30px rgba(0,0,0,0.6), 0 0 25px rgba(100,210,255,0.15);
+        }
+        .suggest-poster-wrap {
+            position:relative;
+            width:100%;
+            aspect-ratio:2/3;
+            overflow:hidden;
+            background:var(--charcoal);
         }
         .suggest-card img {
             width:100%;
-            aspect-ratio:2/3;
+            height:100%;
             object-fit:cover;
             display:block;
-            background:var(--charcoal);
+            transition:transform 0.5s ease;
         }
-        .suggest-info { padding:8px 10px; }
+        .suggest-card:hover img {
+            transform:scale(1.1);
+        }
+        .suggest-badge {
+            position:absolute;
+            top:8px;
+            right:8px;
+            padding:3px 7px;
+            background:rgba(0,0,0,0.85);
+            border:1px solid rgba(255,255,255,0.2);
+            border-radius:5px;
+            font-size:8px;
+            font-weight:800;
+            color:var(--cyan);
+            backdrop-filter:blur(10px);
+        }
+        .suggest-rating-badge {
+            position:absolute;
+            top:8px;
+            left:8px;
+            padding:3px 7px;
+            background:rgba(0,0,0,0.85);
+            border:1px solid rgba(255,214,10,0.4);
+            border-radius:5px;
+            font-size:9px;
+            font-weight:800;
+            color:var(--gold);
+            display:flex;
+            align-items:center;
+            gap:3px;
+            backdrop-filter:blur(10px);
+        }
+        .suggest-rating-badge i { font-size:7px; }
+        .suggest-info { padding:9px 11px; }
         .suggest-name {
             font-size:12px;
             font-weight:700;
             white-space:nowrap;
             overflow:hidden;
             text-overflow:ellipsis;
-            margin-bottom:2px;
+            margin-bottom:4px;
         }
-        .suggest-meta { font-size:10px; color:var(--text-dim); }
+        .suggest-meta {
+            font-size:10px;
+            color:var(--text-dim);
+            display:flex;
+            gap:6px;
+            align-items:center;
+            flex-wrap:wrap;
+        }
+        .suggest-category {
+            padding:1px 6px;
+            border-radius:3px;
+            background:rgba(100,210,255,0.15);
+            color:var(--cyan);
+            font-size:8px;
+            font-weight:700;
+        }
+        
+        /* SKELETON */
+        .suggest-skeleton {
+            position:absolute;
+            inset:0;
+            background:linear-gradient(90deg, #1a1a1c 25%, #2a2a2e 50%, #1a1a1c 75%);
+            background-size:200% 100%;
+            animation:shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position:200% 0; }
+            100% { background-position:-200% 0; }
+        }
         
         /* TOAST */
         .toast {
@@ -362,10 +453,14 @@
         .toast i { font-size:16px; color:var(--pink); }
         
         @media (max-width:768px) {
-            .iframe-wrap { height:56vw; max-height:380px; }
+            .iframe-wrap { height:380px; }
             .content { padding:0 12px 40px; }
             .info-title { font-size:16px; }
-            .suggest-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:8px; }
+            .info-poster { width:80px; }
+            .suggest-grid { grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px; }
+        }
+        @media (max-width:380px) {
+            .suggest-grid { grid-template-columns:repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -382,7 +477,7 @@
     </button>
 </header>
 
-<!-- IFRAME WRAPPER — BLOKE SCROLL -->
+<!-- IFRAME WRAPPER -->
 <div class="iframe-wrap">
     <iframe 
         id="playerIframe" 
@@ -394,7 +489,6 @@
         frameborder="0"
         referrerpolicy="no-referrer-when-downgrade">
     </iframe>
-    <!-- MASKS POU KACHE BARS MOVIESBOX -->
     <div class="mask-top"></div>
     <div class="mask-bottom"></div>
     <div class="mask-left"></div>
@@ -413,7 +507,7 @@
         </div>
         <p id="infoDesc" class="info-desc">Chargement...</p>
         <div class="info-actions">
-            <button class="btn btn-favorite" id="favBtnMain">
+            <button class="btn-favorite" id="favBtnMain">
                 <i class="fas fa-heart"></i> <span>Ajouter aux favoris</span>
             </button>
         </div>
@@ -430,11 +524,15 @@
         </a>
     </div>
 
-    <div class="suggest-title"><i class="fas fa-film"></i> Films suggérés</div>
+    <div class="suggest-head">
+        <div class="suggest-title"><i class="fas fa-film"></i> Films suggérés</div>
+        <button class="refresh-btn" id="refreshBtn" title="Changer les suggestions">
+            <i class="fas fa-sync-alt"></i> Changer
+        </button>
+    </div>
     <div class="suggest-grid" id="suggestGrid"></div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"><i class="fas fa-heart"></i> <span id="toastText">OK</span></div>
 
 <script>
@@ -479,6 +577,77 @@ console.log('🔗 Iframe URL:', iframeUrl);
 iframe.src = iframeUrl;
 
 // ============================================================
+// ✅ DATABASE FIM POU SIJESYON (50+ fim ak kategori)
+// ============================================================
+const ALL_MOVIES = [
+    // === ACTION ===
+    { subjectId: "144265366439707640", title: "One Battle After Another", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year: "2025", rating: "8.2", category: "Action", detailPath: "one-battle-after-another-AorB0GGJEa", desc: "Ex-revolutionaries reunite." },
+    { subjectId: "407974060606504992", title: "The Family Plan 2", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/873fd90dff1123846fe6cc34c1010f10.jpg", year: "2025", rating: "5.6", category: "Action", detailPath: "the-family-plan-2-YctPw7Aw8u", desc: "Dan wants quality time." },
+    { subjectId: "1740329846154085032", title: "The Family Plan", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/44b4bb2b8981eb13b9ce374e1d0f6df5.jpg", year: "2023", rating: "6.3", category: "Action", detailPath: "the-family-plan-4KeFZScJy42", desc: "A former assassin." },
+    { subjectId: "3551015833440864784", title: "Resurrection Road", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/4dbb392a0c402c393bd4459395a18150.jpg", year: "2025", rating: "5.9", category: "Action", detailPath: "resurrection-road-2DPUL5NGje4", desc: "Elite squad." },
+    { subjectId: "5354442815432983440", title: "The Great Flood", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/7adc70e408e9dc6a418514beaa7f97ec.jpg", year: "2025", rating: "8.7", category: "Action", detailPath: "the-great-flood-4Q3rir6pxn6", desc: "A great flood." },
+    { subjectId: "6543511268924743688", title: "Batman Returns", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/5c28e8bd6737c8240414503bbf79fa54.jpg", year: "1992", rating: "7.1", category: "Action", detailPath: "batman-returns-WNIc4nLlnN7", desc: "Batman and Penguin." },
+    { subjectId: "4923184478689855992", title: "Die Hard 2", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/7cb05853b2133cb1d5c0fb00ab751829.jpg", year: "1990", rating: "7.2", category: "Action", detailPath: "die-hard-2-GNgIXzHeGR5", desc: "John McClane saves lives." },
+    
+    // === DRAMA ===
+    { subjectId: "8759851328492438440", title: "Train Dreams", poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year: "2025", rating: "7.7", category: "Drama", detailPath: "train-dreams-OJyRf09d6ra", desc: "Portrait of a logger." },
+    { subjectId: "4326134359691510608", title: "Love, Lust & Other Things", poster: "https://pbcdnw.aoneroom.com/image/2025/11/10/df4d08e143c4f5a96d71da4804062c16.jpg", year: "2023", rating: "8.7", category: "Drama", detailPath: "love-lust-and-other-things-YEBc3qXJz95", desc: "A divorced woman." },
+    { subjectId: "1409391957499169288", title: "LOVE IN EVERY WORD 2", poster: "https://pbcdnw.aoneroom.com/image/2025/10/27/24c90921fb4c785f0f74ca9a8e800616.jpeg", year: "2025", rating: "6.5", category: "Drama", detailPath: "love-in-every-word-2-YErqWLR17G1", desc: "The Wedding." },
+    { subjectId: "5557188829699866736", title: "Love In Every Word", poster: "https://pbcdnw.aoneroom.com/image/2025/10/27/5d5ef6e5932c6f964d8066351743225f.jpeg", year: "2025", rating: "6.0", category: "Drama", detailPath: "love-in-every-word-mn60vIZYvC6", desc: "Love In Every Word." },
+    { subjectId: "4322477612187765392", title: "MILES AWAY FROM HOME", poster: "https://pbcdnw.aoneroom.com/image/2025/11/24/d57dd6994404e21d2512465eebda075c.jpeg", year: "2025", rating: "6.7", category: "Drama", detailPath: "miles-away-from-home-uJVxrkAZi95", desc: "Miles from home." },
+    { subjectId: "9072045687273147024", title: "Tell Me Softly", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/c265dc32cae2f68587eec454a78c6ffc.jpg", year: "2025", rating: "6.3", category: "Drama", detailPath: "tell-me-softly-GvNwkL34aOa", desc: "Kamila's life." },
+    { subjectId: "1548711178933884504", title: "10 Dance", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/981d2a25b771c10bfcf60d0d106c4bdc.jpg", year: "2025", rating: "6.5", category: "Drama", detailPath: "10-dance-4srmfN27pQ1", desc: "Two expert dancers." },
+    
+    // === COMEDY ===
+    { subjectId: "1163978523174912112", title: "Ajosepo", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/b04aa69cc737d9c8b23dd69b60cf2f13.jpg", year: "2024", rating: "8.8", category: "Comedy", detailPath: "ajosepo-qvhGAD62Zn1", desc: "A wedding." },
+    { subjectId: "8857965935064499248", title: "Playdate", poster: "https://pbcdnw.aoneroom.com/image/2025/10/28/edc4c3b20c646359da2ce17a49624c51.jpg", year: "2025", rating: "7.0", category: "Comedy", detailPath: "playdate-mr2NLFPzlya", desc: "Brian fired." },
+    { subjectId: "2843458714177258400", title: "Oh. What. Fun.", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/58f229187499f92b61c83d3c83ac3f2b.jpg", year: "2025", rating: "5.3", category: "Comedy", detailPath: "oh-what-fun-CDwbQdp43o3", desc: "Claire's Christmas." },
+    { subjectId: "4010544823357818704", title: "Jingle Bell Heist", poster: "https://pbcdnw.aoneroom.com/image/2025/12/03/9d9b457f3b7ce221b4f145199856e078.jpg", year: "2025", rating: "5.7", category: "Comedy", detailPath: "jingle-bell-heist-AcvbGEWkgM4", desc: "Two strangers." },
+    { subjectId: "3688012692507217704", title: "Love Actually", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/66674c56b50831cd9a05baa7b48fccc2.jpg", year: "2003", rating: "7.5", category: "Comedy", detailPath: "love-actually-y94fACv8ro4", desc: "Eight couples." },
+    { subjectId: "5260672975765916136", title: "Home Alone", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/628d4d8a9f5c798e41e6584298581a13.jpg", year: "1990", rating: "7.7", category: "Comedy", detailPath: "home-alone-SdRNmP9WBg6", desc: "A boy defends home." },
+    { subjectId: "5696096776340603272", title: "Wake Up Dead Man", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/05b76b8516b25e3e270e8d6407e41780.jpg", year: "2025", rating: "8.0", category: "Comedy", detailPath: "wake-up-dead-man-a-knives-out-mystery-udzfX0obMM6", desc: "Benoit Blanc." },
+    
+    // === CRIME ===
+    { subjectId: "3854326812578922640", title: "After the Hunt", poster: "https://pbcdnw.aoneroom.com/image/2025/11/21/40a1b8238733d1169d079a5e7af0fc7f.jpg", year: "2025", rating: "6.2", category: "Crime", detailPath: "after-the-hunt-G9uUgYaRIA4", desc: "A professor's crossroads." },
+    { subjectId: "488603172416769952", title: "Roofman", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year: "2025", rating: "7.2", category: "Crime", detailPath: "roofman-axKcIQ4O5A", desc: "A criminal hides." },
+    { subjectId: "3813785855525798528", title: "Domitilla: The Sequel", poster: "https://pbcdnw.aoneroom.com/image/2025/11/12/dd2b53beb63191803dd0a54f1bddc259.jpg", year: "2023", rating: "8.0", category: "Crime", detailPath: "domitilla-the-sequel-IkpVGG8bJx4", desc: "Domitilla." },
+    
+    // === SCI-FI ===
+    { subjectId: "3725096513421442384", title: "Bugonia", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/cbb960d2b8053e40398372b031d7c6af.jpg", year: "2025", rating: "7.2", category: "Sci-Fi", detailPath: "bugonia-WTd7eaSmwY2", desc: "Conspiracy theorist." },
+    
+    // === ADVENTURE ===
+    { subjectId: "6243981402900418232", title: "Home Alone 2", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/69d198524358e91c600688b1bdf0c928.jpg", year: "1992", rating: "6.9", category: "Adventure", detailPath: "home-alone-2-lost-in-new-york-WD9ZN64vfr7", desc: "Kevin in NYC." },
+    { subjectId: "5818215316253462312", title: "Elf", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/e99797bc5226ae898ce4bf4badf5e467.jpg", year: "2003", rating: "7.1", category: "Adventure", detailPath: "elf-4eQykofuNV6", desc: "Buddy's journey." },
+    { subjectId: "8992435016898596648", title: "A Wrinkle in Time", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/b2749a629f6e6282e75a6f359acf26b4.jpg", year: "2018", rating: "4.3", category: "Adventure", detailPath: "a-wrinkle-in-time-ybrgzgLrhIa", desc: "Meg travels." },
+    
+    // === THRILLER ===
+    { subjectId: "6998664604679571240", title: "The Herd", poster: "https://pbcdnw.aoneroom.com/image/2025/10/06/472f3a01a90a5ac784520745b22484ba.jpg", year: "2025", rating: "6.1", category: "Thriller", detailPath: "the-herd-2hU5z5pXZk8", desc: "The Herd." },
+    { subjectId: "5110177139714851560", title: "High Infidelity", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/541b6773c2dd6eded80e28c97875a1ec.jpg", year: "2023", rating: "7.1", category: "Thriller", detailPath: "high-infidelity-Ao9CQegFu56", desc: "An affair." },
+    { subjectId: "2727018929557326344", title: "Malice", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/9f245368e969cfbebf6e2f0d2f166dcc.jpg", year: "2025", rating: "5.8", category: "Thriller", detailPath: "malice-YIz16w5Mrf3", desc: "A tutor infiltrates." },
+    
+    // === SERIES ===
+    { subjectId: "3646928918696838480", title: "IT: Welcome to Derry", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/9e9b3aeb35ce26354b8092d9621b2c7a.jpg", year: "2025", rating: "7.7", category: "Series", detailPath: "it-welcome-to-derry-UeZadKkYol4", desc: "Derry 1962." },
+    { subjectId: "4956801153355891744", title: "Stranger Things", poster: "https://pbcdnw.aoneroom.com/image/2025/12/01/56d9b04173d90d3f74bb5a7e1112ed7e.jpg", year: "2016", rating: "8.6", category: "Series", detailPath: "stranger-things-wsymkZvcaU5", desc: "Supernatural forces." },
+    { subjectId: "9028867555875774472", title: "Wednesday", poster: "https://pbcdnw.aoneroom.com/image/2025/11/02/0dbb4e91afb214a1ccebb8a9aa93ce35.jpg", year: "2022", rating: "8.0", category: "Series", detailPath: "wednesday-urChTxajYKa", desc: "Wednesday Addams." },
+    { subjectId: "4820822255225686840", title: "Dark", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e617d431f604d5f223f1b54ed4b9a44f.jpg", year: "2017", rating: "8.7", category: "Series", detailPath: "dark-english-UG1YreRp7K5", desc: "Family saga." },
+    { subjectId: "1716151170995028536", title: "Landman", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/fb97784b6e658e8c6d7813fb0cd8975d.jpg", year: "2024", rating: "8.2", category: "Series", detailPath: "landman-EOXbCKpZL22", desc: "Oil rigs." },
+    { subjectId: "2136335731818646680", title: "Fallout", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/b5c44d8606b70a8124338792213a7066.jpg", year: "2024", rating: "8.3", category: "Series", detailPath: "fallout-qfHeMzirOx2", desc: "Post-apocalyptic." },
+    { subjectId: "3819281169544270880", title: "The Witcher", poster: "https://pbcdnw.aoneroom.com/image/2025/11/25/a0556db0b6923ac7c210fe8b92168135.jpg", year: "2019", rating: "7.9", category: "Series", detailPath: "the-witcher-qdCxXLAl8y4", desc: "Geralt of Rivia." },
+    { subjectId: "5262873104975547168", title: "Tulsa King", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/05ba7442193c17115040adec740d31c8.jpg", year: "2022", rating: "7.9", category: "Series", detailPath: "tulsa-king-MsmATkU0Mg6", desc: "Mafia capo." },
+    { subjectId: "3425205252130258896", title: "Gen V", poster: "https://pbcdnw.aoneroom.com/image/2025/12/03/553459017d603d9ad54980561567be76.jpg", year: "2023", rating: "7.6", category: "Series", detailPath: "gen-v-WXriVfxt154", desc: "The Boys universe." },
+    { subjectId: "4120704302786790728", title: "Task", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/f81e5cb17fdb5da5aa1c9de0726b9403.jpg", year: "2025", rating: "8.0", category: "Series", detailPath: "task-QOUf94URoU4", desc: "FBI task force." },
+    { subjectId: "8955962000002143264", title: "Monster", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/b80fee19ffda0a648b1ccd87f6a00ae0.jpg", year: "2022", rating: "7.8", category: "Series", detailPath: "monster-MY4FMlRoAFa", desc: "Serial killers." },
+    
+    // === ANIMATION ===
+    { subjectId: "4548438624232169480", title: "The Grinch", poster: "https://pbcdnw.aoneroom.com/image/2023/02/15/0b5a669e3716664cf67b0ad980aeb73b.jpg", year: "2018", rating: "6.4", category: "Animation", detailPath: "the-grinch-GJEj1FCTZp5", desc: "The Grinch." },
+    { subjectId: "2634029642214166320", title: "A Christmas Carol", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/8e2024d4d94793bcd674ccf44ccfea56.jpg", year: "2009", rating: "6.8", category: "Animation", detailPath: "a-christmas-carol-w8qlYXMSz83", desc: "Scrooge." },
+    { subjectId: "7753995911654967800", title: "The Polar Express", poster: "https://pbcdnw.aoneroom.com/image/2025/11/01/d7342e9116966372e9480381b71c7a10.jpg", year: "2004", rating: "6.6", category: "Animation", detailPath: "the-polar-express-CjI3akMnNe9", desc: "Polar Express." },
+    { subjectId: "3578565637020569624", title: "Diary of A Wimpy Kid Christmas", poster: "https://pbcdnw.aoneroom.com/image/2025/12/03/152264464e2e2bd1fb2a747d2fb5bf34.jpg", year: "2025", rating: "7.1", category: "Animation", detailPath: "diary-of-a-wimpy-kid-christmas-the-last-straw-Gvx3KPQRlg4", desc: "Greg's talent show." },
+    { subjectId: "6828962573602701264", title: "Elio", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/de834a463487c1bbcb00320e620e8da3.jpg", year: "2025", rating: "6.7", category: "Animation", detailPath: "elio-cwJklFHIs88", desc: "Elio's adventure." },
+    { subjectId: "2107937477850792728", title: "The Bad Guys 2", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/82798200c9eb6dc76c2eaec004681701.jpg", year: "2025", rating: "7.0", category: "Animation", detailPath: "the-bad-guys-2-o4SYdojnIv2", desc: "The Bad Guys." }
+];
+
+// ============================================================
 // ✅ FAVORIS
 // ============================================================
 function isFavorite() {
@@ -512,7 +681,7 @@ function toggleFavorite() {
     
     if (exists) {
         favorites = favorites.filter(f => f.subjectId !== data.subjectId);
-        showToast('Retiré des favoris', 'pink');
+        showToast('Retiré des favoris');
     } else {
         favorites.unshift({
             subjectId: data.subjectId,
@@ -525,7 +694,7 @@ function toggleFavorite() {
             desc: data.desc,
             addedAt: Date.now()
         });
-        showToast('Ajouté aux favoris !', 'pink');
+        showToast('Ajouté aux favoris !');
     }
     
     localStorage.setItem('blastflix_favorites', JSON.stringify(favorites));
@@ -564,54 +733,77 @@ updateFavButtons();
 })();
 
 // ============================================================
-// ✅ SIJESYON FIM YO
+// ✅ SIJESYON — PLIS FIM AK KATEGORI VARYE
 // ============================================================
-const SUGGESTIONS = [
-    { subjectId: "3725096513421442384", title: "Bugonia", poster: "https://pbcdnw.aoneroom.com/image/2025/12/04/cbb960d2b8053e40398372b031d7c6af.jpg", year: "2025", rating: "7.2", detailPath: "bugonia-WTd7eaSmwY2", desc: "A conspiracy theorist kidnaps a CEO." },
-    { subjectId: "3854326812578922640", title: "After the Hunt", poster: "https://pbcdnw.aoneroom.com/image/2025/11/21/40a1b8238733d1169d079a5e7af0fc7f.jpg", year: "2025", rating: "6.2", detailPath: "after-the-hunt-G9uUgYaRIA4", desc: "A professor's crossroads." },
-    { subjectId: "8759851328492438440", title: "Train Dreams", poster: "https://pbcdnw.aoneroom.com/image/2025/11/17/ad421550a04b88b8696a04264ec5a37c.jpg", year: "2025", rating: "7.7", detailPath: "train-dreams-OJyRf09d6ra", desc: "Portrait of a logger." },
-    { subjectId: "407974060606504992", title: "The Family Plan 2", poster: "https://pbcdnw.aoneroom.com/image/2025/12/02/873fd90dff1123846fe6cc34c1010f10.jpg", year: "2025", rating: "5.6", detailPath: "the-family-plan-2-YctPw7Aw8u", desc: "Dan wants quality time." },
-    { subjectId: "144265366439707640", title: "One Battle After Another", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/19c186991294a590412ee734350cad0c.jpg", year: "2025", rating: "8.2", detailPath: "one-battle-after-another-AorB0GGJEa", desc: "Ex-revolutionaries reunite." },
-    { subjectId: "488603172416769952", title: "Roofman", poster: "https://pbcdnw.aoneroom.com/image/2025/11/03/e4639ad4c7e759e3385a3afc19157a57.jpg", year: "2025", rating: "7.2", detailPath: "roofman-axKcIQ4O5A", desc: "A criminal hides." }
-];
+function renderSuggestions() {
+    const grid = document.getElementById('suggestGrid');
+    
+    // Filtre fim diferan de fim aktyèl la
+    const others = ALL_MOVIES.filter(m => m.subjectId !== data.subjectId);
+    
+    // MÉLANGE (Fisher-Yates shuffle)
+    const shuffled = [...others].sort(() => Math.random() - 0.5);
+    
+    // CHWAZI 18 FIM (plis pase 6)
+    const picks = shuffled.slice(0, 18);
+    
+    // AFICHE
+    grid.innerHTML = picks.map(m => {
+        const p = new URLSearchParams({
+            subjectId: m.subjectId,
+            title: m.title,
+            poster: m.poster,
+            year: m.year,
+            rating: m.rating,
+            type: m.category === 'Series' ? 'series' : 'movie',
+            detailPath: m.detailPath,
+            desc: m.desc
+        });
+        return `
+            <a href="player.html?${p.toString()}" class="suggest-card">
+                <div class="suggest-poster-wrap">
+                    <div class="suggest-skeleton"></div>
+                    <img src="${m.poster}" alt="${m.title}" loading="lazy"
+                         onload="this.parentElement.querySelector('.suggest-skeleton')?.remove();"
+                         onerror="this.src='https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image'">
+                    <div class="suggest-rating-badge"><i class="fas fa-star"></i>${m.rating}</div>
+                    <div class="suggest-badge">HD</div>
+                </div>
+                <div class="suggest-info">
+                    <div class="suggest-name">${m.title}</div>
+                    <div class="suggest-meta">
+                        <span>${m.year}</span>
+                        <span class="suggest-category">${m.category}</span>
+                    </div>
+                </div>
+            </a>
+        `;
+    }).join('');
+    
+    console.log(`✅ ${picks.length} films suggérés (aléatoire)`);
+}
 
-const suggestGrid = document.getElementById('suggestGrid');
-const filtered = SUGGESTIONS.filter(s => s.subjectId !== data.subjectId);
+// Afiche premye fwa
+renderSuggestions();
 
-suggestGrid.innerHTML = filtered.map(s => {
-    const p = new URLSearchParams({
-        subjectId: s.subjectId,
-        title: s.title,
-        poster: s.poster,
-        year: s.year,
-        rating: s.rating,
-        detailPath: s.detailPath,
-        type: 'movie',
-        desc: s.desc
-    });
-    return `
-        <a href="player.html?${p.toString()}" class="suggest-card">
-            <img src="${s.poster}" alt="${s.title}" loading="lazy"
-                 onerror="this.src='https://via.placeholder.com/300x450/1a1a1c/4a4a52?text=No+Image'">
-            <div class="suggest-info">
-                <div class="suggest-name">${s.title}</div>
-                <div class="suggest-meta">${s.year}</div>
-            </div>
-        </a>
-    `;
-}).join('');
+// Bouton refresh pou chanje suggestions
+document.getElementById('refreshBtn').addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    btn.classList.add('spinning');
+    renderSuggestions();
+    showToast('Suggestions changées !');
+    setTimeout(() => btn.classList.remove('spinning'), 600);
+});
 
 // ============================================================
 // ✅ TOAST
 // ============================================================
-function showToast(text, color) {
+function showToast(text) {
     const toast = document.getElementById('toast');
     document.getElementById('toastText').textContent = text;
-    toast.className = 'toast show';
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 2500);
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
 }
 </script>
 </body>
-              </html>
+    </html>
