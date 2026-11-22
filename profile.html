@@ -8,7 +8,7 @@
   <style>
     * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
     :root {
-      --black:#0a0a0c; --charcoal:#121214;
+      --black:#0a0a0c; --charcoal:#121214; --slate:#1a1a1f; --slate-2:#232329;
       --cyan:#64d2ff; --blue:#0a84ff; --purple:#bf5af2; --pink:#ff375f; --gold:#ffd60a; --green:#30d158; --red:#ff453a;
       --glass-1:rgba(255,255,255,0.035); --glass-2:rgba(255,255,255,0.07);
       --glass-3:rgba(255,255,255,0.12);
@@ -26,7 +26,6 @@
       background:var(--black); color:var(--text); min-height:100vh;
       padding-bottom:90px; overflow-x:hidden;
     }
-    /* LIQUID BACKGROUND */
     .bg-neo { position:fixed; inset:0; z-index:-3; background:var(--black); overflow:hidden; }
     .bg-neo::before {
       content:''; position:absolute; inset:-50%;
@@ -51,7 +50,6 @@
     }
     .svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; display:inline-block; flex-shrink:0; }
     
-    /* HEADER */
     .header {
       position:sticky; top:0; z-index:100; padding:14px 16px;
       background:rgba(10,10,12,0.7);
@@ -136,6 +134,27 @@
     .copy-btn:hover { background:rgba(100,210,255,0.3); transform:scale(1.1); }
     .copy-btn .svg { width:12px; height:12px; }
     
+    /* PLAN BADGE */
+    .plan-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 18px;
+      border-radius:50px;
+      font-size:12px; font-weight:800;
+      text-transform:uppercase; letter-spacing:0.5px;
+      margin-bottom:16px;
+      background:linear-gradient(135deg, rgba(255,214,10,0.15), rgba(255,149,0,0.1));
+      border:1px solid rgba(255,214,10,0.4);
+      color:var(--gold);
+      box-shadow:0 4px 20px rgba(255,214,10,0.25);
+    }
+    .plan-badge.free {
+      background:rgba(255,255,255,0.06);
+      border-color:var(--glass-border);
+      color:var(--text-dim);
+      box-shadow:none;
+    }
+    .plan-badge .svg { width:14px; height:14px; filter:drop-shadow(0 0 6px currentColor); }
+    
     /* STATS */
     .stats { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; max-width:600px; margin:20px auto 0; }
     .stat-card {
@@ -193,7 +212,6 @@
     .tab.active .svg { filter:drop-shadow(0 0 6px rgba(255,255,255,0.8)); }
     .tab .svg { width:14px; height:14px; }
     
-    /* CONTENT */
     .tab-content { display:none; }
     .tab-content.active { display:block; animation:fadeInUp 0.4s ease-out; }
     @keyframes fadeInUp { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
@@ -262,7 +280,6 @@
     .empty-btn:hover { transform:scale(1.05); }
     .empty-btn .svg { width:16px; height:16px; }
     
-    /* CLEAR BTN */
     .clear-btn {
       padding:8px 16px; border-radius:50px;
       background:rgba(255,55,95,0.15);
@@ -296,9 +313,7 @@
     .settings-value { font-size:12px; color:var(--text-dim); }
     .settings-value.mono { color:var(--cyan); font-family:'SF Mono', 'Courier New', monospace; }
     
-    /* =========================================
-       REWARDS STYLES
-       ========================================= */
+    /* REWARDS */
     .rewards-stats { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:20px; }
     .reward-stat {
       padding:18px 12px; border-radius:20px;
@@ -331,7 +346,6 @@
       font-weight:800; text-transform:uppercase; letter-spacing:0.5px;
     }
     
-    /* PWOGRES */
     .reward-progress {
       padding:18px; border-radius:20px;
       background:var(--glass-2);
@@ -359,15 +373,9 @@
       border-radius:50px;
       transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);
       box-shadow:0 0 20px rgba(100,210,255,0.6);
-      animation:progressGlow 2s ease-in-out infinite;
-    }
-    @keyframes progressGlow {
-      0%, 100% { box-shadow:0 0 20px rgba(100,210,255,0.6); }
-      50% { box-shadow:0 0 30px rgba(100,210,255,1); }
     }
     .progress-reward { text-align:center; font-size:13px; color:var(--gold); font-weight:700; margin-top:8px; }
     
-    /* KÒD ENVITASYON */
     .invite-code-section, .enter-code-section, .share-invite-section, .invited-list-section {
       padding:18px; border-radius:20px;
       background:var(--glass-2);
@@ -420,7 +428,6 @@
     #inviteStatus.success { color:var(--green); }
     #inviteStatus.error { color:var(--red); }
     
-    /* SHARE INVITE */
     .share-invite-buttons { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
     .share-invite-btn {
       padding:14px 12px; border-radius:14px;
@@ -437,7 +444,6 @@
     .share-invite-btn.copy { background:linear-gradient(135deg, var(--cyan), var(--blue)); color:var(--black); box-shadow:0 4px 16px rgba(100,210,255,0.4); }
     .share-invite-btn.more { background:linear-gradient(135deg, var(--purple), var(--pink)); box-shadow:0 4px 16px rgba(191,90,242,0.4); }
     
-    /* LIS ENVITE */
     .invited-list { max-height:300px; overflow-y:auto; }
     .empty-invites { text-align:center; padding:30px 20px; color:var(--text-dim); font-size:13px; font-weight:600; }
     .invited-item {
@@ -467,6 +473,136 @@
       border:1px solid rgba(48,209,88,0.3);
     }
     
+    /* ORDERS */
+    .order-card-profile {
+      background:var(--glass-2);
+      backdrop-filter:var(--blur-glass);
+      border:1px solid var(--glass-border);
+      border-radius:18px;
+      padding:16px;
+      margin-bottom:12px;
+      position:relative;
+      overflow:hidden;
+      box-shadow:var(--glass-shadow), var(--glass-highlight);
+    }
+    .order-card-profile .status-bar {
+      position:absolute; left:0; top:0; bottom:0; width:3px;
+    }
+    .order-card-profile.pending .status-bar { background:var(--gold); box-shadow:0 0 16px var(--gold); }
+    .order-card-profile.approved .status-bar { background:var(--green); box-shadow:0 0 16px var(--green); }
+    .order-card-profile.rejected .status-bar { background:var(--red); box-shadow:0 0 16px var(--red); }
+    .order-header-profile {
+      display:flex; justify-content:space-between; align-items:flex-start;
+      gap:12px; margin-bottom:12px; flex-wrap:wrap;
+    }
+    .order-id-profile {
+      font-size:10px; color:var(--text-dim);
+      font-family:monospace; font-weight:600; margin-bottom:4px;
+    }
+    .order-plan-profile {
+      font-size:15px; font-weight:900; margin-bottom:2px;
+    }
+    .order-plan-profile .price {
+      color:var(--gold); font-size:13px; margin-left:4px;
+    }
+    .order-date-profile {
+      font-size:10.5px; color:var(--text-dim); font-weight:600;
+    }
+    .order-status-profile {
+      padding:5px 11px; border-radius:20px;
+      font-size:10px; font-weight:800;
+      text-transform:uppercase; letter-spacing:0.5px;
+      white-space:nowrap;
+    }
+    .order-status-profile.pending {
+      background:rgba(255,214,10,0.1); border:1px solid rgba(255,214,10,0.3); color:var(--gold);
+    }
+    .order-status-profile.approved {
+      background:rgba(48,209,88,0.1); border:1px solid rgba(48,209,88,0.3); color:var(--green);
+    }
+    .order-status-profile.rejected {
+      background:rgba(255,69,58,0.1); border:1px solid rgba(255,69,58,0.3); color:var(--red);
+    }
+    .order-details-profile {
+      padding-top:12px; border-top:1px solid var(--glass-border);
+      display:flex; gap:16px; font-size:11px; flex-wrap:wrap;
+    }
+    .order-detail-mini {
+      display:flex; gap:4px;
+    }
+    .order-detail-mini .label { color:var(--text-dim); font-weight:600; }
+    .order-detail-mini .value { font-weight:700; }
+    .order-detail-mini .value.cyan { color:var(--cyan); font-family:monospace; }
+    .order-detail-mini .value.green { color:var(--green); }
+    .order-detail-mini .value.red { color:var(--red); }
+    
+    .order-notice {
+      margin-top:12px; padding:10px 12px;
+      border-radius:10px;
+      font-size:11px; font-weight:600;
+      display:flex; align-items:center; gap:8px;
+    }
+    .order-notice.pending {
+      background:rgba(255,214,10,0.08);
+      border:1px solid rgba(255,214,10,0.2);
+      color:var(--gold);
+    }
+    .order-notice.approved {
+      background:rgba(48,209,88,0.08);
+      border:1px solid rgba(48,209,88,0.2);
+      color:var(--green);
+    }
+    .order-notice.rejected {
+      background:rgba(255,69,58,0.08);
+      border:1px solid rgba(255,69,58,0.2);
+      color:var(--red);
+    }
+    
+    /* ACTIVE PLAN CARD */
+    .active-plan-card {
+      padding:20px; border-radius:20px;
+      background:linear-gradient(135deg, rgba(48,209,88,0.15), rgba(100,210,255,0.1));
+      border:1px solid rgba(48,209,88,0.4);
+      box-shadow:0 8px 32px rgba(48,209,88,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+      margin-bottom:20px;
+      position:relative; overflow:hidden;
+    }
+    .active-plan-card::before {
+      content:''; position:absolute; top:-50%; right:-50%;
+      width:200%; height:200%;
+      background:radial-gradient(circle, rgba(48,209,88,0.1) 0%, transparent 60%);
+      animation:pulseGlow 4s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity:0.3; transform:scale(1); }
+      50% { opacity:0.6; transform:scale(1.1); }
+    }
+    .active-plan-header {
+      display:flex; align-items:center; gap:12px; margin-bottom:12px;
+      position:relative; z-index:1;
+    }
+    .active-plan-icon {
+      width:44px; height:44px; border-radius:12px;
+      background:linear-gradient(135deg, var(--green), #1da851);
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:20px;
+      box-shadow:0 4px 16px rgba(48,209,88,0.4);
+    }
+    .active-plan-icon .svg { width:22px; height:22px; }
+    .active-plan-label {
+      font-size:11px; color:var(--text-dim); font-weight:700;
+      text-transform:uppercase; letter-spacing:0.5px;
+    }
+    .active-plan-name {
+      font-size:20px; font-weight:900; color:var(--green);
+    }
+    .active-plan-expires {
+      font-size:12px; color:var(--text-dim); font-weight:600;
+      position:relative; z-index:1;
+    }
+    .active-plan-expires span { color:var(--text); }
+    
     /* FOOTER */
     .footer {
       position:fixed; bottom:0; left:0; right:0; z-index:90;
@@ -491,7 +627,6 @@
     .footer-btn.active .svg { filter:drop-shadow(0 0 8px rgba(100,210,255,0.9)); }
     .footer-btn:hover { color:var(--cyan); }
     
-    /* TOAST */
     .toast {
       position:fixed; bottom:110px; left:50%;
       transform:translateX(-50%) translateY(100px);
@@ -508,7 +643,6 @@
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .toast .svg { width:16px; height:16px; color:var(--green); filter:drop-shadow(0 0 8px rgba(48,209,88,0.9)); }
     
-    /* MODAL */
     .modal-overlay {
       position:fixed; inset:0;
       background:rgba(0,0,0,0.7);
@@ -603,6 +737,13 @@
     </div>
   </div>
   <h1 class="user-name" id="userName">Utilisateur</h1>
+  
+  <!-- PLAN AKTIF BADGE -->
+  <div class="plan-badge" id="planBadge">
+    <svg class="svg" viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><line x1="4" y1="20" x2="20" y2="20"/></svg>
+    <span id="planBadgeText">Plan Gratuit</span>
+  </div>
+  
   <div class="user-id">
     <svg class="svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h4M7 16h10"/></svg>
     <span id="userId">#--------</span>
@@ -647,6 +788,10 @@
       <svg class="svg" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       Favoris
     </button>
+    <button class="tab" data-tab="orders">
+      <svg class="svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Commandes
+    </button>
     <button class="tab" data-tab="rewards">
       <svg class="svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       Rewards
@@ -681,6 +826,16 @@
       </h2>
     </div>
     <div class="grid" id="favoritesGrid"></div>
+  </div>
+  
+  <!-- ORDERS -->
+  <div class="tab-content" id="tab-orders">
+    <h2 class="content-title" style="margin-bottom:16px;">
+      <svg class="svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Mes commandes
+    </h2>
+    <div id="activePlanContainer"></div>
+    <div id="userOrdersList"></div>
   </div>
   
   <!-- REWARDS -->
@@ -791,6 +946,16 @@
       </div>
       <div class="settings-item">
         <div class="settings-info">
+          <div class="settings-label">Numéro Natcash</div>
+          <div class="settings-value mono" id="settingsPhone">Non enregistré</div>
+        </div>
+        <button class="clear-btn" onclick="editPhone()">
+          <svg class="svg" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Modifier
+        </button>
+      </div>
+      <div class="settings-item">
+        <div class="settings-info">
           <div class="settings-label">ID utilisateur</div>
           <div class="settings-value mono" id="settingsId">#--------</div>
         </div>
@@ -839,7 +1004,7 @@
   <span id="toastText">OK</span>
 </div>
 
-<!-- MODAL EDIT -->
+<!-- MODAL EDIT USERNAME -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <div class="modal-title">
@@ -854,108 +1019,268 @@
   </div>
 </div>
 
+<!-- MODAL EDIT PHONE -->
+<div class="modal-overlay" id="phoneModal">
+  <div class="modal">
+    <div class="modal-title">
+      <svg class="svg" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Numéro Natcash
+    </div>
+    <input type="tel" class="modal-input" id="phoneInput" placeholder="Ex: 50955112990" maxlength="15">
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-secondary" onclick="closePhoneModal()">Annuler</button>
+      <button class="modal-btn modal-btn-primary" onclick="savePhone()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
-// ✅ GESTION ID UTILISATEUR
+// CONSTANTES
 // ============================================================
-function getOrCreateUserId() {
-  let userId = localStorage.getItem('blastflix_user_id');
-  if (!userId) {
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    userId = 'id' + randomNum;
-    localStorage.setItem('blastflix_user_id', userId);
-  }
-  return userId;
+const STORAGE_KEYS = {
+  USER_ID: 'blastflix_user_id',
+  USERNAME: 'blastflix_username',
+  PHONE: 'blastflix_phone',
+  EMAIL: 'blastflix_email',
+  HISTORY: 'blastflix_history',
+  FAVORITES: 'blastflix_favorites',
+  USERS: 'blastflix_users',
+  ORDERS: 'blastflix_orders',
+  INVITE_CODE: 'blastflix_invite_code',
+  REWARDS: 'blastflix_rewards',
+  PLAN: 'blastflix_current_plan',
+  PLAN_EXPIRES: 'blastflix_plan_expires'
+};
+
+// ============================================================
+// SVG ICONS
+// ============================================================
+const SVG = {
+  empty_history: `<svg class="svg" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/></svg>`,
+  empty_fav: `<svg class="svg" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+  empty_orders: `<svg class="svg" viewBox="0 0 24 24" style="width:40px; height:40px; opacity:0.5;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
+  play: `<svg class="svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+  remove: `<svg class="svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>`,
+  crown: `<svg class="svg" viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><line x1="4" y1="20" x2="20" y2="20"/></svg>`,
+  check: `<svg class="svg" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>`,
+  clock: `<svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  x: `<svg class="svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>`,
+  phone: `<svg class="svg" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+  image: `<svg class="svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`
+};
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getStorage(key, fallback = null) {
+  try {
+    const val = localStorage.getItem(key);
+    return val ? JSON.parse(val) : fallback;
+  } catch { return fallback; }
 }
 
-function getOrCreateUsername() {
-  let name = localStorage.getItem('blastflix_username');
+function setStorage(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
+
+function getUserId() {
+  let id = localStorage.getItem(STORAGE_KEYS.USER_ID);
+  if (!id) {
+    id = 'id' + Math.floor(1000 + Math.random() * 9000);
+    localStorage.setItem(STORAGE_KEYS.USER_ID, id);
+  }
+  return id;
+}
+
+function getUsername() {
+  let name = localStorage.getItem(STORAGE_KEYS.USERNAME);
   if (!name) {
     name = 'Utilisateur' + Math.floor(100 + Math.random() * 900);
-    localStorage.setItem('blastflix_username', name);
+    localStorage.setItem(STORAGE_KEYS.USERNAME, name);
   }
   return name;
 }
 
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem('blastflix_history') || '[]'); }
-  catch { return []; }
+function getPhone() {
+  return localStorage.getItem(STORAGE_KEYS.PHONE) || '';
 }
 
-function getFavorites() {
-  try { return JSON.parse(localStorage.getItem('blastflix_favorites') || '[]'); }
-  catch { return []; }
+function showToast(text) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastText').textContent = text;
+  toast.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-const userId = getOrCreateUserId();
-const userName = getOrCreateUsername();
-
-document.getElementById('userId').textContent = '#' + userId;
-document.getElementById('settingsId').textContent = '#' + userId;
-document.getElementById('userName').textContent = userName;
-document.getElementById('settingsName').textContent = userName;
-document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
-
-// ============================================================
-// ✅ SVG POU EMPTY STATES
-// ============================================================
-const SVG_EMPTY_HISTORY = `<svg class="svg" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/></svg>`;
-const SVG_EMPTY_FAV = `<svg class="svg" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
-const SVG_PLAY = `<svg class="svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
-const SVG_REMOVE = `<svg class="svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch {}
+  document.body.removeChild(ta);
+}
 
 // ============================================================
-// ✅ STATS
+// SYNC AK ADMIN PANEL
+// ============================================================
+function syncWithAdmin() {
+  const userId = getUserId();
+  const userName = getUsername();
+  const userPhone = getPhone();
+  const now = new Date().toISOString();
+  
+  // Mize a jou users database
+  let users = getStorage(STORAGE_KEYS.USERS, []);
+  let existingUser = users.find(u => u.id === userId);
+  
+  if (existingUser) {
+    existingUser.status = 'online';
+    existingUser.lastSeen = now;
+    existingUser.name = userName;
+    if (userPhone) existingUser.phone = userPhone;
+  } else {
+    existingUser = {
+      id: userId,
+      name: userName,
+      email: localStorage.getItem(STORAGE_KEYS.EMAIL) || 'user@blastflix.com',
+      phone: userPhone,
+      plan: 'Gratuit',
+      status: 'online',
+      createdAt: now,
+      lastSeen: now
+    };
+    users.push(existingUser);
+  }
+  setStorage(STORAGE_KEYS.USERS, users);
+  
+  // Chèche kòmand itilizatè a
+  const orders = getStorage(STORAGE_KEYS.ORDERS, []);
+  const userOrders = userPhone 
+    ? orders.filter(o => (o.phone || '').replace(/\D/g, '').includes(userPhone.replace(/\D/g, '')))
+    : [];
+  
+  // Si gen yon kòmand apwouve → aktive plan
+  const approvedOrder = userOrders.find(o => o.status === 'approved');
+  if (approvedOrder) {
+    // Mize a jou plan itilizatè a
+    const userIdx = users.findIndex(u => u.id === userId);
+    if (userIdx !== -1) {
+      users[userIdx].plan = approvedOrder.plan;
+      users[userIdx].planActivatedAt = approvedOrder.approvedAt || now;
+      setStorage(STORAGE_KEYS.USERS, users);
+    }
+    localStorage.setItem(STORAGE_KEYS.PLAN, approvedOrder.plan);
+    localStorage.setItem(STORAGE_KEYS.PLAN_EXPIRES, 
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    );
+  } else {
+    // Pa gen kòmand apwouve → plan gratis
+    if (!localStorage.getItem(STORAGE_KEYS.PLAN)) {
+      localStorage.setItem(STORAGE_KEYS.PLAN, 'Gratuit');
+    }
+  }
+  
+  // Heartbeat chak 30s
+  setInterval(() => {
+    let users2 = getStorage(STORAGE_KEYS.USERS, []);
+    const idx = users2.findIndex(u => u.id === userId);
+    if (idx !== -1) {
+      users2[idx].status = 'online';
+      users2[idx].lastSeen = new Date().toISOString();
+      setStorage(STORAGE_KEYS.USERS, users2);
+    }
+  }, 30000);
+}
+
+// Make offline lè w fèmen
+window.addEventListener('beforeunload', () => {
+  const userId = getUserId();
+  let users = getStorage(STORAGE_KEYS.USERS, []);
+  const idx = users.findIndex(u => u.id === userId);
+  if (idx !== -1) {
+    users[idx].status = 'offline';
+    users[idx].lastSeen = new Date().toISOString();
+    setStorage(STORAGE_KEYS.USERS, users);
+  }
+});
+
+// ============================================================
+// STATS
 // ============================================================
 function updateStats() {
-  const history = getHistory();
-  const favorites = getFavorites();
+  const history = getStorage(STORAGE_KEYS.HISTORY, []);
+  const favorites = getStorage(STORAGE_KEYS.FAVORITES, []);
   document.getElementById('statHistory').textContent = history.length;
   document.getElementById('statFavorites').textContent = favorites.length;
-  const hours = Math.round(history.length * 1.5);
-  document.getElementById('statTime').textContent = hours + 'h';
+  document.getElementById('statTime').textContent = Math.round(history.length * 1.5) + 'h';
 }
 
 // ============================================================
-// ✅ RENDER HISTORY
+// PLAN BADGE
+// ============================================================
+function updatePlanBadge() {
+  const plan = localStorage.getItem(STORAGE_KEYS.PLAN) || 'Gratuit';
+  const badge = document.getElementById('planBadge');
+  const text = document.getElementById('planBadgeText');
+  
+  text.textContent = plan === 'Gratuit' ? 'Plan Gratuit' : 'VIP · ' + plan;
+  
+  if (plan === 'Gratuit') {
+    badge.classList.add('free');
+  } else {
+    badge.classList.remove('free');
+  }
+}
+
+// ============================================================
+// RENDER HISTORY
 // ============================================================
 function renderHistory() {
   const grid = document.getElementById('historyGrid');
-  const history = getHistory();
+  const history = getStorage(STORAGE_KEYS.HISTORY, []);
+  
   if (history.length === 0) {
     grid.innerHTML = `
       <div class="empty" style="grid-column:1/-1;">
-        <div class="empty-icon">${SVG_EMPTY_HISTORY}</div>
+        <div class="empty-icon">${SVG.empty_history}</div>
         <h3>Aucun film vu</h3>
         <p>Commencez à regarder des films pour les voir apparaître ici</p>
-        <a href="movies.html" class="empty-btn">${SVG_PLAY} Découvrir des films</a>
+        <a href="movies.html" class="empty-btn">${SVG.play} Découvrir des films</a>
       </div>`;
     return;
   }
+  
   grid.innerHTML = history.map(item => createCard(item, true)).join('');
 }
 
 // ============================================================
-// ✅ RENDER FAVORITES
+// RENDER FAVORITES
 // ============================================================
 function renderFavorites() {
   const grid = document.getElementById('favoritesGrid');
-  const favorites = getFavorites();
+  const favorites = getStorage(STORAGE_KEYS.FAVORITES, []);
+  
   if (favorites.length === 0) {
     grid.innerHTML = `
       <div class="empty" style="grid-column:1/-1;">
-        <div class="empty-icon">${SVG_EMPTY_FAV}</div>
+        <div class="empty-icon">${SVG.empty_fav}</div>
         <h3>Aucun favori</h3>
         <p>Ajoutez des films à votre liste pour les retrouver ici</p>
-        <a href="movies.html" class="empty-btn">${SVG_PLAY} Parcourir les films</a>
+        <a href="movies.html" class="empty-btn">${SVG.play} Parcourir les films</a>
       </div>`;
     return;
   }
+  
   grid.innerHTML = favorites.map(item => createCard(item, false)).join('');
 }
 
 // ============================================================
-// ✅ CREATE CARD
+// CREATE CARD
 // ============================================================
 function createCard(m, isHistory) {
   const params = new URLSearchParams({
@@ -964,10 +1289,11 @@ function createCard(m, isHistory) {
     detailPath: m.detailPath, desc: m.desc
   });
   const progress = isHistory && m.progress ? m.progress : null;
+  
   return `
-    <a href="player.html?${params.toString()}" class="card" data-id="${m.subjectId}">
+    <a href="player.html?${params.toString()}" class="card">
       <button class="remove-btn" onclick="event.preventDefault(); event.stopPropagation(); removeItem('${m.subjectId}', ${isHistory});">
-        ${SVG_REMOVE}
+        ${SVG.remove}
       </button>
       <div class="poster-wrap">
         <img class="poster" src="${m.poster}" alt="${m.title}" loading="lazy"
@@ -985,13 +1311,14 @@ function createCard(m, isHistory) {
 }
 
 // ============================================================
-// ✅ REMOVE ITEM
+// REMOVE ITEM
 // ============================================================
 function removeItem(subjectId, isHistory) {
-  const key = isHistory ? 'blastflix_history' : 'blastflix_favorites';
-  let items = isHistory ? getHistory() : getFavorites();
+  const key = isHistory ? STORAGE_KEYS.HISTORY : STORAGE_KEYS.FAVORITES;
+  let items = getStorage(key, []);
   items = items.filter(item => item.subjectId !== subjectId);
-  localStorage.setItem(key, JSON.stringify(items));
+  setStorage(key, items);
+  
   if (isHistory) renderHistory();
   else renderFavorites();
   updateStats();
@@ -999,11 +1326,11 @@ function removeItem(subjectId, isHistory) {
 }
 
 // ============================================================
-// ✅ CLEAR HISTORY
+// CLEAR HISTORY
 // ============================================================
 document.getElementById('clearHistoryBtn').addEventListener('click', () => {
   if (confirm('Effacer tout l\'historique ?')) {
-    localStorage.setItem('blastflix_history', '[]');
+    setStorage(STORAGE_KEYS.HISTORY, []);
     renderHistory();
     updateStats();
     showToast('Historique effacé');
@@ -1011,12 +1338,12 @@ document.getElementById('clearHistoryBtn').addEventListener('click', () => {
 });
 
 // ============================================================
-// ✅ CLEAR ALL DATA
+// CLEAR ALL
 // ============================================================
 function clearAllData() {
   if (confirm('Effacer TOUTES les données (historique + favoris) ?')) {
-    localStorage.setItem('blastflix_history', '[]');
-    localStorage.setItem('blastflix_favorites', '[]');
+    setStorage(STORAGE_KEYS.HISTORY, []);
+    setStorage(STORAGE_KEYS.FAVORITES, []);
     renderHistory();
     renderFavorites();
     updateStats();
@@ -1025,12 +1352,12 @@ function clearAllData() {
 }
 
 // ============================================================
-// ✅ EDIT USERNAME
+// EDIT USERNAME
 // ============================================================
 function editUsername() {
   const modal = document.getElementById('editModal');
   const input = document.getElementById('usernameInput');
-  input.value = userName;
+  input.value = getUsername();
   modal.classList.add('active');
   setTimeout(() => input.focus(), 100);
 }
@@ -1042,47 +1369,62 @@ function closeEditModal() {
 function saveUsername() {
   const input = document.getElementById('usernameInput');
   const newName = input.value.trim();
-  if (newName) {
-    localStorage.setItem('blastflix_username', newName);
+  if (newName && newName.length >= 2) {
+    localStorage.setItem(STORAGE_KEYS.USERNAME, newName);
+    syncWithAdmin();
     location.reload();
   } else {
-    closeEditModal();
+    showToast('Nom trop court');
   }
 }
 
-document.getElementById('usernameInput').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') saveUsername();
-});
+// ============================================================
+// EDIT PHONE
+// ============================================================
+function editPhone() {
+  const modal = document.getElementById('phoneModal');
+  const input = document.getElementById('phoneInput');
+  input.value = getPhone();
+  modal.classList.add('active');
+  setTimeout(() => input.focus(), 100);
+}
 
-document.getElementById('editModal').addEventListener('click', (e) => {
-  if (e.target.id === 'editModal') closeEditModal();
-});
+function closePhoneModal() {
+  document.getElementById('phoneModal').classList.remove('active');
+}
+
+function savePhone() {
+  const input = document.getElementById('phoneInput');
+  const newPhone = input.value.trim().replace(/\D/g, '');
+  if (newPhone.length >= 8) {
+    localStorage.setItem(STORAGE_KEYS.PHONE, newPhone);
+    syncWithAdmin();
+    location.reload();
+  } else {
+    showToast('Numéro invalide (min 8 chiffres)');
+  }
+}
 
 // ============================================================
-// ✅ COPY USER ID
+// COPY USER ID
 // ============================================================
 function copyUserId() {
+  const userId = getUserId();
   if (navigator.clipboard) {
     navigator.clipboard.writeText(userId).then(() => {
       showToast('ID copié: ' + userId);
-    }).catch(() => fallbackCopy(userId));
+    }).catch(() => {
+      fallbackCopy(userId);
+      showToast('ID copié: ' + userId);
+    });
   } else {
     fallbackCopy(userId);
+    showToast('ID copié: ' + userId);
   }
 }
 
-function fallbackCopy(text) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  document.body.appendChild(ta);
-  ta.select();
-  document.execCommand('copy');
-  document.body.removeChild(ta);
-  showToast('Copié: ' + text);
-}
-
 // ============================================================
-// ✅ TABS
+// TABS
 // ============================================================
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -1090,14 +1432,145 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    
+    // Refresh orders lè w klike sou tab
+    if (tab.dataset.tab === 'orders') {
+      renderUserOrders();
+    }
   });
 });
 
 // ============================================================
-// ✅ SISTÈM REWARDS
+// RENDER USER ORDERS
+// ============================================================
+function renderUserOrders() {
+  const container = document.getElementById('userOrdersList');
+  const activeContainer = document.getElementById('activePlanContainer');
+  
+  const orders = getStorage(STORAGE_KEYS.ORDERS, []);
+  const userPhone = getPhone();
+  
+  // Filtré kòmand itilizatè a pa phone
+  const userOrders = userPhone 
+    ? orders.filter(o => (o.phone || '').replace(/\D/g, '').includes(userPhone.replace(/\D/g, '')))
+    : [];
+  
+  // Plan aktif
+  const approvedOrder = userOrders.find(o => o.status === 'approved');
+  if (approvedOrder) {
+    const expires = localStorage.getItem(STORAGE_KEYS.PLAN_EXPIRES);
+    const expiresStr = expires 
+      ? new Date(expires).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' })
+      : '—';
+    
+    activeContainer.innerHTML = `
+      <div class="active-plan-card">
+        <div class="active-plan-header">
+          <div class="active-plan-icon">${SVG.check}</div>
+          <div>
+            <div class="active-plan-label">Plan actif</div>
+            <div class="active-plan-name">${approvedOrder.plan}</div>
+          </div>
+        </div>
+        <div class="active-plan-expires">
+          Expire le: <span>${expiresStr}</span>
+        </div>
+      </div>
+    `;
+  } else {
+    activeContainer.innerHTML = '';
+  }
+  
+  // Si pa gen phone → montre envit
+  if (!userPhone) {
+    container.innerHTML = `
+      <div class="empty" style="grid-column:1/-1; padding:40px 20px;">
+        <div class="empty-icon" style="width:80px; height:80px;">
+          ${SVG.phone}
+        </div>
+        <h3 style="font-size:15px;">Numéro requis</h3>
+        <p>Ajoutez votre numéro Natcash dans les paramètres pour voir vos commandes</p>
+        <button class="empty-btn" onclick="editPhone()" style="margin-top:8px;">
+          ${SVG.phone} Ajouter mon numéro
+        </button>
+      </div>
+    `;
+    return;
+  }
+  
+  // Si pa gen kòmand
+  if (userOrders.length === 0) {
+    container.innerHTML = `
+      <div class="empty" style="grid-column:1/-1; padding:40px 20px;">
+        <div class="empty-icon" style="width:80px; height:80px;">
+          ${SVG.empty_orders}
+        </div>
+        <h3 style="font-size:15px;">Aucune commande</h3>
+        <p>Souscrivez à un plan VIP pour débloquer tout le catalogue</p>
+        <a href="payment.html" class="empty-btn" style="margin-top:8px;">
+          ${SVG.crown} Payer maintenant
+        </a>
+      </div>
+    `;
+    return;
+  }
+  
+  // Afiche kòmand yo
+  const statusMap = {
+    pending: { class: 'pending', icon: SVG.clock, label: 'En attente', notice: '⏳ Vérification en cours — Vous serez notifié dans les 24h' },
+    approved: { class: 'approved', icon: SVG.check, label: 'Approuvée', notice: '✓ Plan activé — Profitez de votre abonnement !' },
+    rejected: { class: 'rejected', icon: SVG.x, label: 'Rejetée', notice: '✗ Preuve non valide — Contactez le support WhatsApp' }
+  };
+  
+  container.innerHTML = userOrders.map(order => {
+    const status = order.status || 'pending';
+    const cfg = statusMap[status];
+    const date = new Date(order.date || Date.now());
+    const dateStr = date.toLocaleDateString('fr-FR', { 
+      day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' 
+    });
+    
+    return `
+      <div class="order-card-profile ${cfg.class}">
+        <div class="status-bar"></div>
+        <div class="order-header-profile">
+          <div>
+            <div class="order-id-profile">${order.id || 'N/A'}</div>
+            <div class="order-plan-profile">
+              ${order.plan}
+              <span class="price">${(order.price || 0).toLocaleString('fr-FR')} HTG</span>
+            </div>
+            <div class="order-date-profile">${dateStr}</div>
+          </div>
+          <div class="order-status-profile ${cfg.class}">
+            ${cfg.label}
+          </div>
+        </div>
+        <div class="order-details-profile">
+          <div class="order-detail-mini">
+            <span class="label">Numéro:</span>
+            <span class="value cyan">${order.phone || '—'}</span>
+          </div>
+          <div class="order-detail-mini">
+            <span class="label">Preuve:</span>
+            <span class="value ${order.proof ? 'green' : 'red'}">
+              ${order.proof ? '✓ Fournie' : '✗ Manquante'}
+            </span>
+          </div>
+        </div>
+        <div class="order-notice ${cfg.class}">
+          ${cfg.notice}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// REWARDS
 // ============================================================
 function getOrCreateInviteCode() {
-  let code = localStorage.getItem('blastflix_invite_code');
+  let code = localStorage.getItem(STORAGE_KEYS.INVITE_CODE);
   if (!code) {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let randomCode = '';
@@ -1105,24 +1578,19 @@ function getOrCreateInviteCode() {
       randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     code = 'BLST' + randomCode;
-    localStorage.setItem('blastflix_invite_code', code);
+    localStorage.setItem(STORAGE_KEYS.INVITE_CODE, code);
   }
   return code;
 }
 
 function getRewards() {
-  let rewards = localStorage.getItem('blastflix_rewards');
-  if (!rewards) {
-    rewards = { totalInvites: 0, totalPoints: 0, invitedFriends: [], usedCodes: [] };
-    localStorage.setItem('blastflix_rewards', JSON.stringify(rewards));
-  } else {
-    rewards = JSON.parse(rewards);
-  }
-  return rewards;
+  return getStorage(STORAGE_KEYS.REWARDS, { 
+    totalInvites: 0, totalPoints: 0, invitedFriends: [], usedCodes: [] 
+  });
 }
 
 function saveRewards(rewards) {
-  localStorage.setItem('blastflix_rewards', JSON.stringify(rewards));
+  setStorage(STORAGE_KEYS.REWARDS, rewards);
 }
 
 function renderRewards() {
@@ -1146,8 +1614,7 @@ function renderRewards() {
   document.getElementById('progressText').textContent = `${rewards.totalInvites % 5}/5`;
   
   const list = document.getElementById('invitedList');
-  const count = document.getElementById('invitesCount');
-  count.textContent = rewards.invitedFriends.length;
+  document.getElementById('invitesCount').textContent = rewards.invitedFriends.length;
   
   if (rewards.invitedFriends.length === 0) {
     list.innerHTML = '<div class="empty-invites">Aucun ami invité pour le moment</div>';
@@ -1168,11 +1635,10 @@ function renderRewards() {
 function copyInviteCode() {
   const code = getOrCreateInviteCode();
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(code).then(() => {
-      showToast('Code copié: ' + code);
-    }).catch(() => fallbackCopy(code));
+    navigator.clipboard.writeText(code).then(() => showToast('Code copié: ' + code));
   } else {
     fallbackCopy(code);
+    showToast('Code copié: ' + code);
   }
 }
 
@@ -1187,8 +1653,7 @@ function useInviteCode() {
     return;
   }
   
-  const myCode = getOrCreateInviteCode();
-  if (code === myCode) {
+  if (code === getOrCreateInviteCode()) {
     status.textContent = '❌ Vous ne pouvez pas utiliser votre propre code';
     status.className = 'invite-hint error';
     return;
@@ -1223,33 +1688,76 @@ function shareInvite(platform) {
       navigator.clipboard.writeText(message).then(() => showToast('Lien copié !'));
     } else {
       fallbackCopy(message);
+      showToast('Lien copié !');
     }
   } else if (platform === 'more') {
     if (navigator.share) {
       navigator.share({ title: 'BLAST FLIX', text: message, url: window.location.origin }).catch(() => {});
     } else {
       fallbackCopy(message);
+      showToast('Lien copié !');
     }
   }
 }
 
 // ============================================================
-// ✅ TOAST
+// MODAL CLOSE ON OUTSIDE CLICK
 // ============================================================
-function showToast(text) {
-  const toast = document.getElementById('toast');
-  document.getElementById('toastText').textContent = text;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
-}
+document.getElementById('editModal').addEventListener('click', (e) => {
+  if (e.target.id === 'editModal') closeEditModal();
+});
+
+document.getElementById('phoneModal').addEventListener('click', (e) => {
+  if (e.target.id === 'phoneModal') closePhoneModal();
+});
+
+document.getElementById('usernameInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') saveUsername();
+});
+
+document.getElementById('phoneInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') savePhone();
+});
 
 // ============================================================
-// ✅ INIT
+// INITIALISATION
 // ============================================================
-renderHistory();
-renderFavorites();
-renderRewards();
-updateStats();
+(function init() {
+  const userId = getUserId();
+  const userName = getUsername();
+  const userPhone = getPhone();
+  
+  // Update UI
+  document.getElementById('userId').textContent = '#' + userId;
+  document.getElementById('settingsId').textContent = '#' + userId;
+  document.getElementById('userName').textContent = userName;
+  document.getElementById('settingsName').textContent = userName;
+  document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+  document.getElementById('settingsPhone').textContent = userPhone || 'Non enregistré';
+  
+  // Sync ak admin
+  syncWithAdmin();
+  
+  // Update plan badge
+  updatePlanBadge();
+  
+  // Render
+  renderHistory();
+  renderFavorites();
+  renderUserOrders();
+  renderRewards();
+  updateStats();
+  
+  // Refresh plan badge chak 10 segond (si admin apwouve pandan w sou paj la)
+  setInterval(() => {
+    updatePlanBadge();
+    const currentPlan = localStorage.getItem(STORAGE_KEYS.PLAN);
+    if (currentPlan && currentPlan !== 'Gratuit') {
+      // Plan chanje → refresh orders
+      renderUserOrders();
+    }
+  }, 10000);
+})();
 </script>
 </body>
   </html>
